@@ -1,0 +1,1268 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>50대 그룹 경영진 지도</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: 공시 원장(ledger). 한 단, 위에 고정 도구 띠(내 그룹·검색·테마), 표가 주인공이고 차트는 표를 돕는다.
+   비교의 기준(전체·중앙값·상위 10대·내 그룹)은 어디서나 같은 자리, 같은 모양으로 나온다. */
+@font-face {
+  font-family: "Pretendard Variable";
+  font-weight: 45 920; font-style: normal; font-display: swap;
+  src: url("fonts/PretendardVariable.woff2") format("woff2-variations"), url("fonts/PretendardVariable.woff2") format("woff2");
+}
+:root {
+  --bg: #f3f5f8;
+  --surface: #ffffff;
+  --surface-2: #f8f9fb;
+  --ink: #121722;
+  --ink-2: #3f4757;
+  --muted: #5d6576;
+  --faint: #8a92a3;
+  --line: #dfe3ea;
+  --line-2: #edf0f4;
+  --accent: #23408e;
+  --accent-ink: #ffffff;
+  --accent-soft: #e8edf8;
+  --mine: #fff4d6;
+  --mine-line: #c98a00;
+  --seal: #a8352a;
+  --seal-soft: #fbecea;
+  --ev-new: #2a6fc9;
+  --ev-up: #0f8a5f;
+  --ev-out: #8a92a3;
+  --bar: #6f7f9f;
+  --o1: #6a4fb0; --o2: #a28bd8; --o3: #b07a1e; --o4: #c25b43; --o5: #2f8a7f; --o6: #7d9a3a; --o7: #8a92a3; --o8: #c9ced8;
+  --font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1117; --surface: #161a22; --surface-2: #1b2029; --ink: #eaedf3; --ink-2: #bcc3d0; --muted: #9aa3b4; --faint: #737c8e;
+    --line: #2b313d; --line-2: #222833; --accent: #93abed; --accent-ink: #0e1117; --accent-soft: #1d2640; --mine: #3a2f12; --mine-line: #e0a82e;
+    --seal: #ec8b80; --seal-soft: #3a1f1c; --ev-new: #5b9cf0; --ev-up: #39b886; --ev-out: #7d8699; --bar: #8996b3; color-scheme: dark;
+    --o1: #9a84e0; --o2: #c3b4ee; --o3: #d6a243; --o4: #e08470; --o5: #4fb3a6; --o6: #a3c25a; --o7: #7d8699; --o8: #4a5161;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1117; --surface: #161a22; --surface-2: #1b2029; --ink: #eaedf3; --ink-2: #bcc3d0; --muted: #9aa3b4; --faint: #737c8e;
+  --line: #2b313d; --line-2: #222833; --accent: #93abed; --accent-ink: #0e1117; --accent-soft: #1d2640; --mine: #3a2f12; --mine-line: #e0a82e;
+  --seal: #ec8b80; --seal-soft: #3a1f1c; --ev-new: #5b9cf0; --ev-up: #39b886; --ev-out: #7d8699; --bar: #8996b3; color-scheme: dark;
+    --o1: #9a84e0; --o2: #c3b4ee; --o3: #d6a243; --o4: #e08470; --o5: #4fb3a6; --o6: #a3c25a; --o7: #7d8699; --o8: #4a5161;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.6;
+  word-break: keep-all; overflow-wrap: anywhere; font-feature-settings: "ss06"; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+button { font: inherit; color: inherit; }
+.num, td.n, .kpi b, .chart text { font-variant-numeric: tabular-nums; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- 상단 도구 띠 ---------- */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 6; background: var(--surface); border-bottom: 1px solid var(--line); }
+.bar-in { max-width: 1200px; margin: 0 auto; padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; gap: 10px 14px; align-items: center; flex-wrap: wrap; }
+.brand { font-weight: 800; font-size: 17px; letter-spacing: -.02em; color: var(--ink); white-space: nowrap; }
+.brand:hover { text-decoration: none; }
+.nav { display: flex; gap: 2px; }
+.nav a { font-size: 13.5px; color: var(--ink-2); padding: 5px 9px; border-radius: 6px; }
+.nav a:hover { background: var(--surface-2); text-decoration: none; }
+.tools { display: flex; gap: 8px; align-items: center; margin-left: auto; flex: 1 1 420px; justify-content: flex-end; min-width: 0; }
+.mine-pick { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); white-space: nowrap; }
+select, input[type="search"] { font: inherit; font-size: 14px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--ink); min-width: 0; }
+.search { position: relative; flex: 1 1 220px; max-width: 360px; min-width: 150px; }
+.search input { width: 100%; background: var(--surface-2); }
+.search input:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+.iconbtn { border: 1px solid var(--line); background: var(--surface); border-radius: 7px; padding: 6px 9px; cursor: pointer; font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.iconbtn:hover { background: var(--surface-2); }
+.results { position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: var(--surface); border: 1px solid var(--line); border-radius: 9px;
+  box-shadow: 0 10px 28px rgba(10, 20, 40, .14); max-height: 62vh; overflow-y: auto; z-index: 8; min-width: 280px; }
+.results button { display: grid; grid-template-columns: 34px 1fr; gap: 2px 8px; width: 100%; text-align: left; padding: 8px 12px; border: 0; background: none; cursor: pointer; border-bottom: 1px solid var(--line-2); }
+.results button:hover, .results button.on { background: var(--accent-soft); }
+.results .tag { font-size: 11px; color: var(--muted); grid-row: span 2; padding-top: 2px; }
+.results .sub { color: var(--muted); font-size: 12px; }
+.prep { font-size: 12px; color: var(--muted); white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+.prep i { display: inline-block; width: 46px; height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; position: relative; }
+.prep i b { position: absolute; inset: 0 auto 0 0; background: var(--accent); }
+
+main { max-width: 1200px; margin: 0 auto; padding-block: 22px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; letter-spacing: -.02em; }
+h1 { font-size: clamp(25px, 3.4vw, 34px); line-height: 1.25; font-weight: 800; }
+h2 { font-size: 19px; font-weight: 750; }
+h3 { font-size: 14.5px; font-weight: 650; color: var(--ink); }
+.lede { color: var(--ink-2); margin: 8px 0 0; max-width: 70ch; }
+.eyebrow { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.chip { font-size: 12px; padding: 2px 9px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--ink-2); white-space: nowrap; }
+.chip b { font-weight: 650; color: var(--ink); }
+.crumb { font-size: 13px; color: var(--muted); display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
+.crumb a { color: var(--ink-2); }
+.headrow { display: flex; gap: 12px; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 12px; cursor: pointer; font-size: 13.5px; font-weight: 550; color: var(--ink); }
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.08); }
+.band { background: var(--seal-soft); color: var(--seal); border: 1px solid color-mix(in oklab, var(--seal) 30%, transparent); border-radius: 8px; padding: 9px 12px; font-size: 13.5px; }
+.band.info { background: var(--accent-soft); color: var(--ink-2); border-color: color-mix(in oklab, var(--accent) 25%, transparent); }
+
+/* ---------- KPI ---------- */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.kpi { background: var(--surface); padding: 14px 16px; display: grid; gap: 3px; align-content: start; min-width: 0; }
+.kpi > span:first-child { font-size: 12.5px; color: var(--muted); display: flex; gap: 4px; align-items: center; }
+.kpi b { font-size: 26px; font-weight: 750; letter-spacing: -.02em; line-height: 1.2; }
+.kpi b small { font-size: 14px; font-weight: 600; margin-left: 2px; color: var(--ink-2); }
+.kpi .cmp { font-size: 12.5px; color: var(--ink-2); }
+.kpi .cmp em { font-style: normal; font-weight: 650; color: var(--ink); }
+.kpi .rank { font-size: 12px; color: var(--muted); }
+.strip { margin-top: 4px; }
+.strip svg { display: block; width: 100%; height: 22px; }
+
+section.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; min-width: 0; }
+.panel-head { display: flex; gap: 8px 14px; align-items: baseline; flex-wrap: wrap; justify-content: space-between; margin-bottom: 12px; }
+.panel-head p { margin: 0; color: var(--muted); font-size: 13px; flex: 1 1 260px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
+.grid2 > * { min-width: 0; }
+.note { font-size: 12.5px; color: var(--muted); margin: 10px 0 0; }
+.note b { color: var(--ink-2); font-weight: 600; }
+
+/* ---------- 표 ---------- */
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--line); margin-bottom: 10px; }
+.tabs button { border: 0; background: none; padding: 8px 12px; font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.tbl { overflow: auto; max-height: 78vh; border: 1px solid var(--line-2); border-radius: 8px; }
+table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 13.5px; }
+th, td { padding: 7px 10px; border-bottom: 1px solid var(--line-2); text-align: left; vertical-align: top; background: var(--surface); }
+thead th { position: sticky; top: 0; z-index: 2; font-weight: 600; font-size: 12px; color: var(--muted); white-space: nowrap; border-bottom: 1px solid var(--line); }
+thead tr.grp th { top: 0; font-size: 11.5px; color: var(--ink-2); background: var(--surface-2); text-align: center; border-left: 1px solid var(--line); }
+thead tr.grp + tr th { top: 29px; }
+th.n, td.n { text-align: right; white-space: nowrap; }
+td.n .cov { display: block; white-space: normal; font-size: 11.5px; color: var(--muted); }
+th.gl, td.gl { border-left: 1px solid var(--line); }
+th .sortb { all: unset; cursor: pointer; display: inline-flex; gap: 3px; align-items: center; }
+th .sortb:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+th[aria-sort] .sortb { color: var(--accent); }
+th[aria-sort="ascending"] .sortb::after { content: "↑"; }
+th[aria-sort="descending"] .sortb::after { content: "↓"; }
+td.sticky, th.sticky { position: sticky; left: 0; z-index: 1; }
+thead th.sticky { z-index: 3; }
+tr.ref td { background: var(--surface-2); color: var(--ink-2); font-weight: 600; }
+tr.ref td.name { color: var(--ink); }
+tr.ref.last td { border-bottom: 2px solid var(--line); }
+tr.mine td { background: var(--mine); }
+tr.mine td.name { box-shadow: inset 3px 0 0 var(--mine-line); }
+tr.go { cursor: pointer; }
+tr.go:hover td { background: var(--accent-soft); }
+tr.small td { color: var(--muted); }
+tr.nodata td { color: var(--muted); font-size: 12.5px; }
+td.name { font-weight: 600; white-space: nowrap; }
+td.wrap { min-width: 200px; color: var(--ink-2); }
+.cellbar { display: inline-flex; align-items: center; justify-content: flex-end; gap: 7px; white-space: nowrap; }
+.cellbar i { display: block; height: 6px; border-radius: 0 3px 3px 0; background: var(--bar); opacity: .55; }
+.na { color: var(--muted); font-size: 12px; }
+.pill { display: inline-block; font-size: 11.5px; padding: 1px 7px; border-radius: 10px; background: var(--line-2); color: var(--ink-2); white-space: nowrap; }
+.pill.reg { background: var(--accent-soft); color: var(--accent); }
+.pill.org { background: transparent; border: 1px solid var(--line); }
+td.nw { white-space: nowrap; }
+.pill.warn { background: var(--seal-soft); color: var(--seal); font-weight: 600; }
+.tblbar { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 8px; }
+.tblbar .left { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tblbar .count { font-size: 12.5px; color: var(--muted); }
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--surface); padding: 8px 14px; border-radius: 8px; font-size: 13px; z-index: 30; }
+
+/* 정의 도움말 */
+.def { all: unset; cursor: help; display: inline-grid; place-items: center; width: 15px; height: 15px; border-radius: 50%; border: 1px solid var(--faint); color: var(--muted); font-size: 10px; font-weight: 700; line-height: 1; }
+.def:focus-visible { outline: 2px solid var(--accent); }
+.pop { position: fixed; z-index: 25; max-width: 320px; background: var(--ink); color: var(--surface); font-size: 12.5px; line-height: 1.55; padding: 9px 11px; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+.pop b { font-weight: 650; }
+
+/* ---------- 차트 ---------- */
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { font-size: 11px; fill: var(--muted); font-family: var(--font); }
+.chart .lbl { fill: var(--ink); font-weight: 650; }
+details.nums { margin-top: 8px; font-size: 13px; }
+details.nums summary { cursor: pointer; color: var(--accent); font-size: 12.5px; }
+.legend { display: flex; gap: 6px 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-2); margin-top: 8px; }
+.legend i { display: inline-block; width: 12px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.legend i.line { height: 0; border-top: 2px solid; border-radius: 0; vertical-align: 3px; }
+.legend i.dash { height: 0; border-top: 2px dashed; border-radius: 0; vertical-align: 3px; }
+.tip { position: fixed; z-index: 20; pointer-events: none; background: var(--ink); color: var(--surface); font-size: 12.5px; padding: 7px 10px; border-radius: 7px; line-height: 1.5; max-width: 280px; }
+.tip b { font-weight: 650; }
+.hbars { display: grid; gap: 6px; }
+.hb { display: grid; grid-template-columns: minmax(92px, 132px) 1fr auto; gap: 10px; align-items: center; font-size: 13px; }
+.hb .track { position: relative; height: 10px; background: var(--line-2); border-radius: 3px; }
+.hb .track i { position: absolute; inset: 0 auto 0 0; border-radius: 3px; background: var(--bar); }
+.hb .track u { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); opacity: .55; }
+.hb .v { font-variant-numeric: tabular-nums; color: var(--ink-2); white-space: nowrap; min-width: 92px; text-align: right; }
+.stack { display: flex; height: 22px; border-radius: 5px; overflow: hidden; gap: 2px; }
+.stack div { min-width: 2px; }
+.stackleg { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 4px 12px; font-size: 12.5px; margin-top: 10px; color: var(--ink-2); }
+.stackleg b { font-weight: 650; color: var(--ink); margin-left: 4px; font-variant-numeric: tabular-nums; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+
+.controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+.seg button { border: 0; background: var(--surface); color: var(--ink-2); padding: 6px 11px; cursor: pointer; font-size: 13px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+
+/* 인물 */
+.timeline { display: grid; }
+.tl-row { display: grid; grid-template-columns: 62px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line-2); }
+.tl-year { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; padding-top: 1px; }
+.tl-body { display: grid; gap: 4px; min-width: 0; }
+.tl-body .pos { font-weight: 650; }
+.tl-body .duty { color: var(--ink-2); font-size: 13.5px; }
+.evs { display: flex; gap: 6px; flex-wrap: wrap; }
+.ev { font-size: 11.5px; padding: 1px 8px; border-radius: 10px; border: 1px solid var(--line); color: var(--ink-2); }
+.ev.new { border-color: var(--ev-new); color: var(--ev-new); }
+.ev.up { border-color: var(--ev-up); color: var(--ev-up); }
+.ev.out { border-color: var(--ev-out); }
+.career { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 3px; font-size: 14px; }
+.career li { padding-left: 12px; position: relative; }
+.career li::before { content: ""; position: absolute; left: 0; top: .72em; width: 4px; height: 4px; border-radius: 50%; background: var(--faint); }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; font-size: 13.5px; margin: 0; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+
+/* 보고서 한 장 */
+.report { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 26px; display: grid; gap: 18px; }
+.report table td, .report table th { font-size: 13.5px; }
+.report .foot { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 3px; }
+
+.method { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; font-size: 13.5px; color: var(--ink-2); }
+.method h3 { margin-bottom: 6px; }
+.method ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+footer.site { max-width: 1200px; margin: 0 auto; padding-block: 18px 36px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  font-size: 12.5px; color: var(--muted); display: grid; gap: 4px; border-top: 1px solid var(--line); }
+.loading { color: var(--muted); font-size: 13.5px; padding: 14px 0; }
+.skel { display: grid; gap: 8px; }
+.skel i { display: block; height: 14px; border-radius: 4px; background: linear-gradient(90deg, var(--line-2), var(--surface-2), var(--line-2)); background-size: 200% 100%; animation: sh 1.4s infinite; }
+@keyframes sh { to { background-position: -200% 0; } }
+.empty { color: var(--muted); font-size: 13.5px; }
+
+@media (max-width: 720px) {
+  .tools { flex-basis: 100%; justify-content: flex-start; flex-wrap: wrap; }
+  .search { flex: 1 1 100%; max-width: none; order: 3; }
+  .prep { font-size: 0; }
+  .mine-pick span { display: none; }
+  .kpis { grid-template-columns: 1fr 1fr; }
+  .kpi b { font-size: 21px; }
+  section.panel { padding: 14px; }
+  .report { padding: 16px; }
+  .nav a:first-child { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+@page { size: A4 landscape; margin: 12mm; }
+@media print {
+  html:root, html:root:not([data-theme="light"]), html:root[data-theme="dark"], html:root[data-theme="light"] { --bg: #fff; --surface: #fff; --surface-2: #f6f7f9; --ink: #111; --ink-2: #333; --muted: #555; --faint: #888;
+    --line: #ccc; --line-2: #e5e5e5; --accent: #23408e; --accent-soft: #e8edf8; --mine: #fff4d6; --bar: #6f7f9f; color-scheme: light; }
+  .bar, footer.site, .actions, .tblbar, .tabs, .no-print, .def, details.nums { display: none !important; }
+  *, .num, td.n, .kpi b, .chart text, .hb .v, .tl-year { font-variant-numeric: normal !important; font-feature-settings: normal !important; }
+  body { background: #fff; }
+  main { padding: 0; }
+  .report { border: 0; padding: 0; }
+  .tbl { max-height: none; overflow: visible; border: 0; }
+  thead th, td.sticky, th.sticky { position: static !important; }
+  tr, .grid2 > *, .report .foot { break-inside: avoid; }
+  .report { display: block; }
+  .report > * + * { margin-top: 8px; }
+  .report .grid2 { display: flex !important; gap: 14px; }
+  .report .grid2 > * { flex: 1 1 0; }
+  .report .chart svg { max-height: 120px !important; width: auto; max-width: 100%; }
+  .report .lede li { line-height: 1.35; }
+  .report { line-height: 1.3; }
+  .report table th, .report table td { padding-top: 1px !important; padding-bottom: 1px !important; line-height: 1.25; font-size: 10px !important; }
+  .report td.n .cov { font-size: 9px; }
+  .report .na { font-size: inherit; }
+  .report h3 { font-size: 12px; margin-bottom: 2px !important; }
+  .report .lede { max-width: none; }
+  body { font-size: 11px; }
+  .report { gap: 8px; }
+  .report h1 { font-size: 20px; }
+  .report .lede { font-size: 11.5px; margin-top: 4px !important; }
+  .report th, .report td { padding: 2px 6px; font-size: 10.5px; }
+  .report .grid2 { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .report .chart svg { max-height: 150px; }
+  .report .legend, .report .stackleg { font-size: 10px; margin-top: 3px; }
+  .report .foot { font-size: 9.5px; padding-top: 6px; }
+  .eyebrow .chip { font-size: 10px; }
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="bar-in">
+    <a class="brand" href="#home">50대 그룹 경영진 지도</a>
+    <nav class="nav" aria-label="주요 화면"><a href="#home">그룹 비교</a><a href="#method">자료와 기준</a></nav>
+    <div class="tools">
+      <label class="mine-pick" for="mine"><span>내 그룹</span><select id="mine" aria-label="내 그룹 선택"><option value="">내 그룹 고르기</option></select></label>
+      <div class="search">
+        <input id="q" type="search" placeholder="임원 이름, 회사, 그룹 검색" autocomplete="off" aria-label="임원 이름, 회사, 그룹 검색" aria-controls="results" role="combobox" aria-expanded="false" aria-autocomplete="list">
+        <div class="results" id="results" role="listbox" hidden></div>
+      </div>
+      <span class="prep" id="prep" hidden></span>
+      <button class="iconbtn" id="theme" type="button" aria-label="밝게, 어둡게 전환">밝게·어둡게</button>
+    </div>
+  </div>
+</header>
+<main id="app"><div class="skel" aria-label="불러오는 중"><i style="width:40%"></i><i style="width:70%"></i><i style="width:55%"></i></div></main>
+<footer class="site" id="foot"></footer>
+<div class="tip" id="tip" hidden></div>
+<div class="pop" id="pop" role="tooltip" hidden></div>
+
+<script>
+(() => {
+"use strict";
+const $ = s => document.querySelector(s);
+const app = $("#app"), tip = $("#tip"), pop = $("#pop");
+let CORE = null, PEOPLE = null, peopleLoading = null;
+const byId = {}, byRank = {}, byName = {};
+let personByCompany = null, personById = null, evIndex = null;
+
+/* ---------- 저장소: 개인 편의용, 실패해도 동작 ---------- */
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} },
+};
+
+/* ---------- 유틸 ---------- */
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = n => n == null || n === "" || Number.isNaN(+n) ? "–" : Number(n).toLocaleString("ko-KR");
+const f1 = n => n == null || n === "" ? "–" : Number(n).toFixed(1);
+const pct = n => n == null || n === "" ? "–" : `${Number(n).toFixed(1)}%`;
+const eok = mn => mn == null || mn === "" ? "–" : `${(Number(mn) / 100).toFixed(2)}억`;
+const sum = a => a.reduce((x, y) => x + (y || 0), 0);
+const uid = p => p + Math.random().toString(36).slice(2, 8);
+const after = fn => setTimeout(fn);
+const M = () => CORE.meta;
+const YEARS = () => M().years.map(Number);
+const FLOW_END = () => +M().flow_end;
+const isPartial = y => !!M().partial?.[String(y)];
+const ylab = y => isPartial(y) ? `${y}년 ${+M().partial[String(y)].slice(5, 7)}월 말` : `${y}년 말`;
+const yshort = y => isPartial(y) ? `${String(y).slice(2)}.${+M().partial[String(y)].slice(5, 7)}` : String(y).slice(2);
+const ASOF = () => M().as_of.replace(/-/g, ".");
+const xpos = y => isPartial(y) ? y - 1 + (+M().partial[String(y)].slice(5, 7)) / 12 : y;   // 반기 점은 반년 간격에
+const mineRank = () => +(store.get("mineGroup") || 0) || null;
+
+function toast(msg) { const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; t.setAttribute("role", "status"); document.body.append(t); setTimeout(() => t.remove(), 2200); }
+function showTip(e, html) {
+  tip.innerHTML = html; tip.hidden = false;
+  const r = tip.getBoundingClientRect();
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if (x + r.width > innerWidth - 8) x = e.clientX - r.width - 14;
+  if (y + r.height > innerHeight - 8) y = e.clientY - r.height - 14;
+  tip.style.left = `${x}px`; tip.style.top = `${y}px`;
+}
+const hideTip = () => { tip.hidden = true; };
+
+/* ---------- 용어 정의 (ⓘ) ---------- */
+const DEF = {
+  executives: "<b>경영진</b> = 사내이사 + 미등기 임원 + 집행임원. 사외이사·기타비상무이사·감사는 뺍니다. 같은 그룹 계열사를 겸직하면 1명으로 셉니다.",
+  avg_age: "<b>평균 나이</b> = 기준 연도 − 출생연도의 평균. 만 나이와 최대 1세 차이가 납니다.",
+  female: "<b>여성 비율</b> = 여성 경영진 ÷ 경영진.",
+  b80: "<b>80년대생</b> = 1980–1989년생 경영진 ÷ 경영진.",
+  rank_hidden: "<b>직급 비공개</b> = 상무·전무 같은 직급 대신 '임원', '리더', 보직명만 공시된 경영진 비율. 이 비율이 높으면 승진을 직급으로 셀 수 없습니다.",
+  new_rate: "<b>신규율</b> = 해마다 (그해 신규 선임 ÷ 전년 말 경영진)의 평균, 2020–2025. 신규는 전년 그룹 명단에 없던 사람입니다. 직급 개편, 공시 범위 확대, 회사 상장·편입으로 생긴 등장은 빼고 셉니다.",
+  exit_rate: "<b>이탈률</b> = 해마다 (그해 명단에서 빠진 사람 ÷ 전년 말 경영진)의 평균, 2020–2025. 퇴임과 비상장 계열사로의 이동이 섞여 있습니다.",
+  new_age: "<b>신규 임원 나이</b> = 2020–2025년 신규 선임 시점 나이의 평균(신규 10명 이상인 그룹).",
+  pay: "<b>미등기 임원 평균 보수</b> = 사업보고서 '미등기임원 보수 현황'의 연간 급여 총액 ÷ 인원(근로소득 기준, 2025년).",
+  ext_hire: "<b>외부 경력 확인 비율</b> = 2020–2025 신규 임원 중 출신을 판단할 수 있는 사람 가운데, 공시 경력에 외부 경력(관료·법조·학계·다른 그룹·외국계·외부 회사)이 나오는 비율. 경력이 한 줄뿐이라 판단할 수 없는 사람은 분모에서 빼고, 판단 가능한 사람이 신규의 절반 미만이거나 30명 미만이면 ‘근거 부족’으로 두고 순위를 매기지 않습니다. 외부 영입 전체를 센 값이 아닙니다. 값이 0%나 100%면 편입 전 계열사 경력을 외부로 판정했을 수 있어 ‘검수 필요’로 두고 비교하지 않습니다.",
+  out_ratio: "<b>사외이사 비율</b> = 공시 회사 이사회(사내이사 + 사외이사 + 기타비상무이사) 중 사외이사 비율, 그룹 합계.",
+  law: "<b>법정 요건 점검</b> = 자산 2조 원 이상 비금융 상장사(2025년 말 별도 기준)가 공시 명단에서 두 요건을 채우는지 센 것. 사외이사 3명 이상·이사 총수의 과반(상법 제542조의8), 이사회 전원을 한 성별로 구성하지 않음(자본시장법 제165조의20). 대부분 충족이라 순위를 매기지 않고, 미충족 회사 수만 표시합니다. 금융회사는 금융회사지배구조법이 따로 적용돼 뺍니다.",
+  fem_dir: "<b>여성 등기이사 비율</b> = 공시 회사 등기이사(사내이사 + 사외이사 + 기타비상무이사) 중 여성의 비율, 의석 기준 그룹 합계. 등기이사 10명 미만이면 비교하지 않습니다.",
+  grad: "<b>석·박사</b> = 학력이 공시된 경영진 중 석사 이상. 다음 중 하나면 ‘근거 부족’으로 두고 순위를 매기지 않습니다. ① 학력 공시자가 30명 미만 ② 경영진의 절반 미만 ③ 학위 없이 학교 이름만 적혀 ‘학사(추정)’으로 둔 사람이 학력 공시자의 절반을 넘음(석·박사가 빠졌을 가능성).",
+  overseas: "<b>해외 학위</b> = 학력이 공시된 경영진 중 해외 대학 학위가 있는 사람.",
+  out_n: "<b>사외이사</b> = 기준일 현재 사외이사(2026년부터 '독립이사' 포함) 수.",
+  out_female: "<b>사외이사 여성</b> = 여성 사외이사 ÷ 사외이사.",
+  out_gov: "<b>관료·법조 출신 사외이사</b> = 공시 경력에 정부·공공기관(관료) 또는 법원·검찰·로펌(법조) 경력이 주 출신으로 나오는 사외이사 비율.",
+  out_acad: "<b>학계 출신 사외이사</b> = 주 출신이 교수·총장인 사외이사 비율.",
+};
+function defBtn(key) { return DEF[key] ? `<button class="def" type="button" data-def="${key}" aria-label="정의 보기">i</button>` : ""; }
+function bindDefs(root = document) {
+  root.querySelectorAll(".def[data-def]").forEach(b => {
+    const show = () => { pop.innerHTML = DEF[b.dataset.def]; pop.hidden = false; const r = b.getBoundingClientRect(), p = pop.getBoundingClientRect();
+      pop.style.left = `${Math.max(8, Math.min(innerWidth - p.width - 8, r.left - 20))}px`; pop.style.top = `${r.bottom + 6 + p.height > innerHeight ? r.top - p.height - 6 : r.bottom + 6}px`; };
+    const hide = () => { pop.hidden = true; };
+    b.addEventListener("mouseenter", show); b.addEventListener("mouseleave", hide);
+    b.addEventListener("focus", show); b.addEventListener("blur", hide);
+    b.addEventListener("click", e => { e.stopPropagation(); pop.hidden ? show() : hide(); });
+  });
+}
+
+/* ---------- 지표 정의: 값, 형식, 표본 조건 ---------- */
+const MET = {
+  executives: { t: "경영진", f: v => fmt(Math.round(v)), unit: "명", time: "now" },
+  avg_age: { t: "평균 나이", f: v => f1(v), unit: "세", time: "now", rate: true },
+  female: { t: "여성", f: v => pct(v), time: "now", rate: true, pp: true },
+  b80: { t: "80년대생", f: v => pct(v), time: "now", rate: true, pp: true },
+  rank_hidden: { t: "직급 비공개", f: v => pct(v), time: "now", rate: true, pp: true },
+  new_rate: { t: "신규율", f: v => pct(v), time: "flow", rate: true, pp: true },
+  exit_rate: { t: "이탈률", f: v => pct(v), time: "flow", rate: true, pp: true },
+  new_age: { t: "신규 임원 나이", f: v => f1(v), unit: "세", time: "flow", rate: true },
+  ext_hire: { t: "외부 경력 확인", f: v => pct(v), time: "flow", rate: true, pp: true },   // 판단 가능한 신규 임원 중 비율
+  out_ratio: { t: "사외이사 비율", f: v => pct(v), time: "now", rate: true, pp: true },
+  fem_dir: { t: "여성 등기이사", f: v => pct(v), time: "now", rate: true, pp: true },
+  law: { t: "법정 요건", f: v => v, time: "now", check: true },
+  pay: { t: "미등기 평균 보수", f: v => eok(v), time: "pay", rate: true },
+  grad: { t: "석·박사", f: v => pct(v), time: "now", rate: true, pp: true },
+  overseas: { t: "해외 학위", f: v => pct(v), time: "now", rate: true, pp: true },
+  out_n: { t: "사외이사", f: v => fmt(Math.round(v)), unit: "명", time: "now" },
+  out_female: { t: "사외이사 여성", f: v => pct(v), time: "now", rate: true, pp: true },
+  out_gov: { t: "관료·법조 출신", f: v => pct(v), time: "now", rate: true, pp: true },
+  out_acad: { t: "학계 출신", f: v => pct(v), time: "now", rate: true, pp: true },
+};
+const timeLabel = t => t === "now" ? `${ASOF()} 기준` : t === "flow" ? `${M().flow[0]}–${M().flow[1]} 연평균` : `${M().pay_year}년 연간`;
+function diffText(m, v, ref) {
+  if (v == null || ref == null) return "";
+  const d = v - ref, mm = MET[m];
+  if (Math.abs(d) < 0.05) return "전체와 같음";
+  const s = mm.pp ? `${Math.abs(d).toFixed(1)}%p` : m === "pay" ? `${Math.abs(d / 100).toFixed(2)}억` : `${Math.abs(d).toFixed(1)}${mm.unit || ""}`;
+  return `전체보다 ${s} ${d > 0 ? "높음" : "낮음"}`;
+}
+
+/* ---------- 차트 ---------- */
+function niceStep(v) { const p = 10 ** Math.floor(Math.log10(v)); const m = v / p; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p; }
+function numsTable(headers, rows) {   // 차트 아래 '숫자로 보기': 마우스 없이도 값을 읽고 복사할 수 있게
+  const id = uid("n");
+  after(() => document.querySelector(`[data-ncopy="${id}"]`)?.addEventListener("click", async () => {
+    const tsv = [headers, ...rows].map(r => r.join("\t")).join("\n") + `\n출처: DART 정기보고서·공정위 2026 지정, 50대 그룹 경영진 지도 (${ASOF()} 기준)`;
+    try { await navigator.clipboard.writeText(tsv); toast("숫자를 복사했습니다."); } catch { toast("복사가 막혀 있습니다. 표를 드래그해 복사해 주세요."); }
+  }));
+  return `<details class="nums no-print"><summary>숫자로 보기</summary><div class="tbl" style="max-height:none;margin-top:6px"><table><thead><tr>${headers.map((h, i) => `<th class="${i ? "n" : ""}">${esc(h)}</th>`).join("")}</tr></thead>
+    <tbody>${rows.map(r => `<tr>${r.map((c, i) => `<td class="${i ? "n" : ""}">${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
+    <button class="btn" type="button" data-ncopy="${id}" style="margin-top:6px">숫자 복사</button></details>`;
+}
+function niceMax(v) { if (v <= 5) return 5; const p = 10 ** Math.floor(Math.log10(v)); const m = v / p; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p; }
+
+/* 선 차트: series = [{name, values, color, dash, width}] / 반기 점은 반년 간격, 마지막 구간 점선, 속 빈 원 */
+function lineChart(series, { label = "", unit = "명", fmtv = fmt, zero = true, valueLabel = true, from = 0, to = 0 } = {}) {
+  const off = from ? Math.max(0, YEARS().indexOf(from)) : 0, end = to && YEARS().includes(to) ? YEARS().indexOf(to) + 1 : YEARS().length;
+  if (off || end < YEARS().length) series = series.map(s => ({ ...s, values: s.values.slice(off, end) }));
+  const ys = YEARS().slice(off, end), W = 560, H = 210, L = 46, R = 46, T = 14, B = 26;
+  const all = series.flatMap(s => s.values.filter(v => v != null));
+  if (!all.length) return `<p class="empty">추이를 그릴 자료가 없습니다.</p>`;
+  let lo = zero ? 0 : Math.min(...all), hi = Math.max(...all);
+  if (!zero) { const st = niceStep((hi - lo) / 3 || hi / 10 || 1); lo = Math.max(0, Math.floor((lo - st * 0.3) / st) * st); hi = Math.ceil((hi + st * 0.3) / st) * st; }
+  const max = zero ? niceMax(hi * 1.08) : hi, min = lo;
+  const x0 = xpos(ys[0]), x1 = xpos(ys[ys.length - 1]);
+  const x = yr => L + (xpos(yr) - x0) / (x1 - x0) * (W - L - R);
+  const y = v => T + (1 - (v - min) / (max - min)) * (H - T - B);
+  const ticks = [0, .5, 1].map(f => min + (max - min) * f);
+  let out = ticks.map(t => `<line x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line-2)"/><text x="${L - 8}" y="${y(t) + 4}" text-anchor="end">${fmtv(unit === "명" ? Math.round(t) : Math.round(t * 10) / 10)}</text>`).join("");
+  out += ys.map(yr => `<text x="${x(yr)}" y="${H - 7}" text-anchor="middle">${yshort(yr)}</text>`).join("");
+  series.forEach((s, si) => {
+    const pts = s.values.map((v, i) => [ys[i], v]).filter(p => p[1] != null);
+    if (pts.length < 1) return;
+    const full = pts.filter(p => !isPartial(p[0])), part = pts.filter(p => isPartial(p[0]));
+    const d = full.map((p, i) => `${i ? "L" : "M"}${x(p[0])},${y(p[1])}`).join("");
+    if (si === 0 && zero && full.length > 1) out += `<path d="${d}L${x(full.at(-1)[0])},${y(min)}L${x(full[0][0])},${y(min)}Z" fill="${s.color}" fill-opacity=".09"/>`;
+    out += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.width || 2}" ${s.dash ? 'stroke-dasharray="5 4"' : ""} stroke-linejoin="round"/>`;
+    if (part.length && full.length) out += `<path d="M${x(full.at(-1)[0])},${y(full.at(-1)[1])}L${x(part[0][0])},${y(part[0][1])}" fill="none" stroke="${s.color}" stroke-width="${s.width || 2}" stroke-dasharray="3 3"/>`;
+    const last = pts.at(-1);
+    out += `<circle cx="${x(last[0])}" cy="${y(last[1])}" r="4" fill="${isPartial(last[0]) ? "var(--surface)" : s.color}" stroke="${s.color}" stroke-width="2"/>`;
+    if (valueLabel && (si === 0 || series.length < 3)) out += `<text class="lbl" x="${x(last[0]) + 8}" y="${y(last[1]) + 4}">${fmtv(last[1])}</text>`;
+  });
+  const band = (W - L - R) / (ys.length - 1);
+  out += ys.map((yr, i) => `<rect class="hit" data-i="${i}" x="${x(yr) - band / 2}" y="${T}" width="${band}" height="${H - T - B}" fill="transparent"/>`).join("");
+  out += `<line class="cross" y1="${T}" y2="${H - B}" stroke="var(--faint)" stroke-dasharray="2 3" style="display:none"/>`;
+  const id = uid("l");
+  after(() => {
+    const el = document.getElementById(id); if (!el) return;
+    const ln = el.querySelector(".cross");
+    el.querySelectorAll(".hit").forEach(h => {
+      const i = +h.dataset.i, yr = ys[i];
+      const move = e => { ln.setAttribute("x1", x(yr)); ln.setAttribute("x2", x(yr)); ln.style.display = "";
+        showTip(e, `${ylab(yr)}${isPartial(yr) ? " (반기)" : ""}<br>` + series.map(s => `<span style="color:${s.color === "var(--faint)" ? "inherit" : "inherit"}">${esc(s.name)}</span> <b>${s.values[i] == null ? "–" : fmtv(s.values[i])}${unit === "명" ? "명" : ""}</b>`).join("<br>")); };
+      h.addEventListener("mousemove", move); h.addEventListener("mouseleave", () => { ln.style.display = "none"; hideTip(); });
+    });
+  });
+  const leg = series.length > 1 ? `<div class="legend">${series.map(s => `<span><i class="${s.dash ? "dash" : "line"}" style="border-color:${s.color}"></i>${esc(s.name)}</span>`).join("")}</div>` : "";
+  const nums = numsTable(["시점", ...series.map(s => s.name)], ys.map((yr, i) => [ylab(yr), ...series.map(s => s.values[i] == null ? "–" : fmtv(s.values[i]))]).filter(r => r.slice(1).some(v => v !== "–")));
+  return `<div class="chart" id="${id}"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}">${out}</svg>${leg}${nums}</div>`;
+}
+
+/* 신규·승진(0선 위) / 이탈(0선 아래) 발산형 막대 + 순증 선. 직급 비공개가 크면 승진은 빗금(집계 불가) */
+function flowChart(ev, heads, { hidden = null, partialUp = false } = {}) {
+  const ys = YEARS().filter(y => y > YEARS()[0] && y <= FLOW_END());
+  const idx = ys.map(y => YEARS().indexOf(y));
+  const nw = idx.map(i => ev["신규"][i] || 0), up = idx.map(i => ev["승진"][i] || 0), ot = idx.map(i => ev["이탈"][i] || 0);
+  const noUpY = idx.map(i => hidden ? (hidden[i] || 0) >= 30 : false);   // 그해 직급 비공개가 30% 이상이면 승진을 셀 수 없다
+  const anyNoUp = noUpY.some(Boolean);
+  const top = niceMax(Math.max(1, ...nw.map((v, j) => Math.max(v, noUpY[j] ? 0 : up[j])))), bot = niceMax(Math.max(1, ...ot));
+  const W = 560, H = 230, L = 46, R = 10, T = 12, B = 26;
+  const y0 = T + (H - T - B) * top / (top + bot);
+  const sy = v => (H - T - B) * v / (top + bot);
+  const band = (W - L - R) / ys.length, bw = Math.min(16, (band - 12) / 2);
+  const hatchId = uid("h");
+  let out = `<defs><pattern id="${hatchId}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="var(--surface)"/><line x1="0" y1="0" x2="0" y2="5" stroke="var(--faint)" stroke-width="2"/></pattern></defs>`;
+  out += `<line x1="${L}" x2="${W - R}" y1="${T}" y2="${T}" stroke="var(--line-2)"/><text x="${L - 8}" y="${T + 4}" text-anchor="end">${fmt(top)}</text>`;
+  out += `<line x1="${L}" x2="${W - R}" y1="${H - B}" y2="${H - B}" stroke="var(--line-2)"/><text x="${L - 8}" y="${H - B + 4}" text-anchor="end">−${fmt(bot)}</text>`;
+  out += `<line x1="${L}" x2="${W - R}" y1="${y0}" y2="${y0}" stroke="var(--line)"/><text x="${L - 8}" y="${y0 + 4}" text-anchor="end">0</text>`;
+  const net = [];
+  ys.forEach((yr, j) => {
+    const cx = L + band * j + band / 2, xa = cx - bw - 1, xb = cx + 1;
+    if (noUpY[j]) out += `<rect x="${cx - band / 2 + 2}" y="${T}" width="${band - 4}" height="${H - T - B}" fill="url(#${hatchId})" opacity=".35"/>`;
+    out += `<text x="${cx}" y="${H - 8}" text-anchor="middle">${yshort(yr)}</text>`;
+    const rUp = (xx, h, fill) => h <= 0 ? "" : `<path d="M${xx},${y0}V${y0 - h + Math.min(3, h)}Q${xx},${y0 - h} ${xx + Math.min(3, h)},${y0 - h}H${xx + bw - Math.min(3, h)}Q${xx + bw},${y0 - h} ${xx + bw},${y0 - h + Math.min(3, h)}V${y0}Z" fill="${fill}"/>`;
+    out += rUp(xa, sy(nw[j]), "var(--ev-new)");
+    if (!noUpY[j]) out += rUp(xb, sy(up[j]), "var(--ev-up)");
+    const ho = sy(ot[j]);
+    if (ho > 0) out += `<path d="M${xa},${y0}V${y0 + ho - Math.min(3, ho)}Q${xa},${y0 + ho} ${xa + Math.min(3, ho)},${y0 + ho}H${xa + bw * 2 + 2 - Math.min(3, ho)}Q${xa + bw * 2 + 2},${y0 + ho} ${xa + bw * 2 + 2},${y0 + ho - Math.min(3, ho)}V${y0}Z" fill="var(--ev-out)" fill-opacity=".75"/>`;
+    net.push([cx, y0 - sy(nw[j] - ot[j])]);
+    out += `<rect class="hit" data-j="${j}" x="${cx - band / 2}" y="${T}" width="${band}" height="${H - T - B}" fill="transparent"/>`;
+  });
+  out += `<path d="${net.map((p, i) => `${i ? "L" : "M"}${p[0]},${p[1]}`).join("")}" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-opacity=".7"/>` + net.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="2.5" fill="var(--ink)" fill-opacity=".8"/>`).join("");
+  const id = uid("f");
+  after(() => {
+    const el = document.getElementById(id); if (!el) return;
+    el.querySelectorAll(".hit").forEach(h => {
+      h.addEventListener("mousemove", e => { const j = +h.dataset.j, prev = heads ? heads[idx[j] - 1] : null;
+        showTip(e, `${ys[j]}년 (전년 말 경영진 ${fmt(prev)}명)<br>신규 선임 <b>${fmt(nw[j])}</b>${prev ? ` (${(100 * nw[j] / prev).toFixed(1)}%)` : ""}<br>승진 <b>${noUpY[j] ? "집계 불가(직급 비공개)" : fmt(up[j])}</b><br>이탈 <b>${fmt(ot[j])}</b><br>순증 <b>${nw[j] - ot[j] > 0 ? "+" : ""}${fmt(nw[j] - ot[j])}</b>`); });
+      h.addEventListener("mouseleave", hideTip);
+    });
+  });
+  return `<div class="chart" id="${id}"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="연도별 신규 선임, 승진, 이탈과 순증">${out}</svg>
+    <div class="legend"><span><i style="background:var(--ev-new)"></i>신규 선임</span><span><i style="background:var(--ev-up)"></i>승진${partialUp ? " (직급이 공시된 경영진만)" : ""}</span><span><i style="background:var(--ev-out)"></i>이탈 (0선 아래)</span><span><i class="line" style="border-color:var(--ink)"></i>순증(신규 − 이탈)</span>${anyNoUp ? `<span><i style="background:repeating-linear-gradient(45deg,var(--faint) 0 2px,transparent 2px 5px)"></i>빗금 = 그해 직급 비공개 30% 이상, 승진 집계 불가</span>` : ""}</div>
+    ${numsTable(["연도", "전년 말 경영진", "신규 선임", "승진", "이탈", "순증"], ys.map((yr, j) => [String(yr), heads ? fmt(heads[idx[j] - 1]) : "–", fmt(nw[j]), noUpY[j] ? "집계 불가" : fmt(up[j]), fmt(ot[j]), fmt(nw[j] - ot[j])]))}</div>`;
+}
+
+function ageHist(hist) {
+  const bins = [35, 40, 45, 50, 55, 60, 65, 70], W = 560, H = 180, L = 40, R = 8, T = 14, B = 26;
+  const v = bins.map(b => hist?.[b] || 0), tot = sum(v);
+  if (!tot) return `<p class="empty">자료가 없습니다.</p>`;
+  const max = niceMax(Math.max(...v)), band = (W - L - R) / bins.length, y = n => T + (1 - n / max) * (H - T - B);
+  let out = [0, .5, 1].map(f => `<line x1="${L}" x2="${W - R}" y1="${y(max * f)}" y2="${y(max * f)}" stroke="var(--line-2)"/><text x="${L - 8}" y="${y(max * f) + 4}" text-anchor="end">${fmt(max * f)}</text>`).join("");
+  bins.forEach((b, i) => {
+    const bx = L + band * i + 1, bw = band - 2, top = y(v[i]), h = y(0) - top, r = Math.min(3, h);
+    const lab = b === 35 ? "39세 이하" : b === 70 ? "70세 이상" : `${b}–${b + 4}`;
+    out += `<path d="M${bx},${y(0)}V${top + r}Q${bx},${top} ${bx + r},${top}H${bx + bw - r}Q${bx + bw},${top} ${bx + bw},${top + r}V${y(0)}Z" fill="var(--bar)"/>
+      ${v[i] ? `<text x="${bx + bw / 2}" y="${top - 4}" text-anchor="middle" class="lbl" style="font-size:10.5px">${(100 * v[i] / tot).toFixed(0)}%</text>` : ""}
+      <text x="${bx + bw / 2}" y="${H - 8}" text-anchor="middle">${lab}</text>
+      <rect class="hit" data-i="${i}" data-l="${lab}" x="${bx}" y="${T}" width="${bw}" height="${H - T - B}" fill="transparent"/>`;
+  });
+  const id = uid("a");
+  after(() => { const el = document.getElementById(id); if (!el) return;
+    el.querySelectorAll(".hit").forEach(h => { h.addEventListener("mousemove", e => { const i = +h.dataset.i; showTip(e, `${h.dataset.l} <b>${fmt(v[i])}명</b> (${(100 * v[i] / tot).toFixed(1)}%)`); }); h.addEventListener("mouseleave", hideTip); }); });
+  return `<div class="chart" id="${id}"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="나이 분포">${out}</svg></div>`;
+}
+
+/* 비교 막대: 항목별 내 값(막대) + 전체(눈금) */
+function compareBars(items, { suffix = "%", refName = "전체" } = {}) {
+  const max = Math.max(1, ...items.flatMap(i => [i.v || 0, i.ref || 0]));
+  return `<div class="hbars">${items.map(i => `<div class="hb"><span>${esc(i.k)}</span><span class="track" title="${esc(refName)} ${i.ref == null ? "–" : i.ref.toFixed(1) + suffix}"><i style="width:${100 * (i.v || 0) / max}%"></i>${i.ref == null ? "" : `<u style="left:${100 * i.ref / max}%"></u>`}</span>
+    <span class="v"><b>${i.v == null ? "–" : i.v.toFixed(1) + suffix}</b>${i.ref == null ? "" : ` · ${esc(refName)} ${i.ref.toFixed(1)}${suffix}`}</span></div>`).join("")}</div>
+    <p class="note">막대 = 이 그룹, 세로 눈금 = ${esc(refName)}.</p>`;
+}
+
+const RANK_ORDER = ["회장", "부회장", "사장", "부사장", "전무", "상무", "이사(미등기)", "이사대우", "직급비공개", "전문임원", "고문", "이사", "감사", "기타"];
+function rankStack(ranks) {
+  const items = RANK_ORDER.map(k => [k, ranks?.[k] || 0]).filter(x => x[1] > 0);
+  const tot = sum(items.map(x => x[1]));
+  if (!tot) return `<p class="empty">자료가 없습니다.</p>`;
+  const ord = ["회장", "부회장", "사장", "부사장", "전무", "상무", "이사(미등기)", "이사대우"];
+  const color = k => { const i = ord.indexOf(k); return i >= 0 ? `color-mix(in oklab, var(--accent) ${92 - i * 10}%, var(--surface))` : k === "직급비공개" ? "var(--faint)" : "color-mix(in oklab, var(--faint) 45%, var(--surface))"; };
+  const id = uid("r");
+  after(() => { const el = document.getElementById(id); if (!el) return;
+    el.querySelectorAll("[data-k]").forEach(d => { d.addEventListener("mousemove", e => showTip(e, `${d.dataset.k} <b>${fmt(+d.dataset.v)}명</b> (${(100 * d.dataset.v / tot).toFixed(1)}%)`)); d.addEventListener("mouseleave", hideTip); }); });
+  return `<div id="${id}"><div class="stack" role="img" aria-label="직급 구성">${items.map(([k, v]) => `<div data-k="${k}" data-v="${v}" style="flex:${v};background:${color(k)}"></div>`).join("")}</div>
+    <div class="stackleg">${items.map(([k, v]) => `<span><i class="sw" style="background:${color(k)}"></i>${k}<b>${fmt(v)}</b></span>`).join("")}</div></div>`;
+}
+const ORIGIN_GROUPS = [["관료·공공", "관료·공공"], ["법조", "법조"], ["학계", "학계"], ["회계·컨설팅", ["회계·세무", "컨설팅"]], ["다른 그룹·외국계", ["타 그룹 출신", "외국계 기업"]], ["외부 기업·기관", "외부 기업·기관"], ["그룹 내부·오너", ["그룹 내부", "오너일가"]], ["기타·판단 불가", ["군", "언론", "미상(경력 짧음)", "미상"]]];
+const ORIGIN_COLORS = ["var(--o1)", "var(--o2)", "var(--o3)", "var(--o4)", "var(--o5)", "var(--o6)", "var(--o7)", "var(--o8)"];
+function originStack(origin, n) {
+  if (!n) return `<p class="empty">사외이사가 없습니다.</p>`;
+  const items = ORIGIN_GROUPS.map(([k, keys], i) => [k, sum([].concat(keys).map(x => origin?.[x] || 0)), ORIGIN_COLORS[i]]).filter(x => x[1] > 0);
+  const id = uid("o");
+  after(() => { const el = document.getElementById(id); if (!el) return;
+    el.querySelectorAll("[data-k]").forEach(d => { d.addEventListener("mousemove", e => showTip(e, `${d.dataset.k} <b>${fmt(+d.dataset.v)}명</b> (${(100 * d.dataset.v / n).toFixed(1)}%)`)); d.addEventListener("mouseleave", hideTip); }); });
+  return `<div id="${id}"><div class="stack" role="img" aria-label="출신 구성">${items.map(([k, v, c]) => `<div data-k="${k}" data-v="${v}" style="flex:${v};background:${c}"></div>`).join("")}</div>
+    <div class="stackleg">${items.map(([k, v, c]) => `<span><i class="sw" style="background:${c}"></i>${k}<b>${fmt(v)}</b> <span style="color:var(--muted)">${(100 * v / n).toFixed(0)}%</span></span>`).join("")}</div></div>`;
+}
+/* 46개 그룹 사이 위치 띠 */
+function strip(m, g) {
+  const pts = CORE.groups.filter(x => x.has_data && !x.small && x.v[m] != null).map(x => [x, x.v[m]]);
+  if (pts.length < 5 || g.v[m] == null) return "";
+  const lo = Math.min(...pts.map(p => p[1])), hi = Math.max(...pts.map(p => p[1])), W = 200, xx = v => 6 + (hi === lo ? .5 : (v - lo) / (hi - lo)) * (W - 12);
+  const b = CORE.bench[m];
+  return `<div class="strip" aria-hidden="true"><svg viewBox="0 0 ${W} 22"><text x="0" y="21" style="font-size:9px;fill:var(--muted)">낮음</text><text x="${W}" y="21" text-anchor="end" style="font-size:9px;fill:var(--muted)">높음</text>${pts.map(p => `<circle cx="${xx(p[1])}" cy="11" r="2.6" fill="var(--faint)" fill-opacity=".55"/>`).join("")}
+    ${b.all != null ? `<line x1="${xx(b.all)}" x2="${xx(b.all)}" y1="3" y2="19" stroke="var(--ink)" stroke-width="1.5" stroke-opacity=".6"/>` : ""}
+    <circle cx="${xx(g.v[m])}" cy="11" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="1.5"/></svg></div>`;
+}
+
+/* ---------- 표: 정렬(키보드), 고정 기준 행, 열 그룹, 표본 작음 아래로, 복사·CSV ---------- */
+function table({ cols, rows, pinned = [], key, dir = -1, href, rowClass, groupsHdr, title = "표", note = "", stickyFirst = true, countLabel, limit = 0 }) {
+  const id = uid("t");
+  let k = key === null ? null : (key || cols[0].k), d = dir, lim = limit, lastSorted = rows;
+  const val = (c, r) => c.v ? c.v(r) : r[c.k];
+  const draw = () => {
+    const el = document.getElementById(id); if (!el) return;
+    const c = cols.find(c => c.k === k);
+    const sorted = !c ? rows.slice() : rows.slice().sort((a, b) => {   // key가 없으면 넘겨받은 순서를 지킨다
+      const sa = a._bottom ? 1 : 0, sb = b._bottom ? 1 : 0; if (sa !== sb) return sa - sb;   // 표본 작음·공시 없음은 항상 아래
+      const va = val(c, a), vb = val(c, b);
+      if (va == null || va === "") return 1; if (vb == null || vb === "") return -1;
+      return (va > vb ? 1 : va < vb ? -1 : 0) * d;
+    });
+    lastSorted = sorted;
+    const vis = lim ? sorted.slice(0, lim) : sorted;
+    const head = (groupsHdr ? `<tr class="grp">${groupsHdr.map(g => `<th colspan="${g.span}" class="${g.cls || ""}">${g.t}</th>`).join("")}</tr>` : "") +
+      "<tr>" + cols.map((c, i) => `<th class="${c.n ? "n" : ""} ${c.gl ? "gl" : ""} ${i === 0 && stickyFirst ? "sticky" : ""}" scope="col" ${c.k === k ? `aria-sort="${d > 0 ? "ascending" : "descending"}"` : ""}>
+        ${c.nosort ? c.t : `<button class="sortb" data-k="${c.k}" type="button">${c.t}</button>`}${c.def ? " " + defBtn(c.def) : ""}</th>`).join("") + "</tr>";
+    const rowHtml = (r, cls, h) => `<tr class="${cls}" ${h ? `data-href="${h}"` : ""}>` + cols.map((c, i) => `<td class="${c.n ? "n" : ""} ${c.gl ? "gl" : ""} ${c.cls || ""} ${i === 0 && stickyFirst ? "sticky" : ""}">${r._span && i === 1 ? `<span>${r._span}</span>` : r._span && i > 1 ? "" : (c.f ? c.f(r) : esc(val(c, r)))}</td>`).join("") + "</tr>";
+    el.querySelector("thead").innerHTML = head;
+    el.querySelector("tbody").innerHTML = pinned.map((r, i) => rowHtml(r, `ref ${r._mine ? "mine" : ""} ${i === pinned.length - 1 ? "last" : ""}`, r._href)).join("") +
+      vis.map(r => rowHtml(r, (rowClass ? rowClass(r) : "") + (href && href(r) ? " go" : ""), href ? href(r) : null)).join("");
+    el.querySelectorAll("button.sortb").forEach(b => b.addEventListener("click", () => {
+      const nk = b.dataset.k; d = nk === k ? -d : (cols.find(c => c.k === nk).n ? -1 : 1); k = nk; draw();
+      el.querySelector(`button.sortb[data-k="${nk}"]`)?.focus();
+    }));
+    el.querySelectorAll("tr[data-href]").forEach(tr => {
+      const go = () => { location.hash = tr.dataset.href; };
+      tr.addEventListener("click", e => { if (!e.target.closest("a,button")) go(); });
+      tr.addEventListener("keydown", e => { if (e.key === "Enter" && e.target === tr) go(); });
+    });
+    bindDefs(el);
+    const more = document.getElementById(id + "-more");
+    if (more) {
+      more.innerHTML = vis.length < sorted.length ? `<button class="btn" type="button">${fmt(Math.min(limit, sorted.length - vis.length))}명 더 보기</button> <span class="na">화면에는 ${fmt(vis.length)}/${fmt(sorted.length)}명. 정렬은 전체 기준이고, 표 복사·CSV도 전체 ${fmt(sorted.length)}명이 나갑니다.</span>` : "";
+      more.querySelector("button")?.addEventListener("click", () => { lim += limit; draw(); });
+    }
+  };
+  const exportRows = () => {
+    const hdr = cols.map(c => c.x || c.t.replace(/<[^>]+>/g, ""));
+    const body = [...pinned, ...lastSorted].map(r => cols.map(c => r._span && c !== cols[0] && c !== cols[1] ? "" : (c.xv ? c.xv(r) : (r._span && c === cols[1] ? r._spanText : (val(c, r) ?? "")))));
+    return [hdr, ...body];
+  };
+  const tools = `<div class="tblbar"><div class="left">${countLabel ? `<span class="count">${countLabel}</span>` : ""}</div>
+    <div class="actions"><button class="btn" type="button" data-copy="${id}">표 복사</button><button class="btn" type="button" data-csv="${id}">CSV 내려받기</button></div></div>`;
+  after(() => {
+    draw();
+    document.querySelector(`[data-copy="${id}"]`)?.addEventListener("click", async () => {
+      const tsv = exportRows().map(r => r.map(x => String(x).replace(/\t|\n/g, " ")).join("\t")).join("\n") + `\n출처: DART 정기보고서·공정위 2026 지정, 50대 그룹 경영진 지도 (${ASOF()} 기준)`;
+      try { await navigator.clipboard.writeText(tsv); toast("표를 복사했습니다. 엑셀에 붙여 넣으면 칸이 나뉩니다."); }
+      catch { toast("이 화면에서는 복사가 막혀 있습니다. 표를 드래그해 복사해 주세요."); }
+    });
+    document.querySelector(`[data-csv="${id}"]`)?.addEventListener("click", () => {
+      const csv = "﻿" + [[title], [`기준: 명단 ${ASOF()} · 흐름 ${M().flow[0]}–${M().flow[1]} · 보수 ${M().pay_year} · 출처 DART 정기보고서, 공정위 2026 지정`], ...exportRows()]
+        .map(r => r.map(x => `"${String(x ?? "").replace(/"/g, '""')}"`).join(",")).join("\r\n");
+      try {
+        const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+        a.download = `${title.replace(/[\\/:*?"<>|\s]+/g, "_")}.csv`; document.body.append(a); a.click(); a.remove();
+        toast("CSV를 내려받습니다. 내려받기가 막힌 화면이면 ‘표 복사’를 써 주세요.");
+      } catch { toast("내려받기가 막혀 있습니다. ‘표 복사’를 써 주세요."); }
+    });
+  });
+  return `${tools}<div class="tbl"><table id="${id}"><thead></thead><tbody></tbody></table></div>${limit ? `<p id="${id}-more"></p>` : ""}${note ? `<p class="note">${note}</p>` : ""}`;
+}
+const bar = (v, max, txt) => v == null ? `<span class="na">–</span>` : `<span class="cellbar">${txt}<i style="width:${Math.max(2, 40 * (v || 0) / max)}px"></i></span>`;
+
+/* ---------- 인물 데이터: 첫 화면 뒤 미리 받기, 진행률 ---------- */
+function loadPeople() {
+  if (PEOPLE) return Promise.resolve(PEOPLE);
+  if (!peopleLoading) {
+    const prep = $("#prep");
+    prep.hidden = false; prep.innerHTML = `인물 명단 준비 <i><b style="width:0%"></b></i>`;
+    peopleLoading = fetch("data/people.json").then(async r => {
+      if (!r.ok) throw new Error(r.status);
+      const total = +r.headers.get("content-length") || 0;
+      if (!r.body || !total) return r.json();
+      const reader = r.body.getReader(); const chunks = []; let got = 0;
+      for (;;) { const { done, value } = await reader.read(); if (done) break; chunks.push(value); got += value.length;
+        const b = prep.querySelector("b"); if (b) b.style.width = `${Math.min(100, 100 * got / total)}%`; }
+      const buf = new Uint8Array(got); let o = 0; chunks.forEach(c => { buf.set(c, o); o += c.length; });
+      return JSON.parse(new TextDecoder().decode(buf));
+    }).then(d => {
+      PEOPLE = d; personByCompany = new Map(); personById = new Map(); evIndex = new Map();
+      d.people.forEach(p => {
+        personById.set(p[0], p);
+        p[5].forEach(row => { if (!personByCompany.has(row[1])) personByCompany.set(row[1], []); personByCompany.get(row[1]).push([p, row]); });
+        p[6].forEach(e => evIndex.set(`${p[0]}|${e[0]}|${e[2]}`, (evIndex.get(`${p[0]}|${e[0]}|${e[2]}`) || []).concat([e])));
+      });
+      prep.hidden = true; return d;
+    }).catch(e => { prep.innerHTML = "인물 명단을 불러오지 못했습니다"; peopleLoading = null; throw e; });
+  }
+  return peopleLoading;
+}
+const compAt = i => CORE.companies[i];
+const EXEC_REG = new Set([0, 1, 2]);
+const ORIGIN_EXT = () => new Set(M().external);
+
+/* ---------- 공통 조각 ---------- */
+function timeChips() {
+  return `<div class="eyebrow"><span class="chip">명단·구성 <b>${ASOF()}</b> (반기보고서)</span><span class="chip">인사 흐름 <b>${M().flow[0]}–${M().flow[1]}</b> 연평균</span><span class="chip">보수 <b>${M().pay_year}</b> 연간</span></div>`;
+}
+function kpiCard(m, g, { label, sub } = {}) {
+  const mm = MET[m], v = g ? g.v[m] : CORE.bench[m].all, b = CORE.bench[m];
+  if (g && v == null && coverage(m, g)) {
+    const raw = m === "ext_hire" ? g.hire.ext_pct_raw : null;
+    return `<div class="kpi"><span>${label || mm.t} ${defBtn(m)}</span><b style="color:var(--muted)">근거 부족</b><span class="cmp">${esc(coverage(m, g))}${raw != null ? ` · 판단 가능자 중 ${pct(raw)}` : ""}</span><span class="rank">판단할 수 있는 사람이 적어 순위에서 뺐습니다. 전체 ${b.all == null ? "–" : mm.f(b.all)}</span></div>`;
+  }
+  if (g && g.small && mm.rate) return `<div class="kpi"><span>${label || mm.t} ${defBtn(m)}</span><b>${v == null ? "–" : mm.f(v)}${mm.unit && v != null ? `<small>${mm.unit}</small>` : ""}</b><span class="cmp">표본이 작아(경영진 ${g.k?.n || 0}명) 비교하지 않습니다</span></div>`;
+  const rank = g?.rank_of?.[m];
+  return `<div class="kpi"><span>${label || mm.t} ${defBtn(m)}</span>
+    <b>${v == null ? "–" : mm.f(v)}${mm.unit && v != null && !String(mm.f(v)).endsWith(mm.unit) ? `<small>${mm.unit}</small>` : ""}</b>
+    ${g && m === "executives" ? `<span class="cmp">50대 그룹 경영진 ${fmt(b.all)}명의 <em>${(100 * v / b.all).toFixed(1)}%</em> · 그룹 중앙값 ${fmt(b.median)}명</span>${strip(m, g)}` : g ? `<span class="cmp">전체 <em>${b.all == null ? "–" : mm.f(b.all)}</em> · 중앙값 ${b.median == null ? "–" : mm.f(b.median)}</span>
+      ${m === "ext_hire" ? `<span class="rank">${esc(coverage(m, g))}</span>` : ""}
+      ${rank && m !== "executives" ? `<span class="rank">경영진 ${M().min_n}명 이상${m === "ext_hire" ? "·근거 충분" : ""} ${b.n}개 그룹 중 ${rankText(rank, b.n)}${mm.rate && v != null && b.all != null ? ` · ${diffText(m, v, b.all)}` : ""}</span>` : ""}${m !== "executives" ? strip(m, g) : ""}`
+      : `<span class="cmp">${sub || timeLabel(mm.time)}</span>`}</div>`;
+}
+function footer() {
+  $("#foot").innerHTML = `<div>자료: DART 사업보고서·반기보고서 'VIII-1. 임원 및 직원 등의 현황'(2018–2026.6), 공정거래위원회 2026년 공시대상기업집단 지정 결과. 공시된 그대로 정리했고, 뉴스나 SNS 정보는 붙이지 않았습니다.</div>
+    <div>개인 정보는 공시 원문에 있는 항목(이름, 출생연월, 성별, 직위, 경력)만 씁니다. 원문이 바뀌면 다음 갱신에 반영합니다. 갱신일 ${M().built}.</div>
+    <div>분류(기능·학력·출신)는 공시 문구에 규칙을 적용한 추정이라 원문 확인이 필요합니다. <a href="#method">자료와 기준 보기</a></div>
+    ${M().owner ? `<div>만든 곳: ${esc(M().owner)}</div>` : ""}
+    ${M().contact ? `<div>공시와 다르거나 다른 사람과 합쳐진 기록을 보시면 ${esc(M().contact)}로 알려 주세요.</div>` : ""}`;
+}
+
+/* 받침에 따라 조사를 고른다 */
+function jong(w) { const c = String(w).trim().slice(-1).charCodeAt(0); if (c >= 0xAC00 && c <= 0xD7A3) return (c - 0xAC00) % 28; return /[0-9]$/.test(w) ? [1, 8, 0, 1, 0, 0, 1, 8, 8, 0][+String(w).slice(-1)] : 0; }   // 영 일 이 삼 사 오 육 칠 팔 구
+const ro = w => { const j = jong(w); return `${w}${j && j !== 8 ? "으로" : "로"}`; };
+const ida = w => `${w}${jong(w) ? "이었" : "였"}`;
+/* ---------- 화면: 첫 화면 ---------- */
+let homeView = store.get("homeView") || "comp";
+function groupRowsForHome() {
+  const me = mineRank();
+  return CORE.groups.map(g => ({ ...g, _bottom: !g.has_data || g.small, _mine: g.rank === me }));
+}
+const HOME_VIEWS = {
+  comp: { t: "경영진 구성", cols: ["executives", "avg_age", "female", "b80", "rank_hidden"], hdr: [["현재 단면", "now", 5]] },
+  flow: { t: "인사 흐름", cols: ["executives", "new_rate", "exit_rate", "new_age", "ext_hire"], hdr: [["현재", "now", 1], ["인사 흐름", "flow", 4]] },
+  board: { t: "이사회·사외이사", cols: ["out_n", "out_ratio", "fem_dir", "law", "out_female", "out_gov", "out_acad"], hdr: [["이사회 구성", "now", 4], ["사외이사 출신", "now", 3]] },
+  edu: { t: "학력·보수", cols: ["executives", "grad", "overseas", "pay"], hdr: [["현재 단면", "now", 3], ["보수", "pay", 1]] },
+};
+const rankText = (r, n) => r <= Math.ceil(n / 2) ? `높은 쪽에서 ${r}번째` : `낮은 쪽에서 ${n - r + 1}번째`;
+function coverage(m, g) {   // 근거가 부족해 비교하지 않는 지표의 설명
+  if (m === "ext_hire" && g.hire) return !g.hire.n ? "신규 없음" : g.hire.extreme ? `검수 필요 · 판단 가능 ${fmt(g.hire.known)}명 중 외부 ${fmt(g.hire.ext)}명(${pct(g.hire.ext_pct_raw)})` : `판단 가능 ${fmt(g.hire.known)}/${fmt(g.hire.n)}명(${pct(g.hire.known_pct)})`;
+  if ((m === "grad" || m === "overseas") && g.mix) {
+    const thin = g.mix.edu_n < 30 || g.mix.edu_n < 0.5 * g.mix.n;
+    return thin || m === "overseas" ? `학력 공시 ${fmt(g.mix.edu_n)}/${fmt(g.mix.n)}명` : `학사(추정) ${fmt(g.mix.est)}/${fmt(g.mix.edu_n)}명: 학위가 적히지 않은 학력이 절반을 넘음`;
+  }
+  return "";
+}
+function lawText(r) {
+  const bx = r.boardx; if (!r.has_data || !bx?.n_mand) return "대상 없음";
+  const bad = new Set([...bx.no_major, ...bx.no_fem]).size;
+  return bad ? `${bx.n_mand}곳 중 ${bad}곳 미충족` : `${bx.n_mand}곳 모두 충족`;
+}
+function lawCell(r) {
+  const bx = r.boardx; if (!r.has_data) return ""; if (!bx?.n_mand) return `<span class="na">대상 없음</span>`;
+  const bad = new Set([...bx.no_major, ...bx.no_fem]).size;
+  const why = [bx.no_major.length ? `사외이사 과반 아님 ${bx.no_major.length}곳` : "", bx.no_fem.length ? `여성 등기이사 없음 ${bx.no_fem.length}곳` : ""].filter(Boolean).join(", ");
+  return bad ? `<span class="pill warn" title="${esc(why)}">${bad}곳 미충족</span><div class="na" style="font-size:11.5px">${esc(why)}</div>` : `<span class="na">${bx.n_mand}/${bx.n_mand} 충족</span>`;
+}
+function metricCell(m, r) {
+  if (!r.has_data) return "";
+  const v = r.v[m], mm = MET[m];
+  if (v == null && coverage(m, r)) return `<span class="na">${coverage(m, r).startsWith("검수") ? "검수 필요" : "근거 부족"}</span><div class="na" style="font-size:11px">${esc(coverage(m, r).replace(/^검수 필요 · /, ""))}</div>`;
+  if (v == null) return `<span class="na">–</span>`;
+  if (r.small && mm.rate) return `<span class="na" title="경영진 ${r.k?.n || 0}명: 표본이 작아 비율을 비교하지 않습니다">표본 작음</span>`;
+  const max = Math.max(...CORE.groups.filter(g => g.has_data && !g.small && g.v[m] != null).map(g => g.v[m]));
+  return ["executives", "female", "out_n", "pay", "ext_hire", "new_rate"].includes(m) ? bar(v, max, mm.f(v)) : mm.f(v);
+}
+function homeTable() {
+  const view = HOME_VIEWS[homeView], ms = view.cols, B = CORE.bench, me = mineRank();
+  const cols = [
+    { k: "rank", t: "순위", n: 1, f: r => r._ref ? "" : `<span class="num">${r.rank}</span>`, x: "순위", xv: r => r._ref ? "" : r.rank },
+    { k: "name", t: "그룹", cls: "name", f: r => r._ref ? esc(r.name) : r.has_data ? `<a href="#g${r.rank}">${esc(r.name)}</a>${r.unlisted?.length ? ` <span class="pill org" title="비상장이지만 사업보고서를 내는 회사로 집계">비상장 포함</span>` : ""}` : esc(r.name), xv: r => r.name },
+    { k: "companies", t: "대상 회사", n: 1, v: r => r.companies?.length, f: r => r._ref ? (r._companies || "") : r.has_data ? fmt(r.companies.length) : "", xv: r => r._ref ? "" : r.companies?.length ?? "" },
+    ...ms.map((m, i) => ({ k: m, t: MET[m].t, n: 1, def: m, gl: i === 0 || (view.hdr.length > 1 && i === view.hdr[0][2]), v: r => r._ref ? null : (r.has_data && !(r.small && MET[m].rate) ? r.v[m] : null),
+      f: r => r._ref ? (r[m] == null ? "–" : MET[m].f(r[m])) : metricCell(m, r), xv: r => r._ref ? r[m] ?? "" : r.has_data ? r.v[m] ?? "" : "" })),
+  ];
+  const lawTot = () => { const G = CORE.groups.filter(g => g.boardx?.n_mand); const n = G.reduce((a, g) => a + g.boardx.n_mand, 0), bad = new Set(G.flatMap(g => [...g.boardx.no_major, ...g.boardx.no_fem])).size; return `대상 ${fmt(n)}곳 중 미충족 ${fmt(bad)}곳`; };
+  const lawCol = { k: "law", t: MET.law.t, def: "law", v: r => r._ref || !r.boardx?.n_mand ? null : -new Set([...r.boardx.no_major, ...r.boardx.no_fem]).size,
+    f: r => r._ref ? (r.name === "50대 그룹 전체" ? lawTot() : "") : lawCell(r), xv: r => r._ref ? (r.name === "50대 그룹 전체" ? lawTot() : "") : lawText(r) };
+  cols.forEach((c, i) => { if (c.k === "law") cols[i] = { ...lawCol, gl: c.gl }; });
+  const ref = (name, kind, extra = {}) => ({ _ref: true, name, ...Object.fromEntries(ms.map(m => [m, kind === "all" ? B[m]?.all : kind === "median" ? B[m]?.median : B[m]?.top10])), ...extra });
+  const pinned = [ref("50대 그룹 전체", "all", { _companies: fmt(M().n_companies) }), ref(`그룹 중앙값 (경영진 ${M().min_n}명 이상)`, "median"), ref("상위 10대 그룹 평균", "top10")];
+  const mine = me ? CORE.groups.find(g => g.rank === me && g.has_data) : null;
+  if (mine) pinned.push({ ...mine, _mine: true, _href: `g${mine.rank}`, name: `내 그룹: ${mine.name}`,
+    ...Object.fromEntries(ms.map(m => [m, mine.small && MET[m].rate ? null : mine.v[m]])) });
+  const rows = groupRowsForHome().map(r => r.has_data ? r : { ...r, _span: `${esc(r.name)} · ${esc(r.reason)}`, _spanText: r.reason });
+  const grpHdr = [{ t: "", span: 3 }, ...view.hdr.map(([t, time, span]) => ({ t: `${t} · ${timeLabel(time)}`, span, cls: "" }))];
+  return table({ cols, rows, pinned, key: "rank", dir: 1, href: r => r.has_data ? `g${r.rank}` : null, rowClass: r => (!r.has_data ? "nodata" : r.small ? "small" : "") + (r._mine ? " mine" : ""),
+    groupsHdr: grpHdr, title: `50대 그룹 비교_${view.t}`, countLabel: `50개 그룹 · 자료 있는 그룹 ${M().n_groups_data}개`,
+    note: `<b>읽는 법</b> 맨 위 회색 줄이 비교 기준입니다. ‘전체’는 모든 그룹 경영진을 한데 모은 값(인원 가중), ‘중앙값’과 순위는 경영진 ${M().min_n}명 이상 그룹만으로 냅니다. 경영진 ${M().min_n}명 미만 그룹은 비율을 ‘표본 작음’으로 두고 정렬과 관계없이 아래에 둡니다. 쿠팡·부영·한국지엠은 사업보고서를 내는 회사가 없어 임원 명단 자체가 공시되지 않습니다.` });
+}
+function viewHome() {
+  const B = CORE.bench, T = CORE.total, me = mineRank(), mineG = me ? CORE.groups.find(g => g.rank === me && g.has_data) : null;
+  const tabs = Object.entries(HOME_VIEWS).map(([k, v]) => `<button role="tab" type="button" aria-selected="${k === homeView}" data-view="${k}">${v.t}</button>`).join("");
+  const nr = [{ name: "50대 그룹 전체", values: T.new_rate, color: "var(--ink)" }];
+  if (mineG) nr.unshift({ name: `내 그룹: ${mineG.name}`, values: mineG.new_rate, color: "var(--accent)" });
+  app.innerHTML = `
+  <div>
+    ${timeChips()}
+    <h1>대기업 경영진은 누구이고, 어떻게 바뀌고 있나</h1>
+    <p class="lede">공정위가 지정한 자산 상위 50개 그룹의 상장 계열사(일부 비상장 공시 회사 포함) 임원을 공시 원문에서 같은 기준으로 정리했습니다. 내 그룹을 고르면 모든 표와 차트에 비교 기준으로 붙습니다.</p>
+  </div>
+  ${mineG ? "" : `<div class="band info no-print" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span>내 그룹을 고르면 표 맨 위에 고정되고, 숫자마다 전체·중앙값·순위가 붙습니다.</span>
+    <select id="mine2" aria-label="내 그룹 고르기"><option value="">그룹 고르기</option>${CORE.groups.filter(g => g.has_data).map(g => `<option value="${g.rank}">${g.rank}. ${esc(g.name)}</option>`).join("")}</select></div>`}
+  <div class="kpis">
+    ${kpiCard("executives", mineG, { label: mineG ? `${mineG.name} 경영진` : "경영진", sub: `${M().n_groups_data}개 그룹 ${M().n_companies}곳, 겸직자는 한 번만 셈` })}
+    ${kpiCard("avg_age", mineG, { label: mineG ? `${mineG.name} 평균 나이` : "평균 나이" })}
+    ${kpiCard("female", mineG, { label: mineG ? `${mineG.name} 여성` : "여성 비율" })}
+    ${kpiCard("new_rate", mineG, { label: mineG ? `${mineG.name} 신규율` : "연평균 신규율" })}
+  </div>
+  ${insights()}
+  <section class="panel" id="cmp">
+    <div class="panel-head"><h2>그룹 비교</h2><p>열 이름을 누르면 정렬합니다. 그룹 이름을 누르면 계열사와 추이가 나옵니다.</p></div>
+    <div class="tabs" role="tablist" aria-label="비교 보기">${tabs}</div>
+    <div id="hometbl">${homeTable()}</div>
+  </section>
+  <div class="grid2">
+    <section class="panel"><div class="panel-head"><h3>연도별 신규율 ${defBtn("new_rate")}</h3></div>${lineChart(nr, { label: "연도별 신규율", unit: "%", fmtv: v => `${(+v).toFixed(1)}%`, zero: true, from: +M().flow[0], to: FLOW_END() })}
+      <p class="note">해마다 신규 선임 ÷ 전년 말 경영진. ${mineG ? "" : "내 그룹을 고르면 같은 축에 겹쳐 그립니다."}</p></section>
+    <section class="panel"><div class="panel-head"><h3>신규 선임 · 승진 · 이탈 (전체)</h3></div>${flowChart(T.ev, T.heads, { partialUp: true })}
+      <p class="note">직급 개편, 공시 범위 변화, 회사 상장·편입으로 생긴 등장·퇴장은 뺐습니다. 승진은 직급이 공시된 경영진만 셀 수 있어 실제보다 적습니다. 정기 인사 발표가 해를 넘기면 그해 신규가 다음 해로 넘어갑니다(예: 삼성 2019년 말 인사가 2020년 1월로 미뤄진 해). 2026년 상반기는 기간이 반년이라 넣지 않았습니다.</p></section>
+    <section class="panel"><div class="panel-head"><h3>경영진 수 (연말, 마지막은 반기 말)</h3></div>
+      ${lineChart([{ name: `9개 시점 모두 공시된 ${fmt(M().n_const)}곳`, values: T.const_heads, color: "var(--accent)" }, { name: "해마다 공시된 회사 전체", values: T.heads, color: "var(--faint)", dash: true, width: 1.5 }], { label: "경영진 수", unit: "명" })}
+      <p class="note">회사 수가 늘어난 효과를 빼려고 9개 시점 모두 공시된 회사만으로 선을 따로 그렸습니다(겸직자는 한 번). 이 선에도 공시 범위를 넓힌 회사의 증가분이 들어 있습니다: ${YEARS().map((y, i) => [y, M().const_expand[i]]).filter(x => x[1] > 20).map(x => `${x[0]}년 ${fmt(x[1])}명`).join(", ") || "없음"}.</p></section>
+    <section class="panel"><div class="panel-head"><h3>사외이사 출신 (전체 ${fmt(T.out.n)}명)</h3></div>${originStack(T.out.origin, T.out.n)}
+      <p class="note">공시 경력 문구에서 규칙으로 판정한 주 출신입니다(표본 검수 정확도 ${M().validation.classify["출신"]}).</p></section>
+  </div>
+  ${methodHtml()}`;
+  const tabsEl = app.querySelector('[role="tablist"]');
+  tabsEl?.addEventListener("keydown", e => {
+    if (!["ArrowLeft", "ArrowRight"].includes(e.key)) return;
+    const bs = [...tabsEl.querySelectorAll('[role="tab"]')], i = bs.indexOf(document.activeElement);
+    const nx = bs[(i + (e.key === "ArrowRight" ? 1 : bs.length - 1)) % bs.length]; nx.focus(); nx.click();
+  });
+  $("#mine2")?.addEventListener("change", e => { store.set("mineGroup", e.target.value || null); syncMine(); route(true); });
+  app.querySelectorAll('[role="tab"]').forEach(b => b.addEventListener("click", () => {
+    homeView = b.dataset.view; store.set("homeView", homeView);
+    app.querySelectorAll('[role="tab"]').forEach(x => x.setAttribute("aria-selected", x === b));
+    $("#hometbl").innerHTML = homeTable(); hideTip();
+  }));
+  bindDefs(app);
+}
+
+function insights() {
+  const G = CORE.groups.filter(g => g.has_data && !g.small), B = CORE.bench, T = CORE.total, ys = YEARS();
+  const by = m => G.filter(g => g.v[m] != null).sort((a, b) => b.v[m] - a.v[m]);
+  const fem = by("female"), b80 = by("b80");
+  const i0 = ys.indexOf(+M().flow[0]), i1 = ys.indexOf(FLOW_END());
+  const cards = [
+    { h: `여성 경영진 비율, 그룹마다 크게 다르다`, b: `${esc(fem[0].name)} ${pct(fem[0].v.female)}, ${esc(fem[1].name)} ${pct(fem[1].v.female)}가 높고 ${esc(fem.at(-1).name)} ${pct(fem.at(-1).v.female)}가 가장 낮습니다(경영진 ${M().min_n}명 이상 그룹). 50대 전체는 ${pct(B.female.all)}.`, to: `g${fem[0].rank}`, tl: `${esc(fem[0].name)} 보기` },
+    (() => { const a = T.new_rate[i0], b = T.new_rate[i1], dir = b < a - 0.5 ? ["줄었다", "내려갔습니다"] : b > a + 0.5 ? ["늘었다", "올라갔습니다"] : ["비슷하다", "움직였습니다"];
+      return { h: `새로 선임되는 임원 비율이 ${dir[0]}`, b: `연간 신규율이 ${M().flow[0]}년 ${pct(a)}에서 ${FLOW_END()}년 ${pct(b)}로 ${dir[1]}. 신규율은 그해 신규 선임 ÷ 전년 말 경영진입니다.`, to: "cmp-flow", tl: "그룹별 인사 흐름 보기" }; })(),
+    { h: `사외이사는 관료·법조·학계 출신이 많다`, b: `사외이사 ${fmt(T.out.n)}명 중 관료·법조 ${pct(B.out_gov.all)}, 학계 ${pct(B.out_acad.all)}입니다(공시 경력 규칙 분류).`, to: "cmp-board", tl: "그룹별 이사회 보기" },
+    { h: `80년대생 경영진은 아직 드물다`, b: `50대 전체 경영진 중 1980년대생은 ${pct(B.b80.all)}입니다. 가장 높은 곳은 ${esc(b80[0].name)}(${pct(b80[0].v.b80)}), 그다음 ${esc(b80[1].name)}(${pct(b80[1].v.b80)})입니다.`, to: "cmp-comp", tl: "그룹별 구성 보기" },
+  ];
+  return `<div class="grid2" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">${cards.map(c => `<section class="panel"><h3 style="margin-bottom:6px">${c.h}</h3><p style="margin:0;color:var(--ink-2);font-size:14px">${c.b}</p>
+    <p class="note" style="margin-top:8px"><a href="#${c.to}">${c.tl}</a></p></section>`).join("")}</div>`;
+}
+function methodHtml() {
+  const v = M().validation;
+  return `<section class="panel" id="method"><div class="panel-head"><h2>자료와 기준</h2></div><div class="method">
+    <div><h3>출처</h3><ul>
+      <li>그룹 순위와 소속회사: 공정거래위원회 2026년 공시대상기업집단 지정 결과(2026.4.30 보도자료 별첨 2, 5). 법인등록번호로 DART 회사와 맞췄습니다.</li>
+      <li>임원 명단: DART 정기보고서 ‘VIII-1. 임원 및 직원 등의 현황’. 2018–2025년은 사업보고서(12월 말), 2026년은 반기보고서(6월 말)입니다.</li>
+      <li>보수: 같은 섹션의 ‘미등기임원 보수 현황’(2025년).</li></ul></div>
+    <div><h3>용어</h3><ul>
+      <li><b>경영진</b>: 사내이사 + 미등기 임원 + 집행임원. 사외이사·기타비상무이사·감사는 뺍니다.</li>
+      <li><b>신규</b>: 전년 그룹 명단에 없던 사람. 같은 그룹 다른 계열사에서 온 사람은 ‘계열사 이동’입니다.</li>
+      <li><b>이탈</b>: 다음 해 그룹 명단에서 빠진 사람. 퇴임과 비상장 계열사 이동이 섞여 있습니다.</li>
+      <li><b>직급 비공개</b>: 직급 대신 ‘임원’, ‘리더’, 보직명만 공시하는 경우. 승진을 셀 수 없어 빗금으로 표시합니다.</li></ul></div>
+    <div><h3>검증</h3><ul>
+      <li>등기임원 명단이 DART 정형 API와 일치: ${v.api_reg_match}.</li>
+      <li>미등기 명단 인원 vs 보수 현황 인원(연도별 합계): ${v.pay_count_gap}.</li>
+      <li>계산한 취임 연도 vs 공시된 선임일: ${v.start_year_match}.</li>
+      <li>명단 기준일: 보고서 기준일(12월 말, 반기는 6월 말)과 같음 ${fmt(M().asof_check.n - M().asof_check.odd - (M().asof_check.blank || 0))}, 제출일 기준 ${fmt(M().asof_check.odd)}, 표에 적히지 않음 ${fmt(M().asof_check.blank || 0)} (전체 ${fmt(M().asof_check.n)} 회사-연도). 제출일 기준 명단은 회사 화면에 표시합니다.</li>
+      <li>분류 표본 검수(사람이 따로 분류한 표본 ${v.classify_sample}과 일치): ${Object.entries(v.classify).map(([k, x]) => `${k} ${x}`).join(", ")}.</li></ul></div>
+    <div><h3>한계</h3><ul>
+      <li>비상장 계열사 임원은 없습니다(예외: 비상장이지만 사업보고서를 내는 두나무). 그룹 지표는 공시 회사 기준입니다.</li>
+      <li>같은 사람은 이름 + 출생연월 + 그룹으로 판정합니다. 다른 그룹으로 옮긴 사람은 경력 문구로만 보입니다.</li>
+      <li>2018년이나 회사가 처음 보인 해에 이미 임원이던 사람의 취임 연도는 알 수 없습니다.</li>
+      <li>미등기 임원 경력은 대개 직전 보직 한 줄이라 출신을 판단할 수 없는 사람이 많습니다(신규 임원의 약 ${Math.round(CORE.total.hire.unk_pct)}%).</li></ul></div>
+  </div></section>`;
+}
+
+/* ---------- 화면: 그룹 ---------- */
+function viewGroup(rank) {
+  const g = byRank[rank]; if (!g) return viewHome();
+  if (!g.has_data) { app.innerHTML = `<div><div class="crumb"><a href="#home">50대 그룹</a><span>›</span><span>${rank}위</span></div><h1>${esc(g.name)}</h1><p class="lede">${esc(g.reason)}</p></div>`; return; }
+  const k = g.k || {}, T = CORE.total, B = CORE.bench, comps = g.companies.map(id => byId[id]), isMine = mineRank() === g.rank;
+  const nListed = comps.filter(c => !c.market.startsWith("비상장")).length;
+  const maxE = Math.max(1, ...comps.map(c => c.k?.n || 0));
+  const cols = [
+    { k: "name", t: "회사", cls: "name", f: r => `<a href="#c${r.id}">${esc(r.name)}</a>`, xv: r => r.name },
+    { k: "market", t: "시장", f: r => `<span class="pill">${esc(r.market)}</span>` },
+    { k: "n", t: "경영진", n: 1, gl: 1, v: r => r.k?.n ?? 0, f: r => bar(r.k?.n || 0, maxE, fmt(r.k?.n ?? 0)), xv: r => r.k?.n ?? 0 },
+    { k: "age", t: "평균 나이", n: 1, v: r => r.k?.avg_age, f: r => r.k ? f1(r.k.avg_age) : "–" },
+    { k: "fem", t: "여성", n: 1, v: r => (r.k && r.k.n >= 10) ? r.k.female : null, f: r => !r.k ? "–" : r.k.n < 10 ? `<span class="na">${r.k.female_n}/${r.k.n}명</span>` : `${pct(r.k.female)} <span class="na">${r.k.female_n}/${r.k.n}</span>`, xv: r => r.k?.female ?? "" },
+    { k: "out", t: "사외이사", n: 1, gl: 1, v: r => r.board["사외이사"], f: r => fmt(r.board["사외이사"]) },
+    { k: "nr", t: `${FLOW_END()} 신규`, n: 1, gl: 1, v: r => r.ev["신규"][YEARS().indexOf(FLOW_END())], f: r => { const i = YEARS().indexOf(FLOW_END()), p = r.heads[i - 1]; const n = r.ev["신규"][i]; return p ? `${fmt(n)} <span class="na">${(100 * n / p).toFixed(0)}%</span>` : fmt(n); } },
+    { k: "pay", t: "미등기 평균 보수", n: 1, gl: 1, v: r => r.pay?.avg, f: r => eok(r.pay?.avg), xv: r => r.pay?.avg ?? "" },
+  ];
+  const fnItems = M().funcs.filter(f => f !== "이사회(비상근)" && f !== "미분류").map(f => ({ k: f, v: k.n ? 100 * (k.func?.[f] || 0) / k.n : null, ref: 100 * (T.func[f] || 0) / CORE.bench.executives.all }))
+    .filter(i => (i.v || 0) > 0.4 || (i.ref || 0) > 2).sort((a, b) => (b.v || 0) - (a.v || 0));
+  const nr = [{ name: g.name, values: g.new_rate, color: "var(--accent)" }, { name: "50대 그룹 전체", values: T.new_rate, color: "var(--faint)", dash: true }];
+  const h = g.hire;
+  app.innerHTML = `
+  <div class="headrow"><div>
+    <div class="crumb"><a href="#home">50대 그룹</a><span>›</span><span>${rank}위</span></div>
+    <h1>${esc(g.name)}</h1>
+    <p class="lede">총수(동일인) ${esc(g.owner)} · 자산(공정위 기준) ${fmt(Math.round(g.assets / 1000))}조 원 · 소속회사 ${g.n_aff}곳 중 공시 대상 ${comps.length}곳</p></div>
+    <div class="actions no-print"><button class="btn" type="button" id="setmine">${isMine ? "내 그룹 해제" : "내 그룹으로 지정"}</button><a class="btn primary" href="#r${rank}">보고서 한 장</a></div>
+  </div>
+  ${timeChips()}
+  <div class="band info">공시 회사 ${comps.length}곳${comps.length > nListed ? `(상장 ${nListed}곳 + 비상장 사업보고서 제출사 ${comps.length - nListed}곳)` : "(모두 상장사)"} 기준입니다. 비상장 계열사 ${g.n_aff - comps.length}곳의 임원은 공시되지 않아 빠져 있고, 그 회사들과 오간 사람은 신규·이탈로 잡힙니다.</div>
+  <div class="kpis">
+    ${kpiCard("executives", g)}${kpiCard("avg_age", g)}${kpiCard("female", g)}${kpiCard("new_rate", g)}${kpiCard("ext_hire", g)}${kpiCard("pay", g)}
+  </div>
+  <div class="grid2">
+    <section class="panel"><div class="panel-head"><h3>연도별 신규율 ${defBtn("new_rate")}</h3></div>${lineChart(nr, { label: "연도별 신규율", unit: "%", fmtv: v => `${(+v).toFixed(1)}%`, from: +M().flow[0], to: FLOW_END() })}</section>
+    <section class="panel"><div class="panel-head"><h3>신규 선임 · 승진 · 이탈</h3></div>${flowChart(g.ev, g.heads, { hidden: g.hidden_by_year })}
+      ${sum(g.ev["직급체계변경"]) || sum(g.ev["공시확대"]) ? `<p class="note">신규·승진으로 세지 않은 것: 직급 체계를 바꾼 해의 직위 변화 ${fmt(sum(g.ev["직급체계변경"]))}건, 회사가 공시 범위를 넓혀 처음 공시된 사람 ${fmt(sum(g.ev["공시확대"]))}명.</p>` : ""}</section>
+    <section class="panel"><div class="panel-head"><h3>경영진 수 (연말, 마지막은 반기 말)</h3></div>${lineChart([{ name: "경영진", values: g.heads, color: "var(--accent)" }], { label: "경영진 수", zero: false })}<p class="note">축이 0에서 시작하지 않습니다. 변화를 보려고 범위를 좁혔습니다.</p></section>
+    <section class="panel"><div class="panel-head"><h3>나이 분포 (${ASOF()})</h3></div>${ageHist(k.age_hist)}</section>
+    <section class="panel"><div class="panel-head"><h3>맡은 일 (${ASOF()})</h3><p>담당업무 문구로 나눈 기능. 정확도 ${M().validation.classify["기능"]}</p></div>${compareBars(fnItems.slice(0, 10), { refName: "50대 전체" })}</section>
+    <section class="panel"><div class="panel-head"><h3>직급별 인원과 나이 (${ASOF()})</h3></div>${rankStack(k.ranks)}${rankAgeTable(g)}${(g.v.rank_hidden || 0) > 30 ? `<p class="note">경영진의 ${pct(g.v.rank_hidden)}가 직급 없이 공시돼 승진을 직급으로 셀 수 없습니다.</p>` : ""}</section>
+    <section class="panel"><div class="panel-head"><h3>사외이사 ${fmt(g.out.n)}명</h3><p>여성 ${g.out.n ? `${pct(g.out.female)} (${g.out.female_n}명)` : "–"} · 평균 ${g.out.n ? f1(g.out.avg_age) + "세" : "–"} · 전체 여성 ${pct(B.out_female.all)}</p></div>${originStack(g.out.origin, g.out.n)}${boardMandate(g)}</section>
+    <section class="panel"><div class="panel-head"><h3>신규 임원은 어디서 왔나 (${M().flow[0]}–${M().flow[1]}) ${defBtn("ext_hire")}</h3></div>
+      ${compareBars([{ k: "외부 경력 있음", v: h.n ? 100 * h.ext / h.n : null, ref: T.hire.n ? 100 * T.hire.ext / T.hire.n : null }, { k: "그룹 내부", v: h.n ? 100 * h.int / h.n : null, ref: T.hire.n ? 100 * T.hire.int / T.hire.n : null }, { k: "판단 불가", v: h.n ? 100 * h.unk / h.n : null, ref: T.hire.n ? 100 * T.hire.unk / T.hire.n : null }], { refName: "50대 전체" })}
+      <p class="note">신규 ${fmt(h.n)}명 기준. 경력이 한 줄뿐이라 판단할 수 없는 사람을 따로 두었습니다. ${g.v.ext_hire != null ? `위 ‘외부 경력 확인’ ${pct(g.v.ext_hire)}는 판단할 수 있는 ${fmt(h.known)}명 중 외부 경력이 있는 비율입니다.` : `판단할 수 있는 사람이 ${fmt(h.known)}명(${pct(h.known_pct)})뿐이라 ‘외부 경력 확인’ 비율은 근거 부족으로 두었습니다.`}</p></section>
+  </div>
+  <section class="panel"><div class="panel-head"><h2>공시 회사</h2><p>회사를 누르면 연도별 임원 명단이 나옵니다.</p></div>
+    <div class="actions no-print" style="margin-bottom:10px"><a class="btn" href="#m${rank}">그룹 전체 명단 보기</a></div>
+    ${table({ cols, rows: comps, key: "n", dir: -1, href: r => `c${r.id}`, title: `${g.name}_공시회사`, countLabel: `${comps.length}곳` })}</section>`;
+  $("#setmine").addEventListener("click", () => { store.set("mineGroup", isMine ? null : String(g.rank)); syncMine(); viewGroup(rank); toast(isMine ? "내 그룹을 해제했습니다." : `${g.name}을 내 그룹으로 정했습니다.`); });
+  bindDefs(app);
+}
+
+/* 직급별 인원·평균 나이(그룹 vs 50대 전체 같은 직급), 상무 → 첫 승진 소요 연수 */
+function rankAgeTable(g) {
+  const ra = g.rank_age || [];
+  if (!ra.length) return "";
+  const all = {};
+  CORE.groups.filter(x => x.has_data).forEach(x => (x.rank_age || []).forEach(r => { (all[r.rank] ||= [0, 0]); all[r.rank][0] += r.n; all[r.rank][1] += r.n * r.avg; }));
+  const pr = g.promo, PA = M().promo_all, hiddenNow = (g.v.rank_hidden || 0) >= 30;
+  return `<div class="tbl" style="margin-top:12px;max-height:none"><table><thead><tr><th>직급</th><th class="n">인원</th><th class="n">비율</th><th class="n">평균 나이</th><th class="n">최연소</th><th class="n">50대 전체 같은 직급 평균</th></tr></thead><tbody>
+    ${ra.map(r => `<tr><td>${esc(r.rank)}</td><td class="n">${fmt(r.n)}</td><td class="n">${(100 * r.n / g.k.n).toFixed(1)}%</td><td class="n">${r.n >= 5 ? f1(r.avg) : `<span class="na">${f1(r.avg)}</span>`}</td><td class="n">${r.min}</td><td class="n">${all[r.rank] ? f1(all[r.rank][1] / all[r.rank][0]) : "–"}</td></tr>`).join("")}</tbody></table></div>
+    <p class="note"><b>상무 승진 속도</b> ${hiddenNow ? "직급 비공개 비중이 커서 집계할 수 없습니다." : pr && pr.cohort_pct != null ? `2019–2021년 상무로 처음 공시된 ${fmt(pr.cohort_n)}명 중 4년 안에 한 직급 이상 오른 사람 ${fmt(pr.cohort_up)}명(${pct(pr.cohort_pct)}). 50대 전체 ${pct(PA.cohort_pct)}(${fmt(PA.cohort_n)}명).` : `2019–2021년 신규 상무가 20명 미만이라 비율을 내지 않습니다.`} 모두 4년을 지켜본 같은 기간 코호트라 그룹끼리 비교할 수 있습니다. 직급 체계 개편은 승진으로 세지 않습니다.</p>`;
+}
+/* 사외이사 과반·여성 이사: 법정 요건 대상(자산 2조 원 이상 비금융 상장사)만 센다 */
+function boardMandate(g) {
+  const bx = g.boardx || {};
+  if (!bx.n_mand) return `<p class="note">자산 2조 원 이상 비금융 상장사(사외이사 과반·이사회 성별 요건 대상)가 없습니다.</p>`;
+  const nm = id => { const c = byId[id]; return c ? `<a href="#c${c.id}">${esc(c.name)}</a>` : ""; };
+  return `<p class="note" style="margin-top:12px"><b>법정 요건 대상 ${bx.n_mand}곳</b>(자산 2조 원 이상 비금융 상장사, ${M().pay_year}년 말 별도 기준): 사외이사 과반 ${bx.major_n}곳, 여성 등기이사 있음 ${bx.fem_n}곳.
+    ${bx.no_major?.length ? `<br>사외이사가 과반이 아닌 곳: ${bx.no_major.map(nm).join(", ")}` : ""}${bx.no_fem?.length ? `<br>${ASOF()} 명단에 여성 등기이사가 없는 곳: ${bx.no_fem.map(nm).join(", ")}` : ""}
+    ${bx.no_major?.length || bx.no_fem?.length ? `<br><span class="na">공시 명단 기준 집계입니다. 선임 시점과 공시 시점의 차이가 있을 수 있어 원문으로 확인해 주세요.</span>` : ""}</p>`;
+}
+
+/* ---------- 화면: 보고서 한 장 (#r4 또는 #r4x1x2x3: 비교 그룹 최대 3개) ---------- */
+const PEER_COLORS = ["#c25b43", "#8e5bb5", "#4f8a87"];
+function viewReport(rank, peers = []) {
+  const g = byRank[rank]; if (!g || !g.has_data) return viewHome();
+  const B = CORE.bench, T = CORE.total;
+  peers = peers.map(r => byRank[r]).filter(x => x && x.has_data && x.rank !== rank).slice(0, 3);
+  const ms = ["executives", "avg_age", "female", "b80", "new_rate", "exit_rate", "new_age", "ext_hire", "out_ratio", "out_female", "out_gov", "out_acad", "grad", "pay"];
+  const cell = (x, m) => { const v = x.small && MET[m].rate ? null : x.v[m]; return v == null ? (coverage(m, x) ? `근거 부족<span class="cov">${esc(coverage(m, x))}</span>` : "–") : MET[m].f(v); };
+  const rows = ms.map(m => ({ m, t: MET[m].t, time: timeLabel(MET[m].time), rank: g.rank_of?.[m], n: B[m].n }));
+  const cols = [
+    { k: "t", t: "지표", cls: "name", f: r => `${esc(r.t)} ${defBtn(r.m)}`, xv: r => r.t },
+    { k: "time", t: "기준", f: r => `<span class="na" style="white-space:nowrap">${esc(MET[r.m].time === "now" ? `${ASOF()}` : MET[r.m].time === "flow" ? `${M().flow[0]}–${M().flow[1]} 평균` : `${M().pay_year} 연간`)}</span>`, xv: r => r.time },
+    { k: "g", t: esc(g.name), n: 1, gl: 1, f: r => `<b>${cell(g, r.m)}</b>`, xv: r => cell(g, r.m) },
+    ...peers.map(pg => ({ k: "p" + pg.rank, t: esc(pg.name), n: 1, f: r => cell(pg, r.m), xv: r => cell(pg, r.m) })),
+    { k: "all", t: "50대 전체", n: 1, gl: 1, f: r => B[r.m].all == null ? "–" : MET[r.m].f(B[r.m].all), xv: r => B[r.m].all ?? "" },
+    { k: "med", t: "중앙값", n: 1, f: r => B[r.m].median == null ? "–" : MET[r.m].f(B[r.m].median), xv: r => B[r.m].median ?? "" },
+    { k: "top", t: "상위 10대 평균", n: 1, f: r => B[r.m].top10 == null ? "–" : MET[r.m].f(B[r.m].top10), xv: r => B[r.m].top10 ?? "" },
+    { k: "rank", t: "순위", n: 1, gl: 1, f: r => r.rank ? `${rankText(r.rank, r.n)}<span class="na"> / ${r.n}</span>` : "–", xv: r => r.rank ? `${r.rank}/${r.n}` : "" },
+  ];
+  const yi = y => YEARS().indexOf(+y);
+  const y0 = +M().flow[0], y1 = FLOW_END();
+  const a0 = g.new_rate[yi(y0)], a1 = g.new_rate[yi(y1)], t0 = T.new_rate[yi(y0)], t1 = T.new_rate[yi(y1)];
+  const trend = (x0, x1) => x1 > x0 ? "올랐습니다" : x1 < x0 ? "내려갔습니다" : "같습니다";
+  const lines = [
+    `경영진 ${fmt(g.v.executives)}명, 평균 ${f1(g.v.avg_age)}세(전체 ${f1(B.avg_age.all)}세), 여성 ${pct(g.v.female)}(전체 ${pct(B.female.all)}).`,
+    `${y0}–${y1} 연평균 신규율 ${pct(g.v.new_rate)}로 전체 ${pct(B.new_rate.all)}${g.rank_of?.new_rate ? `, ${B.new_rate.n}개 그룹 중 ${rankText(g.rank_of.new_rate, B.new_rate.n)}` : ""}. ${y0}년 ${pct(a0)}에서 ${y1}년 ${pct(a1)}로 ${trend(a0, a1)}(같은 기간 전체 ${pct(t0)} → ${pct(t1)}, ${y1}년 격차 ${a1 != null && t1 != null ? `${(a1 - t1 > 0 ? "+" : "")}${(a1 - t1).toFixed(1)}%p` : "–"}).`,
+    `이사회 중 사외이사 ${pct(g.v.out_ratio)}, 사외이사 ${fmt(g.out.n)}명 중 여성 ${pct(g.out.female)}(전체 ${pct(B.out_female.all)}), 관료·법조 출신 ${pct(g.v.out_gov)}(전체 ${pct(B.out_gov.all)}).`,
+  ];
+  const peerSel = i => `<select data-peer="${i}" aria-label="비교 그룹 ${i + 1}"><option value="">비교 그룹 ${i + 1}</option>${CORE.groups.filter(x => x.has_data && x.rank !== rank).map(x => `<option value="${x.rank}" ${peers[i]?.rank === x.rank ? "selected" : ""}>${x.rank}. ${esc(x.name)}</option>`).join("")}</select>`;
+  const series = [{ name: g.name, values: g.new_rate, color: "var(--accent)", width: 2.5 }, ...peers.map((pg, i) => ({ name: pg.name, values: pg.new_rate, color: PEER_COLORS[i], width: 1.5 })), { name: "50대 그룹 전체", values: T.new_rate, color: "var(--faint)", dash: true }];
+  app.innerHTML = `
+  <div class="headrow no-print"><div><div class="crumb"><a href="#home">50대 그룹</a><span>›</span><a href="#g${rank}">${esc(g.name)}</a><span>›</span><span>보고서 한 장</span></div></div>
+    <div class="actions"><div class="controls">${[0, 1, 2].map(peerSel).join("")}</div><button class="btn primary" type="button" id="printbtn">인쇄·PDF로 저장</button></div></div>
+  <article class="report">
+    <div><div class="eyebrow"><span class="chip">50대 그룹 경영진 지도</span><span class="chip">명단 <b>${ASOF()}</b></span><span class="chip">흐름 <b>${y0}–${y1}</b></span><span class="chip">보수 <b>${M().pay_year}</b></span></div>
+      <h1>${esc(g.name)} 경영진, 상위 50개 그룹과 견주면</h1>
+      <ul class="lede" style="padding-left:18px;margin-top:10px;display:grid;gap:4px">${lines.map(l => `<li>${l}</li>`).join("")}</ul></div>
+    ${table({ cols, rows, key: null, dir: 1, title: `${g.name}_보고서한장`, stickyFirst: false })}
+    <div class="grid2">
+      <div><h3 style="margin-bottom:6px">연도별 신규율</h3>${lineChart(series, { unit: "%", fmtv: v => `${(+v).toFixed(1)}%`, from: +M().flow[0], to: FLOW_END() })}</div>
+      <div><h3 style="margin-bottom:6px">사외이사 출신 (${fmt(g.out.n)}명)</h3>${originStack(g.out.origin, g.out.n)}</div>
+    </div>
+    <div class="foot"><div>정의: 경영진 = 사내이사 + 미등기 임원 + 집행임원(그룹 안 겸직 1명). 신규율 = 해마다 신규 선임 ÷ 전년 말 경영진의 평균. 전체 = 모든 그룹 경영진을 합친 값, 중앙값·순위 = 경영진 ${M().min_n}명 이상 그룹.</div>
+      <div>비교 그룹 수가 지표마다 다른 이유: 사외이사 지표는 사외이사 5명 이상, 이사회 지표는 공시 회사 3곳 이상, 학력은 학력 공시자가 절반 이상·30명 이상(석·박사는 학위 없이 학교만 적힌 사람이 절반 이하일 때만), 외부 경력은 판단 가능한 신규가 절반 이상·30명 이상인 그룹만 넣었습니다. ‘근거 부족’은 이 조건에 못 미친 값입니다.</div>
+      <div>범위: ${esc(g.name)} 공시 회사 ${g.companies.length}곳 기준(비상장 계열사 임원 제외). 출신·기능·학력은 공시 문구에 규칙을 적용한 추정(표본 검수 120명·150행, 출신 ${M().validation.classify["출신"]}).</div>
+      <div>출처: DART 사업보고서·반기보고서 VIII-1 임원 현황, 공정거래위원회 2026년 공시대상기업집단 지정. 50대 그룹 경영진 지도, 갱신 ${M().built}.</div></div>
+  </article>`;
+  app.querySelectorAll("[data-peer]").forEach(sel => sel.addEventListener("change", () => {
+    const ps = [...app.querySelectorAll("[data-peer]")].map(x => x.value).filter(Boolean);
+    location.hash = `r${rank}` + ps.map(x => `x${x}`).join("");
+  }));
+  $("#printbtn").addEventListener("click", () => { try { window.print(); } catch {} setTimeout(() => toast("인쇄 창이 뜨지 않으면 브라우저 메뉴의 인쇄를 써 주세요(아티팩트 화면에서는 막혀 있습니다)."), 400); });
+  bindDefs(app);
+}
+
+/* ---------- 명단 (회사 하나 또는 그룹 전체) ---------- */
+const EVN = () => PEOPLE.events;
+function rosterHtml(compIdx, years, title) {
+  return `<div class="controls" style="margin-bottom:10px">
+      <select id="yr" aria-label="연도">${years.slice().reverse().map(y => `<option value="${y}">${ylab(y)}</option>`).join("")}</select>
+      <div class="seg" role="group" aria-label="구분"><button type="button" data-w="exec" aria-pressed="true">경영진</button><button type="button" data-w="board" aria-pressed="false">이사회</button><button type="button" data-w="all" aria-pressed="false">전체</button></div>
+      <select id="evf" aria-label="그해 사건"><option value="">사건 전체</option><option value="신규">신규 선임</option><option value="승진">승진</option><option value="계열사이동">계열사 이동</option><option value="nextout">다음 해 명단에서 빠짐</option></select>
+      <select id="fnf" aria-label="기능"><option value="">기능 전체</option>${M().funcs.filter(f => f !== "이사회(비상근)").map(f => `<option>${f}</option>`).join("")}</select>
+      <input id="flt" type="search" placeholder="이름·직위·업무로 거르기" aria-label="이름, 직위, 업무로 거르기" style="flex:1 1 160px">
+    </div>
+    <div id="roster"><div class="skel"><i style="width:60%"></i><i style="width:80%"></i><i style="width:50%"></i></div><p class="loading">인물 명단을 불러오고 있습니다. 처음 한 번만 몇 초 걸립니다.</p></div>`;
+}
+function bindRoster(compIdx, years, title) {
+  const yrSel = $("#yr"), flt = $("#flt"), evf = $("#evf"), fnf = $("#fnf");
+  let who = "exec";
+  app.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { app.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x === b)); who = b.dataset.w; draw(); }));
+  [yrSel, evf, fnf].forEach(s => s.addEventListener("change", () => draw())); flt.addEventListener("input", () => draw());
+  function draw() {
+    if (!PEOPLE) return;
+    const yr = +yrSel.value, q = flt.value.trim().toLowerCase(), ef = evf.value, ff = fnf.value;
+    const firstObs = {};
+    compIdx.forEach(ci => { const c = compAt(ci); firstObs[ci] = YEARS().find((_, i) => c.heads[i] != null); });
+    let rows = [];
+    compIdx.forEach(ci => (personByCompany.get(ci) || []).forEach(([p, r]) => {
+      if (r[0] !== yr) return;
+      const here = p[5].filter(x => x[1] === ci).map(x => x[0]), first = Math.min(...here);
+      const evs = (evIndex.get(`${p[0]}|${yr}|${ci}`) || []).map(e => EVN()[e[1]]);
+      const ny = YEARS()[YEARS().indexOf(yr) + 1];
+      const nextOut = ny ? (evIndex.get(`${p[0]}|${ny}|${ci}`) || []).some(e => EVN()[e[1]] === "이탈") : false;
+      rows.push({ p, r, ci, first, censored: first === firstObs[ci], evs, nextOut });
+    }));
+    rows = rows.filter(x => who === "all" ? true : who === "exec" ? EXEC_REG.has(x.r[2]) : !EXEC_REG.has(x.r[2]) || x.r[2] === 1);
+    if (ef === "nextout") rows = rows.filter(x => x.nextOut); else if (ef) rows = rows.filter(x => x.evs.includes(ef));
+    if (ff) rows = rows.filter(x => M().funcs[x.r[6]] === ff);
+    if (q) rows = rows.filter(x => (x.p[1] + " " + x.r[3] + " " + x.r[5]).toLowerCase().includes(q));
+    const multi = compIdx.length > 1;
+    const cols = [
+      { k: "name", t: "이름", cls: "name", v: x => x.p[1], f: x => `<a href="#p${x.p[0]}">${esc(x.p[1])}</a>`, xv: x => x.p[1] },
+      ...(multi ? [{ k: "co", t: "회사", cls: "nw", v: x => compAt(x.ci).name, f: x => `<a href="#c${compAt(x.ci).id}">${esc(compAt(x.ci).name)}</a>`, xv: x => compAt(x.ci).name }] : []),
+      { k: "reg", t: "구분", v: x => x.r[2], f: x => `<span class="pill ${x.r[2] === 0 ? "" : "reg"}">${esc(PEOPLE.reg[x.r[2]])}</span>`, xv: x => PEOPLE.reg[x.r[2]] },
+      { k: "pos", t: "직위", cls: "nw", v: x => PEOPLE.ranks.length - x.r[4], f: x => esc(x.r[3]), xv: x => x.r[3] },
+      { k: "age", t: "나이", n: 1, v: x => yr - +x.p[2].slice(0, 4), f: x => yr - +x.p[2].slice(0, 4), xv: x => yr - +x.p[2].slice(0, 4) },
+      { k: "fn", t: "기능", v: x => M().funcs[x.r[6]], f: x => `<span class="pill">${esc(M().funcs[x.r[6]])}</span>`, xv: x => M().funcs[x.r[6]] },
+      { k: "duty", t: "담당 업무", cls: "wrap", v: x => x.r[5], f: x => esc(x.r[5]), xv: x => x.r[5] },
+      { k: "ev", t: "그해 사건", v: x => x.evs.join(","), f: x => x.evs.filter(e => !["직급체계변경"].includes(e)).map(e => `<span class="ev ${e === "신규" ? "new" : e === "승진" ? "up" : ""}">${esc(evLabel(e))}</span>`).join(" ") + (x.nextOut ? ` <span class="ev out">다음 해 빠짐</span>` : ""), xv: x => x.evs.join("|") + (x.nextOut ? "|다음해빠짐" : "") },
+      { k: "or", t: "출신(추정)", v: x => PEOPLE.origins[x.p[9]], f: x => `<button type="button" class="pill org" data-ev="${esc(x.p[10] || "판정 근거 문구 없음")}" aria-label="${esc(PEOPLE.origins[x.p[9]])}, 근거: ${esc(x.p[10] || "없음")}" style="cursor:pointer;font:inherit;font-size:11.5px">${esc(PEOPLE.origins[x.p[9]])}</button>`, xv: x => PEOPLE.origins[x.p[9]] },
+      { k: "first", t: "첫 공시", n: 1, v: x => x.first, f: x => x.censored ? `${x.first} 이전부터` : `${x.first}`, xv: x => x.censored ? `${x.first} 이전부터` : `${x.first}` },
+    ];
+    $("#roster").innerHTML = rows.length
+      ? table({ cols, rows, limit: 300, key: "pos", dir: -1, href: x => `p${x.p[0]}`, title: `${title}_${yr}_명단`, countLabel: `${fmt(rows.length)}명 · 명단 기준일 ${[...new Set(compIdx.map(ci => compAt(ci).asof?.[yr]).filter(Boolean))].join(", ").replace(/-/g, ".") || ylab(yr)}${compIdx.some(ci => compAt(ci).asof_odd?.includes(String(yr))) ? " (보고서 제출일 기준으로 적힌 명단 포함)" : ""}`,
+        note: "출신 태그를 누르면 판정 근거 문구가 나옵니다. 첫 공시가 ‘이전부터’면 그 회사가 처음 공시된 해에 이미 있던 사람이라 실제 취임은 더 이를 수 있습니다. 나이는 기준 연도 − 출생연도입니다." })
+      : `<p class="empty">조건에 맞는 사람이 없습니다. 연도나 필터를 바꿔 보세요.</p>`;
+  }
+  draw();
+  loadPeople().then(draw).catch(() => { $("#roster").innerHTML = `<p class="empty">인물 명단을 불러오지 못했습니다. 새로고침해 주세요.</p>`; });
+}
+
+/* ---------- 화면: 회사 ---------- */
+function viewCompany(id) {
+  const c = byId[id]; if (!c) return viewHome();
+  const g = byName[c.group], ci = CORE.companies.indexOf(c);
+  const years = YEARS().filter((_, i) => c.heads[i] != null), k = c.k;
+  app.innerHTML = `
+  <div class="headrow"><div>
+    <div class="crumb"><a href="#home">50대 그룹</a><span>›</span><a href="#g${g.rank}">${esc(g.name)}</a></div>
+    <h1>${esc(c.name)}</h1>
+    <p class="lede">${esc(c.market)}${c.fin ? " · 금융·보험" : ""} · 공시 ${yshort(years[0])}–${yshort(years.at(-1))} · <a href="${esc(c.src[years.at(-1)] || "#")}" target="_blank" rel="noopener">최근 보고서 원문</a></p></div></div>
+  ${timeChips()}
+  <div class="kpis">
+    <div class="kpi"><span>경영진 ${defBtn("executives")}</span><b>${fmt(k?.n ?? 0)}<small>명</small></b><span class="cmp">사내이사 ${c.board["사내이사"]} · 사외이사 ${c.board["사외이사"]} · 기타비상무 ${c.board["기타비상무이사"]}</span></div>
+    <div class="kpi"><span>평균 나이 ${defBtn("avg_age")}</span><b>${k ? f1(k.avg_age) : "–"}<small>세</small></b><span class="cmp">최연소 ${k ? k.min_age + "세" : "–"} · 그룹 ${f1(g.v.avg_age)}세 · 전체 ${f1(CORE.bench.avg_age.all)}세</span></div>
+    <div class="kpi"><span>여성 ${defBtn("female")}</span><b>${k ? pct(k.female) : "–"}</b><span class="cmp">${k ? `${k.female_n}/${k.n}명 · 그룹 ${pct(g.v.female)} · 전체 ${pct(CORE.bench.female.all)}` : "–"}</span></div>
+    <div class="kpi"><span>미등기 임원 평균 보수 ${defBtn("pay")}</span><b>${eok(c.pay?.avg)}</b><span class="cmp">${c.pay?.count ? `보수 현황 인원 ${fmt(c.pay.count)}명 · 전체 ${eok(CORE.bench.pay.all)}` : "보수 현황 없음"}</span></div>
+    <div class="kpi"><span>사외이사</span><b>${fmt(c.out.n)}<small>명</small></b><span class="cmp">${c.out.n ? `여성 ${c.out.female_n}명 · 평균 ${f1(c.out.avg_age)}세` : "–"}</span></div>
+  </div>
+  <div class="grid2">
+    <section class="panel"><div class="panel-head"><h3>경영진 수 (연말, 마지막은 반기 말)</h3></div>${lineChart([{ name: "경영진", values: c.heads, color: "var(--accent)" }], { label: "경영진 수" })}</section>
+    <section class="panel"><div class="panel-head"><h3>신규 선임 · 승진 · 이탈</h3></div>${flowChart(c.ev, c.heads, { hidden: c.hidden_by_year })}</section>
+  </div>
+  <section class="panel"><div class="panel-head"><h2>임원 명단</h2><p>연도와 사건으로 거르면 ‘올해 새로 선임된 임원’ 같은 명단이 바로 나옵니다. 이름을 누르면 경력이 나옵니다.</p></div>
+    ${rosterHtml([ci], years, c.name)}
+    <p class="note"><a id="srcl" target="_blank" rel="noopener">선택한 연도의 원문 보기</a></p></section>`;
+  const setSrc = () => { $("#srcl").href = c.src[$("#yr").value] || "#"; };
+  $("#yr").addEventListener("change", setSrc); setSrc();
+  bindRoster([ci], years, c.name);
+  bindDefs(app);
+}
+function viewGroupRoster(rank) {
+  const g = byRank[rank]; if (!g || !g.has_data) return viewHome();
+  const idx = g.companies.map(id => CORE.companies.indexOf(byId[id]));
+  const years = YEARS().filter(y => idx.some(ci => compAt(ci).heads[YEARS().indexOf(y)] != null));
+  app.innerHTML = `<div><div class="crumb"><a href="#home">50대 그룹</a><span>›</span><a href="#g${rank}">${esc(g.name)}</a><span>›</span><span>그룹 전체 명단</span></div>
+    <h1>${esc(g.name)} 전체 임원 명단</h1><p class="lede">공시 회사 ${idx.length}곳을 합친 명단입니다. 계열사를 겸직하면 회사마다 한 줄씩 나옵니다.</p></div>
+    <section class="panel">${rosterHtml(idx, years, `${g.name}_전체`)}</section>`;
+  bindRoster(idx, years, `${g.name}_전체`);
+}
+
+/* ---------- 화면: 인물 ---------- */
+const EV_CLASS = { 신규: "new", 승진: "up", 이탈: "out", 계열사이동: "", 등기전환: "" };
+const EV_LABEL = { 신규: "신규 선임", 승진: "승진", 이탈: "명단에서 빠짐", 계열사이동: "계열사 이동", 등기전환: "등기이사 선임", 공시확대: "공시 범위 확대로 처음 공시",
+  공시축소: "공시 범위 축소로 빠짐", 대상편입: "회사가 공시 대상에 들어옴", 관찰종료: "회사가 공시 대상에서 빠짐", 복귀: "다시 등장", 직급하향: "직위 변경" };
+const evLabel = e => EV_LABEL[e] || e;
+function careerLines(t) {
+  return String(t || "").split(/\n|(?=\s*-\s)|(?=\(現\)|\(前\)|現\)|前\)|現\s|前\s)|\s\/\s|·(?=\s?\d{2,4})/).map(s => s.replace(/^\s*[-·]\s*/, "").trim()).filter(Boolean);
+}
+function viewPerson(id) {
+  app.innerHTML = `<div class="skel"><i style="width:30%"></i><i style="width:60%"></i><i style="width:45%"></i></div><p class="loading">인물 명단을 불러오고 있습니다. 처음 한 번만 몇 초 걸립니다.</p>`;
+  loadPeople().then(() => {
+    const p = personById.get(id); if (!p) return viewHome();
+    const g = CORE.groups[p[4]], rows = p[5], evs = p[6];
+    const evByYear = {}; evs.forEach(e => { (evByYear[e[0]] ||= []).push(e); });
+    const yrsAll = [...new Set(rows.map(r => r[0]).concat(evs.map(e => e[0])))].sort((a, b) => b - a);
+    // 같은 회사·직위·업무가 이어지고 사건이 없는 해는 한 줄로 묶는다
+    const sig = y => rows.filter(r => r[0] === y).map(r => `${r[1]}|${r[3].replace(/\s+/g, "")}|${r[5]}`).join("#");
+    const runs = [];
+    yrsAll.forEach(y => { const lr = runs.at(-1), quiet = !(evByYear[y] || []).some(e => PEOPLE.events[e[1]] !== "직급체계변경");
+      if (lr && quiet && lr.quiet && sig(y) && sig(y) === lr.sig) lr.ys.push(y); else runs.push({ ys: [y], sig: sig(y), quiet }); });
+    const yl = y => isPartial(y) ? `${y}.6` : `${y}`;
+    const tl = runs.map(run => tlRow(run.ys[0], run.ys.length > 1 ? `${yl(run.ys.at(-1))}–${yl(run.ys[0])}` : yl(run.ys[0]))).join("");
+    function tlRow(y, label) {
+      const rs = rows.filter(r => r[0] === y);
+      const es = (evByYear[y] || []).filter(e => !["직급체계변경"].includes(PEOPLE.events[e[1]])).map(e => {
+        const name = PEOPLE.events[e[1]], detail = e[3] && e[4] ? ` ${esc(e[3])} → ${esc(e[4])}` : e[3] ? ` (${esc(e[3])})` : "";
+        return `<span class="ev ${EV_CLASS[name] ?? ""}">${esc(evLabel(name))}${detail}</span>`;
+      }).join("");
+      const body = rs.length ? rs.map(r => { const c = compAt(r[1]);
+        return `<div><span class="pos">${c ? `<a href="#c${c.id}">${esc(c.name)}</a>` : "–"} · ${esc(r[3])}</span> <span class="pill ${r[2] === 0 ? "" : "reg"}">${esc(PEOPLE.reg[r[2]])}</span> <span class="pill">${esc(PEOPLE.funcs[r[6]])}</span>
+          ${r[5] && r[5] !== "-" ? `<div class="duty">${esc(r[5])}</div>` : ""}
+          ${c?.src[y] ? `<span style="font-size:12.5px"><a href="${esc(c.src[y])}" target="_blank" rel="noopener">${isPartial(y) ? `${y} 반기보고서` : `${y} 사업보고서`} 원문</a> · <button style="all:unset;cursor:pointer;color:var(--accent)" type="button" data-cite="${esc(`${c.name}, ${isPartial(y) ? `${y} 반기보고서` : `${y} 사업보고서`}(접수번호 ${(c.src[y].match(/rcpNo=(\d+)/) || [])[1] || ""}), VIII-1 임원 및 직원 등의 현황, 기준일 ${c.asof?.[y] || ""}`)}">인용 복사</button></span>` : ""}</div>`; }).join("") : `<div class="duty">그룹 공시 회사 명단에 없음 (퇴임 또는 비상장 계열사 이동)</div>`;
+      return `<div class="tl-row"><div class="tl-year">${label}</div><div class="tl-body">${body}${es ? `<div class="evs">${es}</div>` : ""}</div></div>`;
+    }
+    const last = rows.at(-1), lc = compAt(last[1]);
+    const firstObs = lc ? YEARS().find((_, i) => lc.heads[i] != null) : null, first = rows[0][0];
+    const posPath = []; rows.forEach(r => { const k = r[3].replace(/\s+/g, ""); if (!posPath.some(x => x.replace(/\s+/g, "") === k)) posPath.push(r[3]); });
+    const edu = p[11] || [4, 6, 0, ""];
+    const nUp = evs.filter(e => PEOPLE.events[e[1]] === "승진").length, nMove = evs.filter(e => PEOPLE.events[e[1]] === "계열사이동").length;
+    const summaryLine = `${first === YEARS()[0] || first === firstObs ? `${first}년 이전부터` : `${first}년부터`} ${ylab(last[0])}까지 ${new Set(rows.map(r => r[1])).size}개 회사에서 공시됐고, 직위는 ${posPath.length > 1 ? `${posPath[0]}에서 ${ro(posPath.at(-1))} 바뀌었습니다` : `계속 ${ida(posPath[0])}습니다`}${nUp ? `(승진 ${nUp}번)` : ""}${nMove ? `, 계열사 이동 ${nMove}번` : ""}.`;
+    const lines = careerLines(p[7]);
+    app.innerHTML = `
+    <div>
+      <div class="crumb"><a href="#home">50대 그룹</a><span>›</span>${g ? `<a href="#g${g.rank}">${esc(g.name)}</a><span>›</span>` : ""}${lc ? `<a href="#c${lc.id}">${esc(lc.name)}</a>` : ""}</div>
+      <h1>${esc(p[1])}</h1>
+      <p class="lede">${lc ? esc(lc.name) : ""} ${esc(last[3])} <span class="na">(${ylab(last[0])} 공시)</span></p>
+      <p style="margin:8px 0 0">${esc(summaryLine)}</p>
+      <p class="note">아래 내용은 공시 원문에 적힌 그대로입니다. 출신·기능·학력 태그는 공시 문구에 규칙을 적용한 추정입니다.${M().contact ? ` 공시와 다르거나 다른 사람과 합쳐진 기록을 보시면 ${esc(M().contact)}로 알려 주세요.` : ""}</p>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><span>공시된 해</span><b>${new Set(rows.map(r => r[0])).size}<small>번</small></b><span class="cmp">${first}${first === YEARS()[0] || first === firstObs ? "년 이전부터" : "년"} ~ ${ylab(last[0])}</span></div>
+      <div class="kpi"><span>거친 회사</span><b>${new Set(rows.map(r => r[1])).size}<small>곳</small></b><span class="cmp">${esc([...new Set(rows.map(r => compAt(r[1])?.name).filter(Boolean))].join(", "))}</span></div>
+      <div class="kpi"><span>직위 변화</span><b>${Math.max(0, posPath.length - 1)}<small>회</small></b><span class="cmp">${esc(posPath.join(" → "))}</span></div>
+      <div class="kpi"><span>출신(추정)</span><b style="font-size:20px">${esc(PEOPLE.origins[p[9]])}</b><span class="cmp">${p[10] ? `근거: ${esc(p[10].split("|").join(", "))}` : "판정 근거 문구 없음"}</span></div>
+    </div>
+    <div class="grid2">
+      <section class="panel"><div class="panel-head"><h3>연도별 경력</h3></div><div class="timeline">${tl}</div></section>
+      <section class="panel"><div class="panel-head"><h3>최근 공시의 주요 경력</h3></div>
+        ${lines.length ? `<ul class="career">${lines.map(l => `<li>${esc(l)}</li>`).join("")}</ul>` : `<p class="empty">공시된 경력이 없습니다.</p>`}
+        <dl class="facts" style="margin-top:14px">
+          <dt>출생</dt><dd>${esc(p[2].replace("-", "년 "))}월</dd>
+          <dt>학력</dt><dd>${p[8] ? esc(p[8]) : PEOPLE.degrees[edu[0]] ? `${esc(PEOPLE.degrees[edu[0]])}${PEOPLE.fields[edu[1]] ? ` · ${esc(PEOPLE.fields[edu[1]])}` : ""}${edu[2] ? " · 해외 학위" : ""}${edu[3] ? ` · ${esc(edu[3].split("|").join(", "))}` : ""} <span class="na">(경력 문구에서 추정)</span>` : "공시 없음"}</dd>
+        </dl></section>
+    </div>`;
+    app.querySelectorAll("[data-cite]").forEach(b => b.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(b.dataset.cite); toast("인용 문구를 복사했습니다."); } catch { toast(b.dataset.cite); }
+    }));
+  }).catch(() => { app.innerHTML = `<p class="empty">인물 명단을 불러오지 못했습니다. 새로고침해 주세요.</p>`; });
+}
+
+/* ---------- 검색 ---------- */
+const q = $("#q"), results = $("#results");
+let sel = -1, items = [];
+function runSearch() {
+  const s = q.value.trim();
+  if (!s) { results.hidden = true; q.setAttribute("aria-expanded", "false"); return; }
+  q.setAttribute("aria-expanded", "true");
+  const low = s.toLowerCase();
+  items = [];
+  CORE.groups.filter(g => g.name.toLowerCase().includes(low)).slice(0, 4).forEach(g => items.push({ tag: "그룹", t: g.name, sub: g.has_data ? `${g.rank}위 · 공시 회사 ${g.companies.length}곳` : `${g.rank}위 · 임원 공시 없음`, h: `g${g.rank}` }));
+  CORE.companies.filter(c => c.name.toLowerCase().includes(low)).slice(0, 6).forEach(c => items.push({ tag: "회사", t: c.name, sub: c.group, h: `c${c.id}` }));
+  if (PEOPLE && s.length >= 2) PEOPLE.people.filter(p => p[1].toLowerCase().includes(low)).slice(0, 30).forEach(p => {
+    const r = p[5].at(-1), c = compAt(r[1]); items.push({ tag: "인물", t: p[1], sub: `${p[2].slice(0, 4)}년생 · ${yshort(r[0])} ${c ? c.name : ""} ${r[3]}`, h: `p${p[0]}` });
+  });
+  const wait = !PEOPLE && s.length >= 2 ? `<div class="loading" style="padding:8px 12px">인물 명단을 불러오고 있습니다. 잠시 후 결과가 이어서 나옵니다.</div>` : "";
+  results.innerHTML = items.length || wait ? items.map((it, i) => `<button role="option" type="button" data-i="${i}" class="${i === sel ? "on" : ""}" aria-selected="${i === sel}"><span class="tag">${it.tag}</span><span>${esc(it.t)}</span><span class="sub">${esc(it.sub)}</span></button>`).join("") + wait
+    : `<div class="empty" style="padding:10px 12px">‘${esc(s)}’에 맞는 결과가 없습니다.</div>`;
+  results.hidden = false;
+  results.querySelectorAll("button").forEach(b => b.addEventListener("mousedown", e => { e.preventDefault(); go(+b.dataset.i); }));
+}
+function go(i) { const it = items[i]; if (!it) return; location.hash = it.h; q.value = ""; results.hidden = true; q.blur(); }
+q.addEventListener("focus", () => { loadPeople().then(() => { if (q.value) runSearch(); }).catch(() => {}); });
+q.addEventListener("input", () => { sel = -1; runSearch(); });
+q.addEventListener("keydown", e => {
+  if (e.key === "ArrowDown") { sel = Math.min(items.length - 1, sel + 1); runSearch(); e.preventDefault(); }
+  else if (e.key === "ArrowUp") { sel = Math.max(0, sel - 1); runSearch(); e.preventDefault(); }
+  else if (e.key === "Enter") go(sel >= 0 ? sel : 0);
+  else if (e.key === "Escape") { results.hidden = true; q.blur(); }
+});
+q.addEventListener("blur", () => setTimeout(() => { results.hidden = true; }, 120));
+
+/* ---------- 내 그룹, 테마 ---------- */
+function syncMine() {
+  const s = $("#mine"), me = mineRank();
+  s.innerHTML = `<option value="">내 그룹 고르기</option>` + CORE.groups.filter(g => g.has_data).map(g => `<option value="${g.rank}" ${g.rank === me ? "selected" : ""}>${g.rank}. ${esc(g.name)}</option>`).join("");
+}
+$("#mine").addEventListener("change", e => { store.set("mineGroup", e.target.value || null); route(true); });
+function applyTheme(t) { if (t) document.documentElement.setAttribute("data-theme", t); else document.documentElement.removeAttribute("data-theme"); }
+applyTheme(store.get("theme"));
+$("#theme").addEventListener("click", () => {
+  const cur = document.documentElement.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const nx = cur === "dark" ? "light" : "dark"; applyTheme(nx); store.set("theme", nx); route(true);
+});
+document.addEventListener("click", e => {
+  if (!e.target.closest(".def")) pop.hidden = true;
+  const ev = e.target.closest("[data-ev]"); if (ev) { e.stopPropagation(); toast(`출신 판정 근거: ${ev.dataset.ev}`); }
+});
+
+/* ---------- 라우팅 ---------- */
+let lastHash = null;
+function route(keepScroll) {
+  hideTip(); pop.hidden = true;
+  const h = (location.hash || "").slice(1);
+  if (/^g\d+$/.test(h)) viewGroup(+h.slice(1));
+  else if (/^r\d+(x\d+)*$/.test(h)) { const [r0, ...ps] = h.slice(1).split("x").map(Number); viewReport(r0, ps); }
+  else if (/^m\d+$/.test(h)) viewGroupRoster(+h.slice(1));
+  else if (/^c\d{8}$/.test(h)) viewCompany(h.slice(1));
+  else if (/^p\d+$/.test(h)) viewPerson(+h.slice(1));
+  else if (/^cmp-(comp|flow|board|edu)$/.test(h)) { homeView = h.slice(4); store.set("homeView", homeView); viewHome(); setTimeout(() => document.getElementById("hometbl")?.scrollIntoView({ block: "start" }), 40); }
+  else { viewHome(); if (h === "method") setTimeout(() => document.getElementById("method")?.scrollIntoView(), 30); }
+  if (!keepScroll && h !== "method" && !h.startsWith("cmp-") && h !== lastHash) {
+    const back = isBack ? scrollMemo.get(h) : 0;   // 뒤로 가기로 돌아왔을 때만 보던 위치로
+    setTimeout(() => window.scrollTo(0, back || 0), back ? 60 : 0);
+    if (back) setTimeout(() => { if (Math.abs(scrollY - back) > 40) window.scrollTo(0, back); }, 700);   // 명단이 늦게 그려지는 화면
+  }
+  lastHash = h;
+}
+const scrollMemo = new Map();
+let isBack = false; const navStack = [];
+addEventListener("hashchange", e => {
+  const nh = location.hash.slice(1);
+  try { scrollMemo.set(new URL(e.oldURL).hash.slice(1), window.scrollY); } catch {}
+  isBack = navStack.length >= 2 && navStack[navStack.length - 2] === nh;
+  if (isBack) navStack.pop(); else navStack.push(nh);
+  route(false);
+});
+fetch("data/core.json").then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => {
+  CORE = d;
+  d.companies.forEach(c => { byId[c.id] = c; });
+  d.groups.forEach(g => { byRank[g.rank] = g; byName[g.name] = g; });
+  syncMine(); footer(); navStack.push(location.hash.slice(1)); route(false);
+  const idle = window.requestIdleCallback || (f => setTimeout(f, 1200));
+  idle(() => loadPeople().catch(() => {}));   // 첫 화면 뒤 인물 명단을 미리 받는다
+}).catch(() => { app.innerHTML = `<p class="empty">데이터 파일(data/core.json)을 불러오지 못했습니다. 페이지를 새로고침해 주세요.</p>`; });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1091 @@
+{
+ "function": {
+  "F000": "전략·기획",
+  "F001": "생산·품질·안전",
+  "F002": "사업부문장",
+  "F003": "생산·품질·안전",
+  "F004": "법무·준법·감사",
+  "F005": "경영지원",
+  "F006": "해외",
+  "F007": "전략·기획",
+  "F008": "최고경영",
+  "F009": "영업·마케팅",
+  "F010": "해외",
+  "F011": "해외",
+  "F012": "연구개발·기술",
+  "F013": "영업·마케팅",
+  "F014": "법무·준법·감사",
+  "F015": "사업부문장",
+  "F016": "생산·품질·안전",
+  "F017": "전략·기획",
+  "F018": "최고경영",
+  "F019": "인사·조직",
+  "F020": "사업부문장",
+  "F021": "재무·IR",
+  "F022": "영업·마케팅",
+  "F023": "고문·자문",
+  "F024": "인사·조직",
+  "F025": "생산·품질·안전",
+  "F026": "생산·품질·안전",
+  "F027": "연구개발·기술",
+  "F028": "생산·품질·안전",
+  "F029": "사업부문장",
+  "F030": "금융업무",
+  "F031": "전략·기획",
+  "F032": "IT·디지털",
+  "F033": "법무·준법·감사",
+  "F034": "연구개발·기술",
+  "F035": "연구개발·기술",
+  "F036": "연구개발·기술",
+  "F037": "사업부문장",
+  "F038": "IT·디지털",
+  "F039": "영업·마케팅",
+  "F040": "영업·마케팅",
+  "F041": "인사·조직",
+  "F042": "사업부문장",
+  "F043": "사업부문장",
+  "F044": "연구개발·기술",
+  "F045": "법무·준법·감사",
+  "F046": "영업·마케팅",
+  "F047": "연구개발·기술",
+  "F048": "법무·준법·감사",
+  "F049": "재무·IR",
+  "F050": "생산·품질·안전",
+  "F051": "해외",
+  "F052": "연구개발·기술",
+  "F053": "생산·품질·안전",
+  "F054": "사업부문장",
+  "F055": "전략·기획",
+  "F056": "재무·IR",
+  "F057": "재무·IR",
+  "F058": "연구개발·기술",
+  "F059": "재무·IR",
+  "F060": "재무·IR",
+  "F061": "최고경영",
+  "F062": "영업·마케팅",
+  "F063": "법무·준법·감사",
+  "F064": "대외·홍보·ESG",
+  "F065": "전략·기획",
+  "F066": "연구개발·기술",
+  "F067": "영업·마케팅",
+  "F068": "대외·홍보·ESG",
+  "F069": "재무·IR",
+  "F070": "연구개발·기술",
+  "F071": "대외·홍보·ESG",
+  "F072": "연구개발·기술",
+  "F073": "해외",
+  "F074": "재무·IR",
+  "F075": "대외·홍보·ESG",
+  "F076": "구매·SCM",
+  "F077": "연구개발·기술",
+  "F078": "연구개발·기술",
+  "F079": "경영지원",
+  "F080": "사업부문장",
+  "F081": "사업부문장",
+  "F082": "생산·품질·안전",
+  "F083": "생산·품질·안전",
+  "F084": "IT·디지털",
+  "F085": "생산·품질·안전",
+  "F086": "재무·IR",
+  "F087": "생산·품질·안전",
+  "F088": "해외",
+  "F089": "금융업무",
+  "F090": "사업부문장",
+  "F091": "영업·마케팅",
+  "F092": "사업부문장",
+  "F093": "사업부문장",
+  "F094": "연구개발·기술",
+  "F095": "연구개발·기술",
+  "F096": "재무·IR",
+  "F097": "사업부문장",
+  "F098": "전략·기획",
+  "F099": "최고경영",
+  "F100": "최고경영",
+  "F101": "경영지원",
+  "F102": "경영지원",
+  "F103": "연구개발·기술",
+  "F104": "전략·기획",
+  "F105": "고문·자문",
+  "F106": "대외·홍보·ESG",
+  "F107": "재무·IR",
+  "F108": "생산·품질·안전",
+  "F109": "법무·준법·감사",
+  "F110": "영업·마케팅",
+  "F111": "IT·디지털",
+  "F112": "생산·품질·안전",
+  "F113": "영업·마케팅",
+  "F114": "영업·마케팅",
+  "F115": "최고경영",
+  "F116": "전략·기획",
+  "F117": "생산·품질·안전",
+  "F118": "미분류",
+  "F119": "대외·홍보·ESG",
+  "F120": "전략·기획",
+  "F121": "금융업무",
+  "F122": "해외",
+  "F123": "경영지원",
+  "F124": "재무·IR",
+  "F125": "연구개발·기술",
+  "F126": "해외",
+  "F127": "영업·마케팅",
+  "F128": "영업·마케팅",
+  "F129": "연구개발·기술",
+  "F130": "영업·마케팅",
+  "F131": "전략·기획",
+  "F132": "영업·마케팅",
+  "F133": "사업부문장",
+  "F134": "사업부문장",
+  "F135": "영업·마케팅",
+  "F136": "생산·품질·안전",
+  "F137": "전략·기획",
+  "F138": "인사·조직",
+  "F139": "영업·마케팅",
+  "F140": "연구개발·기술",
+  "F141": "대외·홍보·ESG",
+  "F142": "영업·마케팅",
+  "F143": "전략·기획",
+  "F144": "대외·홍보·ESG",
+  "F145": "경영지원",
+  "F146": "대외·홍보·ESG",
+  "F147": "연구개발·기술",
+  "F148": "사업부문장",
+  "F149": "사업부문장"
+ },
+ "person": {
+  "P000": {
+   "edu_degree": "박사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "Y",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P001": {
+   "edu_degree": "",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "법조",
+   "other_groups": ""
+  },
+  "P002": {
+   "edu_degree": "박사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "학계",
+   "other_groups": ""
+  },
+  "P003": {
+   "edu_degree": "박사",
+   "edu_field": "인문·사회",
+   "edu_overseas": "Y",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P004": {
+   "edu_degree": "박사",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "학계",
+   "other_groups": ""
+  },
+  "P005": {
+   "edu_degree": "",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P006": {
+   "edu_degree": "박사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "Y",
+   "origin": "학계",
+   "other_groups": "한국앤컴퍼니그룹"
+  },
+  "P007": {
+   "edu_degree": "석사",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "학계",
+   "other_groups": ""
+  },
+  "P008": {
+   "edu_degree": "",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P009": {
+   "edu_degree": "",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P010": {
+   "edu_degree": "박사",
+   "edu_field": "인문·사회",
+   "edu_overseas": "",
+   "origin": "학계",
+   "other_groups": ""
+  },
+  "P011": {
+   "edu_degree": "",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "학계",
+   "other_groups": ""
+  },
+  "P012": {
+   "edu_degree": "박사",
+   "edu_field": "공학",
+   "edu_overseas": "Y",
+   "origin": "학계",
+   "other_groups": ""
+  },
+  "P013": {
+   "edu_degree": "학사",
+   "edu_field": "자연과학",
+   "edu_overseas": "Y",
+   "origin": "회계·세무",
+   "other_groups": "한진"
+  },
+  "P014": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P015": {
+   "edu_degree": "학사",
+   "edu_field": "법학",
+   "edu_overseas": "",
+   "origin": "법조",
+   "other_groups": ""
+  },
+  "P016": {
+   "edu_degree": "학사",
+   "edu_field": "법학",
+   "edu_overseas": "",
+   "origin": "법조",
+   "other_groups": ""
+  },
+  "P017": {
+   "edu_degree": "박사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P018": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "경영·경제",
+   "edu_overseas": "Y",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P019": {
+   "edu_degree": "학사",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P020": {
+   "edu_degree": "석사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P021": {
+   "edu_degree": "석사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "Y",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P022": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P023": {
+   "edu_degree": "",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "법조",
+   "other_groups": "효성"
+  },
+  "P024": {
+   "edu_degree": "석사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "Y",
+   "origin": "관료·공공",
+   "other_groups": "효성"
+  },
+  "P025": {
+   "edu_degree": "",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P026": {
+   "edu_degree": "학사",
+   "edu_field": "인문·사회",
+   "edu_overseas": "",
+   "origin": "학계",
+   "other_groups": ""
+  },
+  "P027": {
+   "edu_degree": "박사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "회계·세무",
+   "other_groups": ""
+  },
+  "P028": {
+   "edu_degree": "박사",
+   "edu_field": "인문·사회",
+   "edu_overseas": "",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P029": {
+   "edu_degree": "석사",
+   "edu_field": "법학",
+   "edu_overseas": "Y",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P030": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P031": {
+   "edu_degree": "박사",
+   "edu_field": "인문·사회",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P032": {
+   "edu_degree": "",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "회계·세무",
+   "other_groups": ""
+  },
+  "P033": {
+   "edu_degree": "박사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "학계",
+   "other_groups": ""
+  },
+  "P034": {
+   "edu_degree": "박사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "Y",
+   "origin": "학계",
+   "other_groups": "삼성|지에스"
+  },
+  "P035": {
+   "edu_degree": "박사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "Y",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P036": {
+   "edu_degree": "",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P037": {
+   "edu_degree": "학사",
+   "edu_field": "인문·사회",
+   "edu_overseas": "",
+   "origin": "타 그룹 출신",
+   "other_groups": "한진"
+  },
+  "P038": {
+   "edu_degree": "박사",
+   "edu_field": "인문·사회",
+   "edu_overseas": "Y",
+   "origin": "학계",
+   "other_groups": ""
+  },
+  "P039": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "법학",
+   "edu_overseas": "",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P040": {
+   "edu_degree": "박사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "Y",
+   "origin": "관료·공공",
+   "other_groups": "영풍|현대자동차"
+  },
+  "P041": {
+   "edu_degree": "박사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "Y",
+   "origin": "학계",
+   "other_groups": ""
+  },
+  "P042": {
+   "edu_degree": "박사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P043": {
+   "edu_degree": "학사",
+   "edu_field": "인문·사회",
+   "edu_overseas": "",
+   "origin": "회계·세무",
+   "other_groups": ""
+  },
+  "P044": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "관료·공공",
+   "other_groups": "효성"
+  },
+  "P045": {
+   "edu_degree": "박사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "Y",
+   "origin": "학계",
+   "other_groups": ""
+  },
+  "P046": {
+   "edu_degree": "",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "학계",
+   "other_groups": ""
+  },
+  "P047": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "회계·세무",
+   "other_groups": ""
+  },
+  "P048": {
+   "edu_degree": "학사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "외국계 기업",
+   "other_groups": ""
+  },
+  "P049": {
+   "edu_degree": "박사",
+   "edu_field": "법학",
+   "edu_overseas": "Y",
+   "origin": "학계",
+   "other_groups": "현대자동차"
+  },
+  "P050": {
+   "edu_degree": "학사",
+   "edu_field": "",
+   "edu_overseas": "Y",
+   "origin": "오너일가",
+   "other_groups": ""
+  },
+  "P051": {
+   "edu_degree": "학사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P052": {
+   "edu_degree": "학사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P053": {
+   "edu_degree": "석사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "Y",
+   "origin": "관료·공공",
+   "other_groups": ""
+  },
+  "P054": {
+   "edu_degree": "학사",
+   "edu_field": "법학",
+   "edu_overseas": "",
+   "origin": "법조",
+   "other_groups": ""
+  },
+  "P055": {
+   "edu_degree": "석사",
+   "edu_field": "법학",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P056": {
+   "edu_degree": "석사",
+   "edu_field": "",
+   "edu_overseas": "Y",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P057": {
+   "edu_degree": "석사",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P058": {
+   "edu_degree": "학사",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P059": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P060": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "법학",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P061": {
+   "edu_degree": "박사",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P062": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P063": {
+   "edu_degree": "학사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P064": {
+   "edu_degree": "석사",
+   "edu_field": "자연과학",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P065": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P066": {
+   "edu_degree": "석사",
+   "edu_field": "인문·사회",
+   "edu_overseas": "Y",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P067": {
+   "edu_degree": "석사",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P068": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P069": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "인문·사회",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P070": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "법조",
+   "other_groups": ""
+  },
+  "P071": {
+   "edu_degree": "석사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "Y",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P072": {
+   "edu_degree": "",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P073": {
+   "edu_degree": "석사",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P074": {
+   "edu_degree": "석사",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "타 그룹 출신",
+   "other_groups": "삼성|네이버|에스케이"
+  },
+  "P075": {
+   "edu_degree": "석사",
+   "edu_field": "",
+   "edu_overseas": "Y",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P076": {
+   "edu_degree": "석사",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P077": {
+   "edu_degree": "석사",
+   "edu_field": "법학",
+   "edu_overseas": "Y",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P078": {
+   "edu_degree": "학사",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P079": {
+   "edu_degree": "석사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "Y",
+   "origin": "외국계 기업",
+   "other_groups": ""
+  },
+  "P080": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P081": {
+   "edu_degree": "박사",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P082": {
+   "edu_degree": "박사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P083": {
+   "edu_degree": "석사",
+   "edu_field": "법학",
+   "edu_overseas": "Y",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P084": {
+   "edu_degree": "석사",
+   "edu_field": "",
+   "edu_overseas": "Y",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P085": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P086": {
+   "edu_degree": "박사",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P087": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "",
+   "edu_overseas": "Y",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P088": {
+   "edu_degree": "학사",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "타 그룹 출신",
+   "other_groups": "엘지"
+  },
+  "P089": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P090": {
+   "edu_degree": "석사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P091": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P092": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P093": {
+   "edu_degree": "박사",
+   "edu_field": "공학",
+   "edu_overseas": "Y",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P094": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "인문·사회",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P095": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P096": {
+   "edu_degree": "학사",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P097": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P098": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P099": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P100": {
+   "edu_degree": "학사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P101": {
+   "edu_degree": "석사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P102": {
+   "edu_degree": "",
+   "edu_field": "공학",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P103": {
+   "edu_degree": "석사",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P104": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P105": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P106": {
+   "edu_degree": "석사",
+   "edu_field": "자연과학",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P107": {
+   "edu_degree": "학사",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P108": {
+   "edu_degree": "박사",
+   "edu_field": "",
+   "edu_overseas": "Y",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P109": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "인문·사회",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P110": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "자연과학",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P111": {
+   "edu_degree": "",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "타 그룹 출신",
+   "other_groups": "HD현대"
+  },
+  "P112": {
+   "edu_degree": "석사",
+   "edu_field": "공학",
+   "edu_overseas": "Y",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P113": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "인문·사회",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P114": {
+   "edu_degree": "박사",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P115": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P116": {
+   "edu_degree": "석사",
+   "edu_field": "경영·경제",
+   "edu_overseas": "",
+   "origin": "그룹 내부",
+   "other_groups": ""
+  },
+  "P117": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P118": {
+   "edu_degree": "",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  },
+  "P119": {
+   "edu_degree": "학사(추정)",
+   "edu_field": "",
+   "edu_overseas": "",
+   "origin": "미상(경력 짧음)",
+   "other_groups": ""
+  }
+ },
+ "notes": {
+  "F001": "MSAT(Manufacturing Science & Technology). M&T 예시와 같은 논리로 생산으로 봤다. 'Technology'를 기술 키워드로 보면 순서상 연구개발·기술.",
+  "F002": "'지속가능경영위원회 위원'은 이사회 위원회 겸직이지 담당 기능이 아니라고 보고 총괄부문장=사업부문장. 순서를 문자 그대로 적용하면 ESG가 이긴다.",
+  "F004": "삼성 경영진단팀=내부감사. '감사' 문자 키워드는 없다.",
+  "F007": "미래성장본부=신사업 조직으로 보고 전략·기획. 키워드만 보면 본부장→사업부문장.",
+  "F009": "퀵서비스센터=서비스(영업) 거점으로 봄. '센터' 키워드로 사업부문장도 가능.",
+  "F012": "삼성전자 CDO=Chief Design Officer로 보고 디자인→연구개발·기술. Chief Data/Digital Officer면 IT·디지털.",
+  "F013": "현대차 지역본부=국내 판매 조직. 문자 키워드는 '본부장'뿐이라 기계는 사업부문장으로 갈 수 있다.",
+  "F016": "생산법인장: 기능(생산)+지역 → 기능 우선 규칙 적용. 실제로는 해외 법인 총괄이라 해외도 납득 가능.",
+  "F024": "평가혁신TF=인사평가 제도 혁신으로 봄. 경영평가라면 전략·기획.",
+  "F029": "'ES사업본부 산하'는 보직장이 아니라 소속 표시. 사업부문장으로 뒀지만 미분류도 가능.",
+  "F038": "AX혁신: 순서를 문자 그대로 적용하면 '혁신'(5)이 'AX'(7)보다 앞선다. 'AX혁신'은 AI 전환 업무라 IT·디지털로 판단.",
+  "F039": "상사 비철금속팀=트레이딩(영업) 팀으로 봄.",
+  "F041": "인력관리=인사. '관리'로 경영지원에 걸릴 위험.",
+  "F045": "증권사 소비자보호실=금융소비자보호 준법 기능으로 봄. '고객'류로 보면 영업.",
+  "F057": "비금융사의 금융담당=자금(재무). 금융업무 아님.",
+  "F066": "LG에너지솔루션 분석담당=R&D 분석 조직으로 추정. 근거 약함, 미분류도 가능.",
+  "F067": "연금 RM=법인 영업(관계관리)으로 봄. 금융업무도 가능.",
+  "F070": "미래전략본부 안의 AI STUDIO 부문장. '기능 조직장은 그 기능' 원칙으로 AI→연구개발·기술. 순서를 문자 그대로 적용하면 전략·기획.",
+  "F079": "지역총괄 지원팀장=경영지원(기능 우선). '지원팀' 단독은 키워드 표에 없다.",
+  "F080": "특수선 MRO사업 담당=사업 단위 장으로 봄.",
+  "F082": "LG생활건강 CPO=Chief Production Officer로 추정(생산). Procurement면 구매·SCM.",
+  "F084": "SK㈜ AT서비스부문=IT 서비스(Application Transformation). '서비스' 키워드로 영업에 걸릴 위험.",
+  "F085": "제조기술센터: 순서상 '기술'(8)이 '제조'(9)보다 앞서 연구개발·기술이 되지만, 글로벌 제조&인프라총괄 소속 제조기술 조직이라 생산으로 판단. F117, F136 동일.",
+  "F089": "대체투자금융=증권사 IB/대체투자. 문자 그대로면 '투자'가 전략·기획(5)에 먼저 걸린다.",
+  "F097": "마트 온라인운영부문=온라인 사업 단위로 봄. 영업·마케팅도 가능.",
+  "F110": "B2C유통전략팀: '전략'이 수식어이고 영역은 유통(영업)이라 영업·마케팅. 문자 순서상 전략·기획.",
+  "F113": "평생care서비스=가전 사후 서비스. 서비스 키워드로 영업·마케팅.",
+  "F114": "증권사 기관 커버리지=기관 영업. 금융업무도 가능.",
+  "F115": "대표이사의 '회사 업무 총괄'=경영총괄과 같다고 봄. 문구에 '대표이사' 없음.",
+  "F118": "영풍 동해사무소: 기능 단서 없음. 미분류.",
+  "F119": "KT&G 지속경영본부=지속가능경영(ESG) 조직으로 추정. 경영지원 성격일 수도 있다.",
+  "F123": "'울산공장 관리담당'은 공장 안의 관리(지원) 기능장. 기능 조직장 원칙으로 경영지원. 문자 순서상 공장(9)이 관리(14)를 이긴다.",
+  "F128": "전략마케팅실=마케팅 조직. 문자 순서상 전략·기획.",
+  "F129": "세포공학=바이오 R&D. 키워드 표에 없음.",
+  "F130": "증권사 지역본부=리테일 지점 영업. 키워드 없음.",
+  "F132": "현대차 N매니지먼트실=N 브랜드 상품·마케팅 운영으로 봄. 불확실.",
+  "F133": "OCI 건설프로젝트: 사업 단위로 봄. 시공·현장으로 보면 생산.",
+  "F139": "삼성생명 CPC전략실=고객·상품·채널 전략(영업 전략). 문자 순서상 전략·기획.",
+  "F142": "CX → 표대로 영업·마케팅.",
+  "F143": "괄호 '(미래성장)'으로 보아 CIO=Chief Investment/Innovation Officer로 판단해 전략·기획. 문자 그대로면 IT·디지털.",
+  "F146": "홍보/마케팅: 순서상 홍보(6)가 마케팅(12)보다 앞.",
+  "P002": "'美 Wrigley' 근무와 'KMU International Business School'(국민대) 재직은 학력이 아니다. 해외 학위 없음.",
+  "P003": "한국건강증진재단 이사장(공공기관)을 관료·공공으로 보아 순서 2가 학계(4)를 이김. 공공기관장을 공공으로 볼지 기준에 없음.",
+  "P004": "UC Berkeley는 박사후연구원(직장)이지 학위가 아니다. 해외 학위 없음.",
+  "P005": "고졸은 학위 칸이 없어 빈칸. 지역농협 조합장·농우바이오=농협 그룹 내부로 봄.",
+  "P009": "하이트진로음료 대표, PE 파트너 등 50대 그룹 밖 외부 경력만 있다. 맞는 출신 범주가 없어 미상(경력 짧음)으로 뒀지만 정의상 맞지 않는다.",
+  "P013": "KPMG 미국 감사 파트너(AICPA)=회계. 표의 4대 회계법인 목록엔 없지만 공인회계사 맥락.",
+  "P014": "금융투자협회 회장 등 50대 그룹 밖 경력만 있다(맞는 범주 없음).",
+  "P016": "법무대학원 '수료'는 학위가 아니라 보고 학사. 기준 문구('대학원'→석사)를 그대로 쓰면 석사. 금융정보분석원 위원은 위원 위촉이라 관료로 안 봄.",
+  "P018": "한국금융연구원을 정책연구원(공공)으로 봄. 민간 출연 연구원이라 아닐 수도 있다.",
+  "P019": "한국기업평가·크레딧뷰로: 맞는 범주 없음.",
+  "P020": "한국전력공사·서부발전(공기업)을 관료·공공으로 봄. P022 동일.",
+  "P022": "'다음정보기술'은 카카오(다음커뮤니케이션)와 무관.",
+  "P025": "도의회 의원(선출직 정치인)을 관료·공공으로 봄. 기준에 정치인 명시 없음.",
+  "P026": "언론대학원 수료→학사로 봄. 한겨레 대표(언론)지만 초빙교수 때문에 순서상 학계가 이김. 사람 감각으로는 언론인.",
+  "P031": "한국정보인증=다우키움 계열사(지식 기반). 토큰엔 없다.",
+  "P034": "한국은행·국민연금 자문위원은 위촉직이라 관료로 안 봄. Dimensional Fund Advisors=외국계 태그.",
+  "P039": "전 국회의원 겸 변호사. 국회의원을 관료·공공으로 보아 순서상 법조보다 앞. 기준에 명시 없음.",
+  "P045": "'교수' 단어는 없고 '강사', '경영전문대학원 원장'만 있음. 학계로 판단.",
+  "P046": "포스텍 교수는 소속이지 학력이 아니다. 학위 빈칸.",
+  "P049": "아우크스부르크대(독일)는 해외 학교 목록에 없지만 해외 학위.",
+  "P050": "한국앤컴퍼니 회장(지주사 회장)으로 오너일가가 분명하다고 봄.",
+  "P053": "서울시(지방정부) 본부장을 관료·공공으로 봄. 맥킨지(컨설팅)보다 순서 앞.",
+  "P055": "학력 조각 순서상 '행정학'이 먼저 나오지만 학부 전공(법학)을 택함. P077 동일(경영학 석사보다 사법학 학사).",
+  "P056": "SAMEX(삼성 멕시코)는 '삼성' 토큰이 없어 미상(경력 짧음). 사람은 삼성 내부로 읽는다.",
+  "P059": "경력 칸에 학력만 있다. '경력 칸이 비었다'(미상)와 '경력 짧음' 중 후자로 둠.",
+  "P061": "일진머티리얼즈=현 롯데에너지머티리얼즈(인수). 지식 기반으로 그룹 내부.",
+  "P065": "SDIHU·중대형전지事=삼성SDI 내부 코드. 토큰 없어서 미상(경력 짧음).",
+  "P066": "에이치에스애드(舊 지투알)=LG 계열 광고사(지식 기반)로 그룹 내부.",
+  "P070": "사내변호사(LG 법무팀 변호사). 기준대로 '변호사'→법조. 사람 감각으로는 그룹 내부에 가깝다.",
+  "P074": "NHN은 현재 네이버와 다른 회사지만 토큰은 네이버. '다음'은 카카오 자기 그룹.",
+  "P077": "KT&G가 KT(케이티)로 잡히면 안 된다.",
+  "P084": "RPI(Rensselaer Polytechnic Institute)는 약칭이라 해외 판정 키워드에 안 걸림. 사람은 Y.",
+  "P088": "LG→LX 계열분리 사례. 기준대로 타 그룹 출신.",
+  "P090": "케이뱅크=KT 계열(지식 기반). 우리은행은 50대 그룹 밖.",
+  "P093": "브이엔티지(외부 스타트업) 경력이 있지만 맞는 범주 없음. 세아홀딩스로 그룹 내부.",
+  "P096": "이명희는 신세계 오너지만 경력 칸이 학력뿐이라 텍스트만으로는 오너일가 판정 불가(관계 칸이 필요).",
+  "P102": "중퇴는 학위 아님→빈칸. 전공은 화학공학으로 공학.",
+  "P110": "전산통계학을 자연과학으로 봄(공학도 가능).",
+  "P112": "'핀)알토대'=핀란드 Aalto. 국가 약칭 '핀)'은 목록에 없다.",
+  "P115": "제일모직=삼성 계열이지만 토큰은 '제일기획'만 있다.",
+  "P119": "'검사총괄'(품질검사)이 법조 '검사'로 잡히면 안 된다."
+ },
+ "standard_issues": [
+  "출신 축에 '50대 그룹 밖 국내 기업·기관 출신' 범주가 없다. 미상(경력 짧음)의 정의('외부 경력도 없다')와 충돌한다. 예: P009(하이트진로음료 대표), P014(금융투자협회장), P019(한국기업평가), P093(브이엔티지).",
+  "기능 축에서 '전략'·'혁신'·'투자'·'기술' 같은 범용 수식어가 순서상 앞이라 실제 영역 명사를 이긴다. 예: F110 'B2C유통전략', F128 '전략마케팅', F139 'CPC전략', F038 'AX혁신', F089 '대체투자금융', F085/F117/F136 '제조기술센터'. '재무전략→재무'(F107)처럼 영역 명사가 앞 순서일 때만 맞게 나온다. 'X전략'에서 X가 기능이면 X로 간다는 판정 규칙이 필요하다.",
+  "관료·공공의 범위가 불명확하다. 공기업(한전, P020/P022), 공공기관장(P003), 국회의원·도의원(P039/P025), 지방정부(P053), 민간 출연 연구원(한국금융연구원 P018), 정부위원회 위촉 위원(P016, P034)을 넣을지 정해야 한다. 위촉 위원까지 넣으면 순서 2라서 법조·학계를 대거 덮어쓴다.",
+  "'경력 칸이 비었다(미상)'와 '경력 짧음'의 경계가 불명확하다. 경력 칸에 학력만 있는 경우(P059, P076, P083, P097)를 어디로 볼지 정해야 한다. 또 삼성 내부 약칭(SAMEX, SDIHU, SDIEU: P056/P065/P087)은 그룹 이름이 없다는 이유로 미상이 되는데, 사람은 그룹 내부로 읽는다.",
+  "학력 전공 규칙 '가장 먼저 나오는 전공 키워드(대개 학부)'는 대학원이 먼저 적힌 경우 학부 전공과 어긋난다(P055 행정학 석사→법학 학사, P077 경영학 석사→사법학 학사). 또 '대학원→석사'를 '수료'에 그대로 적용할지 불명확하다(P016, P026). '박사수료는 석사'만 있고 '석사수료'와 '중퇴'(P102)는 규정이 없다.",
+  "해외 학위 판정이 학력 조각에 의존하지만 경력 문구에도 Univ·美가 섞인다(P004 Berkeley 박사후연구원, P002 '美 Wrigley' 근무, 'KMU International Business School' 재직). 반대로 RPI(P084), 핀)알토대(P112), 아우크스부르크대(P049), 콜로라도대(P024)처럼 목록 밖 해외 학교는 놓친다.",
+  "그룹 내부 판정이 group_tokens에 의존해 계열사 상당수가 빠진다(제일모직 P115, 케이뱅크 P090, 한국정보인증 P031, 에이치에스애드 P066, 일진머티리얼즈→롯데 P061). 그룹별 계열사 명단(공정위 소속회사)으로 토큰을 보강해야 한다.",
+  "사내변호사(P070)도 '변호사' 키워드로 법조가 된다. 법조를 '법원·검찰·로펌 경력'으로 좁힐지 정해야 한다. 같은 이유로 초빙교수(P026)·자문교수가 학계로 언론·기업 경력을 덮는다.",
+  "기능 축에서 이사회 위원회 겸직 문구('지속가능경영위원회 위원', F002)와 소속 표시('ES사업본부 산하', F029; '대체투자금융1본부소속', F089)를 보직으로 볼지 기준이 없다."
+ ]
+}

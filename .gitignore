@@ -1,0 +1,7 @@
+# DART에서 내려받은 원문 사본 (약 785MB). 02_fetch.py로 다시 받는다.
+data/raw/
+# 로컬 설정
+.claude/
+.DS_Store
+__pycache__/
+*.pyc
