@@ -516,7 +516,7 @@ const MET = {
   ext_hire: { t: "외부 경력 확인", f: v => pct(v), time: "flow", rate: true, pp: true },   // 판단 가능한 신규 임원 중 비율
   out_ratio: { t: "사외이사 비율", f: v => pct(v), time: "now", rate: true, pp: true },
   fem_dir: { t: "여성 등기이사", f: v => pct(v), time: "now", rate: true, pp: true },
-  law: { t: "법정 요건", f: v => v, time: "now", check: true },
+  law: { t: "이사회 법정 요건", f: v => v, time: "now", check: true },
   pay: { t: "미등기 평균 보수", f: v => eok(v), time: "pay", rate: true },
   grad: { t: "석·박사", f: v => pct(v), time: "now", rate: true, pp: true },
   overseas: { t: "해외 학위", f: v => pct(v), time: "now", rate: true, pp: true },
@@ -885,15 +885,15 @@ function coverage(m, g) {   // 근거가 부족해 비교하지 않는 지표의
   return "";
 }
 function lawText(r) {
-  const bx = r.boardx; if (!r.has_data || !bx?.n_mand) return "대상 없음";
+  const bx = r.boardx; if (!r.has_data || !bx?.n_mand) return "해당 회사 없음";
   const bad = new Set([...bx.no_major, ...bx.no_fem]).size;
-  return bad ? `${bx.n_mand}곳 중 ${bad}곳 미충족` : `${bx.n_mand}곳 모두 충족`;
+  return bad ? `대상 ${bx.n_mand}곳 중 ${bad}곳 미충족` : `대상 ${bx.n_mand}곳 모두 충족`;
 }
 function lawCell(r) {
-  const bx = r.boardx; if (!r.has_data) return ""; if (!bx?.n_mand) return `<span class="na">대상 없음</span>`;
+  const bx = r.boardx; if (!r.has_data) return ""; if (!bx?.n_mand) return `<span class="na">해당 회사 없음</span>`;
   const bad = new Set([...bx.no_major, ...bx.no_fem]).size;
   const why = [bx.no_major.length ? `사외이사 과반 아님 ${bx.no_major.length}곳` : "", bx.no_fem.length ? `여성 등기이사 없음 ${bx.no_fem.length}곳` : ""].filter(Boolean).join(", ");
-  return bad ? `<span class="pill warn" title="${esc(why)}">${bad}곳 미충족</span><div class="na" style="font-size:11.5px">${esc(why)}</div>` : `<span class="na">${bx.n_mand}/${bx.n_mand} 충족</span>`;
+  return bad ? `<span class="pill warn" title="${esc(why)}">대상 ${bx.n_mand}곳 중 ${bad}곳 미충족</span><div class="na" style="font-size:11.5px">${esc(why)}</div>` : `<span class="na">대상 ${bx.n_mand}곳 모두 충족</span>`;
 }
 function metricCell(m, r) {
   if (!r.has_data) return "";
@@ -928,7 +928,7 @@ function homeTable() {
   return table({ cols, rows, pinned, key: "rank", dir: 1, href: r => r.has_data ? `g${r.rank}` : null, rowClass: r => (!r.has_data ? "nodata" : r.small ? "small" : "") + (r._mine ? " mine" : ""),
     groupsHdr: grpHdr, title: `50대 그룹 비교_${view.t}`, countLabel: `50개 그룹 · 비율 비교 대상 ${fmt(nCmp)}개`,
     limit: 10, moreAll: true, sep: 5, inPlaceKey: "rank",
-    note: `<b>읽는 법</b> 맨 위 회색 띠가 비교 기준입니다. ‘전체’는 모든 그룹 경영진을 합산한 값(인원 가중)이고, ‘중앙값’과 순위는 경영진 ${M().min_n}명 이상 그룹만으로 산출합니다. 막대 위 세로 눈금은 비율 지표에서는 50대 전체, 인원 지표에서는 그룹 중앙값을 나타냅니다. 회색 줄은 비율 비교에서 제외한 그룹입니다. 경영진 ${M().min_n}명 미만 그룹은 ‘표본 작음’으로 표시하고, 쿠팡·부영·한국지엠은 임원 명단 공시가 없습니다. 지표 열로 정렬하면 회색 줄은 맨 아래로 내려갑니다.` });
+    note: `<b>읽는 법</b> 맨 위 회색 띠가 비교 기준입니다. ‘전체’는 모든 그룹 경영진을 합산한 값(인원 가중)이고, ‘중앙값’과 순위는 경영진 ${M().min_n}명 이상 그룹만으로 산출합니다. 막대 위 세로 눈금은 비율 지표에서는 50대 전체, 인원 지표에서는 그룹 중앙값을 나타냅니다. ‘이사회 법정 요건’은 자산 2조 원 이상 비금융 상장 계열사(대상)가 사외이사 과반과 이사회 성별 구성 요건을 지켰는지 점검한 결과입니다. 회색 줄은 비율 비교에서 제외한 그룹입니다. 경영진 ${M().min_n}명 미만 그룹은 ‘표본 작음’으로 표시하고, 쿠팡·부영·한국지엠은 임원 명단 공시가 없습니다. 지표 열로 정렬하면 회색 줄은 맨 아래로 내려갑니다.` });
 }
 function excludedGroups(out) {   // 비교에서 뺀 그룹: 표본이 작거나 임원 명단 공시가 없는 그룹
   if (!out.length) return "";
