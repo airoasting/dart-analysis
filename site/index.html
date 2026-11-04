@@ -424,9 +424,9 @@ const timeLabel = t => t === "now" ? `${ASOF()} 기준` : t === "flow" ? `${M().
 function diffText(m, v, ref) {
   if (v == null || ref == null) return "";
   const d = v - ref, mm = MET[m];
-  if (Math.abs(d) < 0.05) return "전체와 같음";
+  if (Math.abs(d) < 0.05) return "전체와 같습니다";
   const s = mm.pp ? `${Math.abs(d).toFixed(1)}%p` : m === "pay" ? `${Math.abs(d / 100).toFixed(2)}억` : `${Math.abs(d).toFixed(1)}${mm.unit || ""}`;
-  return `전체보다 ${s} ${d > 0 ? "높음" : "낮음"}`;
+  return `전체보다 ${s} ${d > 0 ? "높습니다" : "낮습니다"}`;
 }
 
 /* ---------- 차트 ---------- */
@@ -699,13 +699,13 @@ function kpiCard(m, g, { label, sub } = {}) {
     return `<div class="kpi"><span>${label || mm.t} ${defBtn(m)}</span><b style="color:var(--muted)">근거 부족</b><span class="cmp">${esc(coverage(m, g))}${raw != null ? ` · 판단 가능자 중 ${pct(raw)}` : ""}</span><span class="rank">판단할 수 있는 사람이 적어 순위에서 뺐습니다. 전체 ${b.all == null ? "–" : mm.f(b.all)}</span></div>`;
   }
   if (g && g.small && mm.rate) return `<div class="kpi"><span>${label || mm.t} ${defBtn(m)}</span><b>${v == null ? "–" : mm.f(v)}${mm.unit && v != null ? `<small>${mm.unit}</small>` : ""}</b><span class="cmp">표본이 작아(경영진 ${g.k?.n || 0}명) 비교하지 않습니다</span></div>`;
-  const rank = g?.rank_of?.[m];
+  const rank = g?.rank_of?.[m], pv = prevLine(m, g, v);
   return `<div class="kpi"><span>${label || mm.t} ${defBtn(m)}</span>
     <b>${v == null ? "–" : mm.f(v)}${mm.unit && v != null && !String(mm.f(v)).endsWith(mm.unit) ? `<small>${mm.unit}</small>` : ""}</b>
-    ${g && m === "executives" ? `<span class="cmp">${prevDelta(g.heads)}50대 그룹 경영진 ${fmt(b.all)}명의 <em>${(100 * v / b.all).toFixed(1)}%</em> · 그룹 중앙값 ${fmt(b.median)}명</span>${strip(m, g)}` : g ? `<span class="cmp">전체 <em>${b.all == null ? "–" : mm.f(b.all)}</em> · 중앙값 ${b.median == null ? "–" : mm.f(b.median)}</span>
+    ${g && m === "executives" ? `<span class="cmp">${prevDelta(g.heads)}50대 그룹 경영진 ${fmt(b.all)}명의 <em>${(100 * v / b.all).toFixed(1)}%</em> · 그룹 중앙값 ${fmt(b.median)}명</span>${strip(m, g)}` : g ? `<span class="cmp">${pv}전체 <em>${b.all == null ? "–" : mm.f(b.all)}</em> · 중앙값 ${b.median == null ? "–" : mm.f(b.median)}</span>
       ${m === "ext_hire" ? `<span class="rank">${esc(coverage(m, g))}</span>` : ""}
-      ${rank && m !== "executives" ? `<span class="rank">경영진 ${M().min_n}명 이상${m === "ext_hire" ? "·근거 충분" : ""} ${b.n}개 그룹 중 ${rankText(rank, b.n)}${mm.rate && v != null && b.all != null ? ` · ${diffText(m, v, b.all)}` : ""}</span>` : ""}${m !== "executives" ? strip(m, g) : ""}`
-      : `<span class="cmp">${sub || timeLabel(mm.time)}</span>`}</div>`;
+      ${rank && m !== "executives" ? `<span class="rank">경영진 ${M().min_n}명 이상${m === "ext_hire" ? "·근거 충분" : ""} ${b.n}개 그룹 중 ${rankText(rank, b.n)}${mm.rate && v != null && b.all != null ? `이고, ${diffText(m, v, b.all)}.` : "입니다."}</span>` : ""}${m !== "executives" ? strip(m, g) : ""}`
+      : `<span class="cmp">${pv}${sub || timeLabel(mm.time)}</span>`}</div>`;
 }
 function footer() {
   $("#foot").innerHTML = `<div>자료: DART 사업보고서·반기보고서 'VIII-1. 임원 및 직원 등의 현황'(2018–2026.6), 공정거래위원회 2026년 공시대상기업집단 지정 결과. 공시된 그대로 정리했고, 뉴스나 SNS 정보는 붙이지 않았습니다.</div>
@@ -720,11 +720,20 @@ function jong(w) { const c = String(w).trim().slice(-1).charCodeAt(0); if (c >= 
 const ro = w => { const j = jong(w); return `${w}${j && j !== 8 ? "으로" : "로"}`; };
 const ida = w => `${w}${jong(w) ? "이었" : "였"}`;
 /* 직전 시점(전년 말) 대비 증감: 반기 말이면 6개월 변화다 */
+function prevLine(m, g, v) {   // 평균 나이·여성 비율의 전년 말 대비
+  if (m !== "avg_age" && m !== "female") return "";
+  const k = g ? g.k_prev : CORE.total.k_prev; if (!k || v == null || k[m] == null) return "";
+  const d = Math.round((v - k[m]) * 10) / 10, sign = d > 0 ? "+" : d < 0 ? "−" : "";
+  const prev = m === "avg_age" ? `${f1(k[m])}세` : pct(k[m]);
+  const amt = m === "avg_age" ? `${Math.abs(d).toFixed(1)}세` : `${Math.abs(d).toFixed(1)}%p`;
+  const ch = d === 0 ? "와 같습니다" : `보다 ${amt} ${m === "avg_age" ? (d > 0 ? "많습니다" : "적습니다") : (d > 0 ? "높습니다" : "낮습니다")}`;
+  return `<span class="delta">${k.year}년 말 ${prev}${ch}.</span>${m === "avg_age" ? `<span class="na" style="display:block;font-size:11.5px">나이는 연도 기준이라 같은 사람도 해가 바뀌면 1세 오릅니다.</span>` : "<br>"}`;
+}
 function prevDelta(heads) {
   const ys = YEARS(), i = ys.length - 1, cur = heads?.[i], prev = heads?.[i - 1];
   if (cur == null || prev == null || !prev) return "";
   const d = cur - prev, cls = d > 0 ? "up" : d < 0 ? "down" : "";
-  return `<span class="delta ${cls}">${ys[i - 1]}년 말 ${fmt(prev)}명 대비 ${d === 0 ? "변동 없음" : `${d > 0 ? "+" : "−"}${fmt(Math.abs(d))}명(${d > 0 ? "+" : "−"}${(Math.abs(d) / prev * 100).toFixed(1)}%)`}</span><br>`;
+  return `<span class="delta ${cls}">${ys[i - 1]}년 말 ${fmt(prev)}명보다 ${d === 0 ? "변동이 없습니다" : `${fmt(Math.abs(d))}명(${(Math.abs(d) / prev * 100).toFixed(1)}%) ${d > 0 ? "늘었습니다" : "줄었습니다"}`}.</span><br>`;
 }
 /* ---------- 화면: 첫 화면 ---------- */
 let homeView = store.get("homeView") || "comp";
@@ -743,7 +752,7 @@ function coverage(m, g) {   // 근거가 부족해 비교하지 않는 지표의
   if (m === "ext_hire" && g.hire) return !g.hire.n ? "신규 없음" : g.hire.extreme ? `검수 필요 · 판단 가능 ${fmt(g.hire.known)}명 중 외부 ${fmt(g.hire.ext)}명(${pct(g.hire.ext_pct_raw)})` : `판단 가능 ${fmt(g.hire.known)}/${fmt(g.hire.n)}명(${pct(g.hire.known_pct)})`;
   if ((m === "grad" || m === "overseas") && g.mix) {
     const thin = g.mix.edu_n < 30 || g.mix.edu_n < 0.5 * g.mix.n;
-    return thin || m === "overseas" ? `학력 공시 ${fmt(g.mix.edu_n)}/${fmt(g.mix.n)}명` : `학사(추정) ${fmt(g.mix.est)}/${fmt(g.mix.edu_n)}명: 학위가 적히지 않은 학력이 절반을 넘음`;
+    return thin || m === "overseas" ? `학력 공시 ${fmt(g.mix.edu_n)}/${fmt(g.mix.n)}명` : `학사(추정) ${fmt(g.mix.est)}/${fmt(g.mix.edu_n)}명: 학위가 적히지 않은 학력이 절반을 넘습니다`;
   }
   return "";
 }
@@ -805,7 +814,7 @@ function viewHome() {
   ${mineG ? "" : `<div class="band info no-print" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span>내 그룹을 고르면 표 맨 위에 고정되고, 숫자마다 전체·중앙값·순위가 붙습니다.</span>
     <select id="mine2" aria-label="내 그룹 고르기"><option value="">그룹 고르기</option>${CORE.groups.filter(g => g.has_data).map(g => `<option value="${g.rank}">${g.rank}. ${esc(g.name)}</option>`).join("")}</select></div>`}
   <div class="kpis">
-    ${kpiCard("executives", mineG, { label: mineG ? `${mineG.name} 경영진` : "경영진", sub: `${prevDelta(mineG ? mineG.heads : T.heads)}${M().n_groups_data}개 그룹 ${M().n_companies}곳, 겸직자는 한 번만 셈` })}
+    ${kpiCard("executives", mineG, { label: mineG ? `${mineG.name} 경영진` : "경영진", sub: `${prevDelta(mineG ? mineG.heads : T.heads)}${M().n_groups_data}개 그룹 ${M().n_companies}곳, 겸직자는 한 번만 셉니다` })}
     ${kpiCard("avg_age", mineG, { label: mineG ? `${mineG.name} 평균 나이` : "평균 나이" })}
     ${kpiCard("female", mineG, { label: mineG ? `${mineG.name} 여성` : "여성 비율" })}
     ${kpiCard("new_rate", mineG, { label: mineG ? `${mineG.name} 신규율` : "연평균 신규율" })}
@@ -849,11 +858,11 @@ function insights() {
   const fem = by("female"), b80 = by("b80");
   const i0 = ys.indexOf(+M().flow[0]), i1 = ys.indexOf(FLOW_END());
   const cards = [
-    { h: `여성 경영진 비율, 그룹마다 크게 다르다`, b: `${esc(fem[0].name)} ${pct(fem[0].v.female)}, ${esc(fem[1].name)} ${pct(fem[1].v.female)}가 높고 ${esc(fem.at(-1).name)} ${pct(fem.at(-1).v.female)}가 가장 낮습니다(경영진 ${M().min_n}명 이상 그룹). 50대 전체는 ${pct(B.female.all)}.`, to: `g${fem[0].rank}`, tl: `${esc(fem[0].name)} 보기` },
-    (() => { const a = T.new_rate[i0], b = T.new_rate[i1], dir = b < a - 0.5 ? ["줄었다", "내려갔습니다"] : b > a + 0.5 ? ["늘었다", "올라갔습니다"] : ["비슷하다", "움직였습니다"];
+    { h: `여성 경영진 비율은 그룹마다 크게 다릅니다`, b: `${esc(fem[0].name)} ${pct(fem[0].v.female)}, ${esc(fem[1].name)} ${pct(fem[1].v.female)}가 높고 ${esc(fem.at(-1).name)} ${pct(fem.at(-1).v.female)}가 가장 낮습니다(경영진 ${M().min_n}명 이상 그룹). 50대 전체는 ${pct(B.female.all)}.`, to: `g${fem[0].rank}`, tl: `${esc(fem[0].name)} 보기` },
+    (() => { const a = T.new_rate[i0], b = T.new_rate[i1], dir = b < a - 0.5 ? ["줄었습니다", "내려갔습니다"] : b > a + 0.5 ? ["늘었습니다", "올라갔습니다"] : ["비슷합니다", "움직였습니다"];
       return { h: `새로 선임되는 임원 비율이 ${dir[0]}`, b: `연간 신규율이 ${M().flow[0]}년 ${pct(a)}에서 ${FLOW_END()}년 ${pct(b)}로 ${dir[1]}. 신규율은 그해 신규 선임 ÷ 전년 말 경영진입니다.`, to: "cmp-flow", tl: "그룹별 인사 흐름 보기" }; })(),
-    { h: `사외이사는 관료·법조·학계 출신이 많다`, b: `사외이사 ${fmt(T.out.n)}명 중 관료·법조 ${pct(B.out_gov.all)}, 학계 ${pct(B.out_acad.all)}입니다(공시 경력 규칙 분류).`, to: "cmp-board", tl: "그룹별 이사회 보기" },
-    { h: `80년대생 경영진은 아직 드물다`, b: `50대 전체 경영진 중 1980년대생은 ${pct(B.b80.all)}입니다. 가장 높은 곳은 ${esc(b80[0].name)}(${pct(b80[0].v.b80)}), 그다음 ${esc(b80[1].name)}(${pct(b80[1].v.b80)})입니다.`, to: "cmp-comp", tl: "그룹별 구성 보기" },
+    { h: `사외이사는 관료·법조·학계 출신이 많습니다`, b: `사외이사 ${fmt(T.out.n)}명 중 관료·법조 ${pct(B.out_gov.all)}, 학계 ${pct(B.out_acad.all)}입니다(공시 경력 규칙 분류).`, to: "cmp-board", tl: "그룹별 이사회 보기" },
+    { h: `80년대생 경영진은 아직 드뭅니다`, b: `50대 전체 경영진 중 1980년대생은 ${pct(B.b80.all)}입니다. 가장 높은 곳은 ${esc(b80[0].name)}(${pct(b80[0].v.b80)}), 그다음 ${esc(b80[1].name)}(${pct(b80[1].v.b80)})입니다.`, to: "cmp-comp", tl: "그룹별 구성 보기" },
   ];
   return `<div class="grid2" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">${cards.map(c => `<section class="panel"><h3 style="margin-bottom:6px">${c.h}</h3><p style="margin:0;color:var(--ink-2);font-size:14px">${c.b}</p>
     <p class="note" style="margin-top:8px"><a href="#${c.to}">${c.tl}</a></p></section>`).join("")}</div>`;
@@ -1142,7 +1151,7 @@ function viewPerson(id) {
       const body = rs.length ? rs.map(r => { const c = compAt(r[1]);
         return `<div><span class="pos">${c ? `<a href="#c${c.id}">${esc(c.name)}</a>` : "–"} · ${esc(r[3])}</span> <span class="pill ${r[2] === 0 ? "" : "reg"}">${esc(PEOPLE.reg[r[2]])}</span> <span class="pill">${esc(PEOPLE.funcs[r[6]])}</span>
           ${r[5] && r[5] !== "-" ? `<div class="duty">${esc(r[5])}</div>` : ""}
-          ${c?.src[y] ? `<span style="font-size:12.5px"><a href="${esc(c.src[y])}" target="_blank" rel="noopener">${isPartial(y) ? `${y} 반기보고서` : `${y} 사업보고서`} 원문</a> · <button style="all:unset;cursor:pointer;color:var(--accent)" type="button" data-cite="${esc(`${c.name}, ${isPartial(y) ? `${y} 반기보고서` : `${y} 사업보고서`}(접수번호 ${(c.src[y].match(/rcpNo=(\d+)/) || [])[1] || ""}), VIII-1 임원 및 직원 등의 현황, 기준일 ${c.asof?.[y] || ""}`)}">인용 복사</button></span>` : ""}</div>`; }).join("") : `<div class="duty">그룹 공시 회사 명단에 없음 (퇴임 또는 비상장 계열사 이동)</div>`;
+          ${c?.src[y] ? `<span style="font-size:12.5px"><a href="${esc(c.src[y])}" target="_blank" rel="noopener">${isPartial(y) ? `${y} 반기보고서` : `${y} 사업보고서`} 원문</a> · <button style="all:unset;cursor:pointer;color:var(--accent)" type="button" data-cite="${esc(`${c.name}, ${isPartial(y) ? `${y} 반기보고서` : `${y} 사업보고서`}(접수번호 ${(c.src[y].match(/rcpNo=(\d+)/) || [])[1] || ""}), VIII-1 임원 및 직원 등의 현황, 기준일 ${c.asof?.[y] || ""}`)}">인용 복사</button></span>` : ""}</div>`; }).join("") : `<div class="duty">그룹 공시 회사 명단에 없습니다(퇴임 또는 비상장 계열사 이동).</div>`;
       return `<div class="tl-row"><div class="tl-year">${label}</div><div class="tl-body">${body}${es ? `<div class="evs">${es}</div>` : ""}</div></div>`;
     }
     const last = rows.at(-1), lc = compAt(last[1]);

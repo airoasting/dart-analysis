@@ -196,6 +196,19 @@ def main():
             board_c[r["corp_code"]].append(r)
             board_g[r["group"]][r["person_id"]] = r
 
+    # 직전 시점(전년 말) 단면: 카드의 '전년 말 대비'용
+    PREV = YEARS[-2]
+    prev_g = collections.defaultdict(dict)
+    for r in py:
+        if r["year"] == PREV and r["reg_class"] in EXEC:
+            prev_g[r["group"]][r["person_id"]] = r
+
+    def prev_kpi(rs):
+        if not rs:
+            return None
+        return {"year": PREV, "n": len(rs), "avg_age": round(statistics.mean(int(r["age"]) for r in rs), 1),
+                "female": pct(sum(r["sex"] == "여" for r in rs), len(rs))}
+
     def kpis(rs):
         ex = [r for r in rs if r["reg_class"] in EXEC]
         if not ex:
@@ -313,7 +326,7 @@ def main():
             "heads": [heads[y] or None for y in YEARS],
             "ev": {e: [g_ev[(name, y, e)] for y in YEARS] for e in ("신규", "승진", "이탈", "공시확대", "직급체계변경")},
             "new_rate": new_rate_series(heads, g_ev, name),
-            "k": kpis(list(by_g[name].values())), "mix": person_mix(list(by_g[name].keys())),
+            "k": kpis(list(by_g[name].values())), "k_prev": prev_kpi(list(prev_g[name].values())), "mix": person_mix(list(by_g[name].keys())),
             "out": board_stats(board_g[name].values()),
             "boardx": board_x([c for c in companies if c["group"] == LABEL.get(name, name)]),
             "hidden_by_year": [pct(hid_g[(name, y)], len(g_heads[(name, y)])) if g_heads[(name, y)] else None for y in YEARS],
@@ -421,6 +434,7 @@ def main():
                                 "classify_sample": "기능 150행, 학력·출신 120명", "classify": {"기능": "94.0%", "최종 학위": "90.8%", "전공": "90.8%", "해외 학위": "94.2%", "출신": "92.5%"}}},
         "bench": bench,
         "total": {"heads": [all_heads[y] or None for y in YEARS], "const_heads": const_heads,
+                  "k_prev": prev_kpi([r for d in prev_g.values() for r in d.values()]),
                   "ev": {e: [all_ev[("전체", y, e)] for y in YEARS] for e in ("신규", "승진", "이탈", "공시확대", "직급체계변경")},
                   "new_rate": new_rate_series(all_heads, all_ev, "전체"),
                   "func": dict(collections.Counter(r["function"] for r in pooled_exec)),
