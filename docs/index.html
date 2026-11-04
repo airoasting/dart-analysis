@@ -177,14 +177,14 @@ section.panel { background: transparent; border: 0; border-top: 2px solid var(--
               linear-gradient(135deg, var(--hero-a) 0%, var(--hero-b) 48%, var(--hero-c) 100%); }
 .hero-copy { display: grid; gap: 14px; margin-block: auto; padding-block: 24px; }
 /* 경영진 표식: AI ROASTING 아이콘 갤러리의 여러 사용자·막대 차트·선 차트·검색을 점선으로 이은 구성(경영진을 찾고 비교하는 데이터). 글자 뒤 반투명, 처음 한 번 선을 그린다 */
-.hero-mark { position: absolute; z-index: -1; right: 0; top: 110px; width: min(18vw, 252px); height: auto; color: #ffffff; opacity: .26; pointer-events: none; }
+.hero-mark { position: absolute; z-index: -1; right: 0; top: 70px; width: min(30vw, 420px); height: auto; color: #ffffff; opacity: .26; pointer-events: none; }
 .hero-mark .ic path, .hero-mark .ic circle { stroke-dasharray: 1.02 1; stroke-dashoffset: 1.02; animation: markDraw 1.5s cubic-bezier(.65, 0, .35, 1) var(--d, 0s) forwards; }   /* 대시를 경로보다 조금 길게 해 다 그린 뒤 틈이 남지 않게 */
 .hero-mark .cn { opacity: 0; animation: markFade 1s ease 1.2s forwards; }
 .hero-mark .cn.dots { opacity: 0; }
 @keyframes markDraw { to { stroke-dashoffset: 0; } }
 @keyframes markFade { to { opacity: .8; } }
 @media (prefers-reduced-motion: reduce) { .hero-mark .ic path, .hero-mark .ic circle { animation: none; stroke-dasharray: none; stroke-dashoffset: 0; } .hero-mark .cn { animation: none; opacity: .8; } }
-@media (max-width: 900px) { .hero-mark { width: 35vw; top: 40px; opacity: .12; } }
+@media (max-width: 900px) { .hero-mark { width: 58vw; top: 40px; opacity: .1; } }
 .hero .scroll-cue { align-self: center; margin-top: 18px; font-size: 13px; color: var(--muted); display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
 .hero .scroll-cue:hover { color: var(--ink); text-decoration: none; }
 .hero .scroll-cue svg { animation: cue 1.8s ease-in-out infinite; }
