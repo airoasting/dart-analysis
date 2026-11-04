@@ -177,14 +177,14 @@ section.panel { background: transparent; border: 0; border-top: 2px solid var(--
               linear-gradient(135deg, var(--hero-a) 0%, var(--hero-b) 48%, var(--hero-c) 100%); }
 .hero-copy { display: grid; gap: 14px; margin-block: auto; padding-block: 24px; }
 /* 경영진 표식: AI ROASTING 아이콘 갤러리의 여러 사용자·막대 차트·선 차트·검색을 점선으로 이은 구성(경영진을 찾고 비교하는 데이터). 글자 뒤 반투명, 처음 한 번 선을 그린다 */
-.hero-mark { position: absolute; z-index: -1; right: 0; top: 70px; width: min(30vw, 420px); height: auto; color: #ffffff; opacity: .26; pointer-events: none; }
+.hero-mark { position: absolute; z-index: -1; right: 0; top: 110px; width: min(18vw, 252px); height: auto; color: #ffffff; opacity: .26; pointer-events: none; }
 .hero-mark .ic path, .hero-mark .ic circle { stroke-dasharray: 1.02 1; stroke-dashoffset: 1.02; animation: markDraw 1.5s cubic-bezier(.65, 0, .35, 1) var(--d, 0s) forwards; }   /* 대시를 경로보다 조금 길게 해 다 그린 뒤 틈이 남지 않게 */
 .hero-mark .cn { opacity: 0; animation: markFade 1s ease 1.2s forwards; }
 .hero-mark .cn.dots { opacity: 0; }
 @keyframes markDraw { to { stroke-dashoffset: 0; } }
 @keyframes markFade { to { opacity: .8; } }
 @media (prefers-reduced-motion: reduce) { .hero-mark .ic path, .hero-mark .ic circle { animation: none; stroke-dasharray: none; stroke-dashoffset: 0; } .hero-mark .cn { animation: none; opacity: .8; } }
-@media (max-width: 900px) { .hero-mark { width: 58vw; top: 40px; opacity: .1; } }
+@media (max-width: 900px) { .hero-mark { width: 35vw; top: 40px; opacity: .12; } }
 .hero .scroll-cue { align-self: center; margin-top: 18px; font-size: 13px; color: var(--muted); display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
 .hero .scroll-cue:hover { color: var(--ink); text-decoration: none; }
 .hero .scroll-cue svg { animation: cue 1.8s ease-in-out infinite; }
@@ -686,7 +686,7 @@ function strip(m, g) {
 }
 
 /* ---------- 표: 정렬(키보드), 고정 기준 행, 열 그룹, 표본 작음 아래로, 복사·CSV ---------- */
-function table({ cols, rows, pinned = [], key, dir = -1, href, rowClass, groupsHdr, title = "표", note = "", stickyFirst = true, countLabel, limit = 0, moreAll = false, unit = "명", sep = 0 }) {
+function table({ cols, rows, pinned = [], key, dir = -1, href, rowClass, groupsHdr, title = "표", note = "", stickyFirst = true, countLabel, limit = 0, moreAll = false, unit = "명", sep = 0, inPlaceKey = null }) {
   const id = uid("t");
   let k = key === null ? null : (key || cols[0].k), d = dir, lim = limit, lastSorted = rows;
   const val = (c, r) => c.v ? c.v(r) : r[c.k];
@@ -694,7 +694,7 @@ function table({ cols, rows, pinned = [], key, dir = -1, href, rowClass, groupsH
     const el = document.getElementById(id); if (!el) return;
     const c = cols.find(c => c.k === k);
     const sorted = !c ? rows.slice() : rows.slice().sort((a, b) => {   // key가 없으면 넘겨받은 순서를 지킨다
-      const sa = a._bottom ? 1 : 0, sb = b._bottom ? 1 : 0; if (sa !== sb) return sa - sb;   // 표본 작음·공시 없음은 항상 아래
+      const sa = a._bottom ? 1 : 0, sb = b._bottom ? 1 : 0; if (sa !== sb && c.k !== inPlaceKey) return sa - sb;   // 표본 작음·공시 없음은 아래로(자산 순위 정렬이면 제자리)
       const va = val(c, a), vb = val(c, b);
       if (va == null || va === "") return 1; if (vb == null || vb === "") return -1;
       return (va > vb ? 1 : va < vb ? -1 : 0) * d;
@@ -902,12 +902,12 @@ function homeTable() {
   const mine = me ? CORE.groups.find(g => g.rank === me && g.has_data) : null;
   if (mine) pinned.push({ ...mine, _mine: true, _href: `g${mine.rank}`, name: `관심 그룹: ${mine.name}`,
     ...Object.fromEntries(ms.map(m => [m, mine.small && MET[m].rate ? null : mine.v[m]])) });
-  const all = groupRowsForHome(), rows = all.filter(r => r.has_data && !r.small), out = all.filter(r => !r.has_data || r.small);
+  const rows = groupRowsForHome().map(r => r.has_data ? r : { ...r, _span: `${esc(r.name)} · ${esc(r.reason)}`, _spanText: r.reason }), nCmp = rows.filter(r => r.has_data && !r.small).length;
   const grpHdr = [{ t: "", span: 3 }, ...view.hdr.map(([t, time, span]) => ({ t: `${t} · ${timeLabel(time)}`, span, cls: "" }))];
   return table({ cols, rows, pinned, key: "rank", dir: 1, href: r => r.has_data ? `g${r.rank}` : null, rowClass: r => (!r.has_data ? "nodata" : r.small ? "small" : "") + (r._mine ? " mine" : ""),
-    groupsHdr: grpHdr, title: `50대 그룹 비교_${view.t}`, countLabel: `비교 ${fmt(rows.length)}개 그룹 · 비교 제외 그룹 ${fmt(out.length)}개는 표 아래`,
-    limit: 10, moreAll: true, sep: 5,
-    note: `<b>읽는 법</b> 맨 위 회색 띠가 비교 기준입니다. ‘전체’는 모든 그룹 경영진을 합산한 값(인원 가중)이고, ‘중앙값’과 순위는 경영진 ${M().min_n}명 이상 그룹만으로 산출합니다. 막대 위 세로 눈금은 비율 지표에서는 50대 전체, 인원 지표에서는 그룹 중앙값을 나타냅니다.` }) + excludedGroups(out);
+    groupsHdr: grpHdr, title: `50대 그룹 비교_${view.t}`, countLabel: `50개 그룹 · 비율 비교 대상 ${fmt(nCmp)}개`,
+    limit: 10, moreAll: true, sep: 5, inPlaceKey: "rank",
+    note: `<b>읽는 법</b> 맨 위 회색 띠가 비교 기준입니다. ‘전체’는 모든 그룹 경영진을 합산한 값(인원 가중)이고, ‘중앙값’과 순위는 경영진 ${M().min_n}명 이상 그룹만으로 산출합니다. 막대 위 세로 눈금은 비율 지표에서는 50대 전체, 인원 지표에서는 그룹 중앙값을 나타냅니다. 회색 줄은 비율 비교에서 제외한 그룹입니다. 경영진 ${M().min_n}명 미만 그룹은 ‘표본 작음’으로 표시하고, 쿠팡·부영·한국지엠은 임원 명단 공시가 없습니다. 지표 열로 정렬하면 회색 줄은 맨 아래로 내려갑니다.` });
 }
 function excludedGroups(out) {   // 비교에서 뺀 그룹: 표본이 작거나 임원 명단 공시가 없는 그룹
   if (!out.length) return "";
