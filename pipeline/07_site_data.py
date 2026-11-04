@@ -18,6 +18,7 @@ import collections
 import csv
 import datetime
 import json
+import re
 import statistics
 from pathlib import Path
 
@@ -62,6 +63,15 @@ def read(path):
 
 def pct(a, b):
     return round(100 * a / b, 1) if b else None
+
+
+# 공시 원문에서 붙어 나온 직위·담당 업무 띄어쓰기: 직책 약어 앞뒤, 연달아 붙은 '위원' 사이만 띄운다(회사 이름 'LG전자' 등은 건드리지 않는다)
+_ROLE_ABBR = r"(?:CEO|CFO|COO|CTO|CHO|CSO|CRO|CIO|CMO|CDO|CPO|CCO|CISO|CPRO|ESG|IR|HR|PR)"
+def spaced(text):
+    t = re.sub(rf"(?<=[가-힣)])(?={_ROLE_ABBR}(?![A-Za-z]))", " ", text)
+    t = re.sub(rf"(?<![A-Za-z])({_ROLE_ABBR})(?=[가-힣(])", r"\1 ", t)
+    t = re.sub(r"(위원장?)(?=[가-힣]{1,12}위원)", r"\1 ", t)
+    return re.sub(r"[ \t]{2,}", " ", t)
 
 
 def main():
@@ -459,8 +469,8 @@ def main():
         people.append([
             int(pid[1:]), last["name"], last["birth_ym"], 1 if last["sex"] == "여" else 0, gidx.get(last["group"], -1),
             [[int(r["year"]), cidx.get(r["corp_code"], -1), REG.index(r["reg_class"]) if r["reg_class"] in REG else 6,
-              r["position"].replace("\n", " ").strip(), RANKS.index(r["position_norm"]) if r["position_norm"] in RANKS else len(RANKS) - 1,
-              r["duty"].replace("\n", " ").strip()[:60], FUNCS.index(r["function"]) if r["function"] in FUNCS else FUNCS.index("미분류")]
+              spaced(r["position"].replace("\n", " ").strip()), RANKS.index(r["position_norm"]) if r["position_norm"] in RANKS else len(RANKS) - 1,
+              spaced(r["duty"].replace("\n", " ").strip())[:60], FUNCS.index(r["function"]) if r["function"] in FUNCS else FUNCS.index("미분류")]
              for r in rs],
             ev_by_p.get(pid, []),
             "\n".join(l.strip() for l in last["career"].split("\n") if l.strip())[:500],

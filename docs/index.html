@@ -1288,7 +1288,12 @@ const EV_LABEL = { 신규: "신규 선임", 승진: "승진", 이탈: "명단에
   공시축소: "공시 범위 축소로 빠짐", 대상편입: "회사가 공시 대상에 들어옴", 관찰종료: "회사가 공시 대상에서 빠짐", 복귀: "다시 등장", 직급하향: "직위 변경" };
 const evLabel = e => EV_LABEL[e] || e;
 function careerLines(t) {
-  return String(t || "").split(/\n|(?=\s*-\s)|(?=\(現\)|\(前\)|現\)|前\)|現\s|前\s)|\s\/\s|·(?=\s?\d{2,4})/).map(s => s.replace(/^\s*[-·]\s*/, "").trim()).filter(Boolean);
+  const s = String(t || "")
+    // '(15 ~ '16)', '(2019~현재)'처럼 기간 괄호로 끝나는 항목 뒤에서 줄을 바꾼다
+    .replace(/(\(\s*['’`]?\d{2,4}(?:\.\d{1,2})?\s*[~∼～-]\s*(?:['’`]?\d{2,4}(?:\.\d{1,2})?|현재|現|present)?\s*\))\s*(?=\S)/gi, "$1\n")
+    // '·학력:', '·경력:' 같은 머리말 앞에서 줄을 바꾼다
+    .replace(/\s*·(?=\s?[가-힣]{2,4}\s?:)/g, "\n");
+  return s.split(/\n|(?=\s*-\s)|(?=\(現\)|\(前\))|(?<!(?:[~∼～-]\s?|\())(?=現\)|前\)|現\s|前\s)|\s\/\s|·(?=\s?\d{2,4})/).map(s => s.replace(/^\s*[-·]\s*/, "").trim()).filter(Boolean);
 }
 function viewPerson(id) {
   app.innerHTML = `<div class="skel"><i style="width:30%"></i><i style="width:60%"></i><i style="width:45%"></i></div><p class="loading">인물 명단을 불러오고 있습니다. 처음 한 번만 몇 초 걸립니다.</p>`;
