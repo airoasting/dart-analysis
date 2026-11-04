@@ -7,8 +7,8 @@
 <title>50대 그룹 경영진 지도</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
-/* Layout: 공시 원장(ledger). 한 단, 위에 고정 도구 띠(내 그룹·검색·테마), 표가 주인공이고 차트는 표를 돕는다.
-   비교의 기준(전체·중앙값·상위 10대·내 그룹)은 어디서나 같은 자리, 같은 모양으로 나온다. */
+/* Layout: 공시 원장(ledger). 한 단, 위에 고정 도구 띠(관심 그룹·검색·테마), 표가 주인공이고 차트는 표를 돕는다.
+   비교의 기준(전체·중앙값·상위 10대·관심 그룹)은 어디서나 같은 자리, 같은 모양으로 나온다. */
 @font-face {
   font-family: "Pretendard Variable";
   font-weight: 45 920; font-style: normal; font-display: swap;
@@ -26,7 +26,7 @@
   --line: #e2ddd4;
   --line-2: #eeeae3;
   --rule: #1a1a1a;
-  --accent: #1d4e89;          /* 선택·내 그룹 */
+  --accent: #1d4e89;          /* 선택·관심 그룹 */
   --accent-ink: #ffffff;
   --accent-soft: #e6edf6;
   --base: #8c8780;            /* 50대 전체 기준선 */
@@ -377,7 +377,7 @@ footer.site { max-width: 1440px; margin: 0 auto; padding-block: 18px 36px; paddi
     <a class="brand" href="#home">50대 그룹 경영진 지도</a>
     <nav class="nav" aria-label="주요 화면"><a href="#home">그룹 비교</a><a href="#method">자료와 기준</a></nav>
     <div class="tools">
-      <label class="mine-pick" for="mine"><span>내 그룹</span><select id="mine" aria-label="내 그룹 선택"><option value="">내 그룹 고르기</option></select></label>
+      <label class="mine-pick" for="mine"><span>관심 그룹</span><select id="mine" aria-label="관심 그룹 선택"><option value="">관심 그룹 고르기</option></select></label>
       <div class="search">
         <input id="q" type="search" placeholder="임원 이름, 회사, 그룹 검색" autocomplete="off" aria-label="임원 이름, 회사, 그룹 검색" aria-controls="results" role="combobox" aria-expanded="false" aria-autocomplete="list">
         <div class="results" id="results" role="listbox" hidden></div>
@@ -891,7 +891,7 @@ function homeTable() {
   const ref = (name, kind, extra = {}) => ({ _ref: true, name, ...Object.fromEntries(ms.map(m => [m, kind === "all" ? B[m]?.all : kind === "median" ? B[m]?.median : B[m]?.top10])), ...extra });
   const pinned = [ref("50대 그룹 전체", "all", { _companies: fmt(M().n_companies) }), ref(`그룹 중앙값 (경영진 ${M().min_n}명 이상)`, "median"), ref("상위 10대 그룹 평균", "top10")];
   const mine = me ? CORE.groups.find(g => g.rank === me && g.has_data) : null;
-  if (mine) pinned.push({ ...mine, _mine: true, _href: `g${mine.rank}`, name: `내 그룹: ${mine.name}`,
+  if (mine) pinned.push({ ...mine, _mine: true, _href: `g${mine.rank}`, name: `관심 그룹: ${mine.name}`,
     ...Object.fromEntries(ms.map(m => [m, mine.small && MET[m].rate ? null : mine.v[m]])) });
   const all = groupRowsForHome(), rows = all.filter(r => r.has_data && !r.small), out = all.filter(r => !r.has_data || r.small);
   const grpHdr = [{ t: "", span: 3 }, ...view.hdr.map(([t, time, span]) => ({ t: `${t} · ${timeLabel(time)}`, span, cls: "" }))];
@@ -911,14 +911,14 @@ function viewHome() {
   const B = CORE.bench, T = CORE.total, me = mineRank(), mineG = me ? CORE.groups.find(g => g.rank === me && g.has_data) : null;
   const tabs = Object.entries(HOME_VIEWS).map(([k, v]) => `<button role="tab" type="button" aria-selected="${k === homeView}" data-view="${k}">${v.t}</button>`).join("");
   const nr = [{ name: "50대 그룹 전체", values: T.new_rate, color: "var(--ink)" }];
-  if (mineG) nr.unshift({ name: `내 그룹: ${mineG.name}`, values: mineG.new_rate, color: "var(--accent)" });
+  if (mineG) nr.unshift({ name: `관심 그룹: ${mineG.name}`, values: mineG.new_rate, color: "var(--accent)" });
   app.innerHTML = `
   <div class="hero">
     <div class="hero-copy">
     ${timeChips()}
     <h1>50대 대기업 경영진은 누구이며, 어떤 변화를 보이는가</h1>
-    <p class="lede">공정위가 지정한 자산 상위 50개 그룹의 상장 계열사(일부 비상장 공시 회사 포함) 임원을 공시 원문에서 같은 기준으로 정리했습니다. 내 그룹을 선택하면 모든 표와 차트에 비교 기준으로 함께 표시됩니다.</p>
-    ${mineG ? "" : `<button class="btn primary cta no-print" type="button" id="pickMine">내 그룹과 비교하기</button>`}
+    <p class="lede">공정위가 지정한 자산 상위 50개 그룹의 상장 계열사(일부 비상장 공시 회사 포함) 임원을 공시 원문에서 같은 기준으로 정리했습니다. 관심 그룹을 선택하면 모든 표와 차트에 비교 기준으로 함께 표시됩니다.</p>
+    ${mineG ? "" : `<button class="btn primary cta no-print" type="button" id="pickMine">관심 그룹과 비교하기</button>`}
     </div>
   <div class="kpis">
     ${kpiCard("executives", mineG, { label: mineG ? `${mineG.name} 경영진` : "경영진", sub: `${prevDelta(mineG ? mineG.heads : T.heads)}${M().n_groups_data}개 그룹 ${M().n_companies}곳, 겸직자는 1명으로 집계했습니다` })}
@@ -936,7 +936,7 @@ function viewHome() {
   </section>
   <div class="grid2">
     <section class="panel"><div class="panel-head"><h3>연도별 신규율 ${defBtn("new_rate")}</h3></div>${lineChart(nr, { label: "연도별 신규율", unit: "%", fmtv: v => `${(+v).toFixed(1)}%`, zero: true, from: +M().flow[0], to: FLOW_END() })}
-      <p class="note">해마다 신규 선임 ÷ 전년 말 경영진. ${mineG ? "" : "내 그룹을 선택하면 같은 축에 함께 표시합니다."}</p></section>
+      <p class="note">해마다 신규 선임 ÷ 전년 말 경영진. ${mineG ? "" : "관심 그룹을 선택하면 같은 축에 함께 표시합니다."}</p></section>
     <section class="panel"><div class="panel-head"><h3>신규 선임 · 승진 · 이탈 (전체)</h3></div>${flowChart(T.ev, T.heads, { partialUp: true })}
       <p class="note">직급 개편, 공시 범위 변화, 회사 상장·편입에 따른 증감은 제외했습니다. 승진은 직급이 공시된 경영진만 집계할 수 있어 실제보다 적게 나타납니다. 정기 인사 발표가 해를 넘기면 해당 연도 신규 선임이 다음 해로 집계됩니다(예: 삼성 2019년 말 인사가 2020년 1월로 미뤄진 해). 2026년 상반기는 기간이 반년이라 넣지 않았습니다.</p></section>
     <section class="panel"><div class="panel-head"><h3>경영진 수 (연말, 마지막은 반기 말)</h3></div>
@@ -1030,7 +1030,7 @@ function viewGroup(rank) {
     <div class="crumb"><a href="#home">50대 그룹</a><span>›</span><span>${rank}위</span></div>
     <h1>${esc(g.name)}</h1>
     <p class="lede">총수(동일인) ${esc(g.owner)} · 자산(공정위 기준) ${fmt(Math.round(g.assets / 1000))}조 원 · 소속회사 ${g.n_aff}곳 중 공시 대상 ${comps.length}곳</p></div>
-    <div class="actions no-print"><button class="btn" type="button" id="setmine">${isMine ? "내 그룹 해제" : "내 그룹으로 지정"}</button><a class="btn primary" href="#r${rank}">보고서 한 장</a></div>
+    <div class="actions no-print"><button class="btn" type="button" id="setmine">${isMine ? "관심 그룹 해제" : "관심 그룹으로 지정"}</button><a class="btn primary" href="#r${rank}">보고서 한 장</a></div>
   </div>
   ${timeChips()}
   <div class="band info">공시 회사 ${comps.length}곳${comps.length > nListed ? `(상장 ${nListed}곳 + 비상장 사업보고서 제출사 ${comps.length - nListed}곳)` : "(모두 상장사)"} 기준입니다. 비상장 계열사 ${g.n_aff - comps.length}곳의 임원은 공시되지 않아 제외되었고, 해당 회사와 오간 인원은 신규·이탈로 집계됩니다.</div>
@@ -1053,7 +1053,7 @@ function viewGroup(rank) {
   <section class="panel"><div class="panel-head"><h2>공시 회사</h2><p>회사를 누르면 연도별 임원 명단을 볼 수 있습니다.</p></div>
     <div class="actions no-print" style="margin-bottom:10px"><a class="btn" href="#m${rank}">그룹 전체 명단 보기</a></div>
     ${table({ cols, rows: comps, key: "n", dir: -1, href: r => `c${r.id}`, title: `${g.name}_공시회사`, countLabel: `${comps.length}곳` })}</section>`;
-  $("#setmine").addEventListener("click", () => { store.set("mineGroup", isMine ? null : String(g.rank)); syncMine(); viewGroup(rank); toast(isMine ? "내 그룹을 해제했습니다." : `${g.name}을 내 그룹으로 정했습니다.`); });
+  $("#setmine").addEventListener("click", () => { store.set("mineGroup", isMine ? null : String(g.rank)); syncMine(); viewGroup(rank); toast(isMine ? "관심 그룹을 해제했습니다." : `${g.name}을 관심 그룹으로 정했습니다.`); });
   bindDefs(app);
 }
 
@@ -1332,10 +1332,10 @@ q.addEventListener("keydown", e => {
 });
 q.addEventListener("blur", () => setTimeout(() => { results.hidden = true; }, 120));
 
-/* ---------- 내 그룹, 테마 ---------- */
+/* ---------- 관심 그룹, 테마 ---------- */
 function syncMine() {
   const s = $("#mine"), me = mineRank();
-  s.innerHTML = `<option value="">내 그룹 고르기</option>` + CORE.groups.filter(g => g.has_data).map(g => `<option value="${g.rank}" ${g.rank === me ? "selected" : ""}>${g.rank}. ${esc(g.name)}</option>`).join("");
+  s.innerHTML = `<option value="">관심 그룹 고르기</option>` + CORE.groups.filter(g => g.has_data).map(g => `<option value="${g.rank}" ${g.rank === me ? "selected" : ""}>${g.rank}. ${esc(g.name)}</option>`).join("");
 }
 $("#mine").addEventListener("change", e => { store.set("mineGroup", e.target.value || null); route(true); });
 function applyTheme(t) {
