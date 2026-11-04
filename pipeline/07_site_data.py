@@ -460,8 +460,6 @@ def main():
     people_txt = json.dumps({"reg": REG, "ranks": RANKS, "events": EVENTS, "funcs": FUNCS, "origins": ORIGINS,
                              "degrees": DEGREES, "fields": FIELDS, "people": people}, ensure_ascii=False, separators=(",", ":"))
     (OUT / "people.json").write_text(people_txt, encoding="utf-8")
-    # 서버가 압축해서 보내면 content-length는 압축 크기라 진행 막대가 일찍 찬다. 풀린 크기를 따로 알려 준다.
-    core["meta"]["people_bytes"] = len(people_txt.encode("utf-8"))
     (OUT / "core.json").write_text(json.dumps(core, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     build_html()
     for f in ("core.json", "people.json"):
