@@ -81,6 +81,15 @@ select, input[type="search"] { font: inherit; font-size: 14px; padding: 7px 10px
 .search input:focus { outline: none; border-color: var(--accent); background: var(--surface); }
 .iconbtn { border: 1px solid var(--line); background: var(--surface); border-radius: 7px; padding: 6px 9px; cursor: pointer; font-size: 13px; color: var(--ink-2); white-space: nowrap; }
 .iconbtn:hover { background: var(--surface-2); }
+.iconbtn.theme { display: inline-grid; place-items: center; width: 36px; height: 34px; padding: 0; }
+.iconbtn.theme svg { display: block; }
+.ico-sun { display: none !important; }
+:root[data-theme="dark"] .ico-sun { display: block !important; }
+:root[data-theme="dark"] .ico-moon { display: none !important; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .ico-sun { display: block !important; }
+  :root:not([data-theme="light"]) .ico-moon { display: none !important; }
+}
 .results { position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: var(--surface); border: 1px solid var(--line); border-radius: 9px;
   box-shadow: 0 10px 28px rgba(10, 20, 40, .14); max-height: 62vh; overflow-y: auto; z-index: 8; min-width: 280px; }
 .results button { display: grid; grid-template-columns: 34px 1fr; gap: 2px 8px; width: 100%; text-align: left; padding: 8px 12px; border: 0; background: none; cursor: pointer; border-bottom: 1px solid var(--line-2); }
@@ -96,7 +105,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; letter-spacing: -.02em; }
 h1 { font-size: clamp(25px, 3.4vw, 34px); line-height: 1.25; font-weight: 800; }
 h2 { font-size: 19px; font-weight: 750; }
 h3 { font-size: 14.5px; font-weight: 650; color: var(--ink); }
-.lede { color: var(--ink-2); margin: 8px 0 0; max-width: 70ch; }
+.lede { color: var(--ink-2); margin: 8px 0 0; }
 .eyebrow { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
 .chip { font-size: 12px; padding: 2px 9px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--ink-2); white-space: nowrap; }
 .chip b { font-weight: 650; color: var(--ink); }
@@ -137,7 +146,7 @@ section.panel { background: var(--surface); border: 1px solid var(--line); borde
 .tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .tbl { overflow: auto; max-height: 78vh; border: 1px solid var(--line-2); border-radius: 8px; }
 table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 13.5px; }
-th, td { padding: 7px 10px; border-bottom: 1px solid var(--line-2); text-align: left; vertical-align: top; background: var(--surface); }
+th, td { overflow-wrap: normal; padding: 7px 10px; border-bottom: 1px solid var(--line-2); text-align: left; vertical-align: top; background: var(--surface); }
 thead th { position: sticky; top: 0; z-index: 2; font-weight: 600; font-size: 12px; color: var(--muted); white-space: nowrap; border-bottom: 1px solid var(--line); }
 thead tr.grp th { top: 0; font-size: 11.5px; color: var(--ink-2); background: var(--surface-2); text-align: center; border-left: 1px solid var(--line); }
 thead tr.grp + tr th { top: 29px; }
@@ -161,6 +170,7 @@ tr.go:hover td { background: var(--accent-soft); }
 tr.small td { color: var(--muted); }
 tr.nodata td { color: var(--muted); font-size: 12.5px; }
 td.name { font-weight: 600; white-space: nowrap; }
+td.wrap { overflow-wrap: anywhere; }
 td.wrap { min-width: 200px; color: var(--ink-2); }
 .cellbar { display: inline-flex; align-items: center; justify-content: flex-end; gap: 7px; white-space: nowrap; }
 .cellbar i { display: block; height: 6px; border-radius: 0 3px 3px 0; background: var(--bar); opacity: .55; }
@@ -202,7 +212,7 @@ details.nums summary { cursor: pointer; color: var(--accent); font-size: 12.5px;
 .hb .v { font-variant-numeric: tabular-nums; color: var(--ink-2); white-space: nowrap; min-width: 92px; text-align: right; }
 .stack { display: flex; height: 22px; border-radius: 5px; overflow: hidden; gap: 2px; }
 .stack div { min-width: 2px; }
-.stackleg { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 4px 12px; font-size: 12.5px; margin-top: 10px; color: var(--ink-2); }
+.stackleg { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 4px 12px; font-size: 12.5px; margin-top: 10px; color: var(--ink-2); }
 .stackleg b { font-weight: 650; color: var(--ink); margin-left: 4px; font-variant-numeric: tabular-nums; }
 .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
 
@@ -224,8 +234,7 @@ details.nums summary { cursor: pointer; color: var(--accent); font-size: 12.5px;
 .ev.up { border-color: var(--ev-up); color: var(--ev-up); }
 .ev.out { border-color: var(--ev-out); }
 .career { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 3px; font-size: 14px; }
-.career li { padding-left: 12px; position: relative; }
-.career li::before { content: ""; position: absolute; left: 0; top: .72em; width: 4px; height: 4px; border-radius: 50%; background: var(--faint); }
+.career li { padding: 2px 0; }
 .facts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; font-size: 13.5px; margin: 0; }
 .facts dt { color: var(--muted); }
 .facts dd { margin: 0; }
@@ -307,7 +316,10 @@ footer.site { max-width: 1200px; margin: 0 auto; padding-block: 18px 36px; paddi
         <div class="results" id="results" role="listbox" hidden></div>
       </div>
       <span class="prep" id="prep" hidden></span>
-      <button class="iconbtn" id="theme" type="button" aria-label="밝게, 어둡게 전환">밝게·어둡게</button>
+      <button class="iconbtn theme" id="theme" type="button" aria-label="어둡게 보기" title="어둡게 보기">
+        <svg class="ico-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
+        <svg class="ico-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+      </button>
     </div>
   </div>
 </header>
@@ -670,11 +682,12 @@ function loadPeople() {
     prep.hidden = false; prep.innerHTML = `인물 명단 준비 <i><b style="width:0%"></b></i>`;
     peopleLoading = fetch("data/people.json").then(async r => {
       if (!r.ok) throw new Error(r.status);
-      const total = +r.headers.get("content-length") || 0;
+      const total = M().people_bytes || (r.headers.get("content-encoding") ? 0 : +r.headers.get("content-length") || 0);   // 압축 전송이면 헤더 값은 압축 크기
       if (!r.body || !total) return r.json();
       const reader = r.body.getReader(); const chunks = []; let got = 0;
       for (;;) { const { done, value } = await reader.read(); if (done) break; chunks.push(value); got += value.length;
-        const b = prep.querySelector("b"); if (b) b.style.width = `${Math.min(100, 100 * got / total)}%`; }
+        const b = prep.querySelector("b"); if (b) b.style.width = `${Math.min(96, 100 * got / total)}%`; }
+      const b = prep.querySelector("b"); if (b) b.style.width = "100%";
       const buf = new Uint8Array(got); let o = 0; chunks.forEach(c => { buf.set(c, o); o += c.length; });
       return JSON.parse(new TextDecoder().decode(buf));
     }).then(d => {
@@ -819,10 +832,10 @@ function viewHome() {
       <p class="note">해마다 신규 선임 ÷ 전년 말 경영진. ${mineG ? "" : "내 그룹을 고르면 같은 축에 겹쳐 그립니다."}</p></section>
     <section class="panel"><div class="panel-head"><h3>신규 선임 · 승진 · 이탈 (전체)</h3></div>${flowChart(T.ev, T.heads, { partialUp: true })}
       <p class="note">직급 개편, 공시 범위 변화, 회사 상장·편입으로 생긴 등장·퇴장은 뺐습니다. 승진은 직급이 공시된 경영진만 셀 수 있어 실제보다 적습니다. 정기 인사 발표가 해를 넘기면 그해 신규가 다음 해로 넘어갑니다(예: 삼성 2019년 말 인사가 2020년 1월로 미뤄진 해). 2026년 상반기는 기간이 반년이라 넣지 않았습니다.</p></section>
-    <section class="panel"><div class="panel-head"><h3>경영진 수 (연말, 마지막은 반기 말)</h3></div>
+    <section class="panel" style="grid-column:1/-1"><div class="panel-head"><h3>경영진 수 (연말, 마지막은 반기 말)</h3></div>
       ${lineChart([{ name: `9개 시점 모두 공시된 ${fmt(M().n_const)}곳`, values: T.const_heads, color: "var(--accent)" }, { name: "해마다 공시된 회사 전체", values: T.heads, color: "var(--faint)", dash: true, width: 1.5 }], { label: "경영진 수", unit: "명" })}
       <p class="note">회사 수가 늘어난 효과를 빼려고 9개 시점 모두 공시된 회사만으로 선을 따로 그렸습니다(겸직자는 한 번). 이 선에도 공시 범위를 넓힌 회사의 증가분이 들어 있습니다: ${YEARS().map((y, i) => [y, M().const_expand[i]]).filter(x => x[1] > 20).map(x => `${x[0]}년 ${fmt(x[1])}명`).join(", ") || "없음"}.</p></section>
-    <section class="panel"><div class="panel-head"><h3>사외이사 출신 (전체 ${fmt(T.out.n)}명)</h3></div>${originStack(T.out.origin, T.out.n)}
+    <section class="panel" style="grid-column:1/-1"><div class="panel-head"><h3>사외이사 출신 (전체 ${fmt(T.out.n)}명)</h3></div>${originStack(T.out.origin, T.out.n)}
       <p class="note">공시 경력 문구에서 규칙으로 판정한 주 출신입니다(표본 검수 정확도 ${M().validation.classify["출신"]}).</p></section>
   </div>
   ${methodHtml()}`;
@@ -942,7 +955,7 @@ function rankAgeTable(g) {
   const all = {};
   CORE.groups.filter(x => x.has_data).forEach(x => (x.rank_age || []).forEach(r => { (all[r.rank] ||= [0, 0]); all[r.rank][0] += r.n; all[r.rank][1] += r.n * r.avg; }));
   const pr = g.promo, PA = M().promo_all, hiddenNow = (g.v.rank_hidden || 0) >= 30;
-  return `<div class="tbl" style="margin-top:12px;max-height:none"><table><thead><tr><th>직급</th><th class="n">인원</th><th class="n">비율</th><th class="n">평균 나이</th><th class="n">최연소</th><th class="n">50대 전체 같은 직급 평균</th></tr></thead><tbody>
+  return `<div class="tbl" style="margin-top:12px;max-height:none"><table><thead><tr><th>직급</th><th class="n">인원</th><th class="n">비율</th><th class="n">평균 나이</th><th class="n">최연소</th><th class="n">50대 전체 평균 나이</th></tr></thead><tbody>
     ${ra.map(r => `<tr><td>${esc(r.rank)}</td><td class="n">${fmt(r.n)}</td><td class="n">${(100 * r.n / g.k.n).toFixed(1)}%</td><td class="n">${r.n >= 5 ? f1(r.avg) : `<span class="na">${f1(r.avg)}</span>`}</td><td class="n">${r.min}</td><td class="n">${all[r.rank] ? f1(all[r.rank][1] / all[r.rank][0]) : "–"}</td></tr>`).join("")}</tbody></table></div>
     <p class="note"><b>상무 승진 속도</b> ${hiddenNow ? "직급 비공개 비중이 커서 집계할 수 없습니다." : pr && pr.cohort_pct != null ? `2019–2021년 상무로 처음 공시된 ${fmt(pr.cohort_n)}명 중 4년 안에 한 직급 이상 오른 사람 ${fmt(pr.cohort_up)}명(${pct(pr.cohort_pct)}). 50대 전체 ${pct(PA.cohort_pct)}(${fmt(PA.cohort_n)}명).` : `2019–2021년 신규 상무가 20명 미만이라 비율을 내지 않습니다.`} 모두 4년을 지켜본 같은 기간 코호트라 그룹끼리 비교할 수 있습니다. 직급 체계 개편은 승진으로 세지 않습니다.</p>`;
 }
@@ -1017,7 +1030,7 @@ function rosterHtml(compIdx, years, title) {
   return `<div class="controls" style="margin-bottom:10px">
       <select id="yr" aria-label="연도">${years.slice().reverse().map(y => `<option value="${y}">${ylab(y)}</option>`).join("")}</select>
       <div class="seg" role="group" aria-label="구분"><button type="button" data-w="exec" aria-pressed="true">경영진</button><button type="button" data-w="board" aria-pressed="false">이사회</button><button type="button" data-w="all" aria-pressed="false">전체</button></div>
-      <select id="evf" aria-label="그해 사건"><option value="">사건 전체</option><option value="신규">신규 선임</option><option value="승진">승진</option><option value="계열사이동">계열사 이동</option><option value="nextout">다음 해 명단에서 빠짐</option></select>
+      <select id="evf" aria-label="인사 변동"><option value="">변동 전체</option><option value="신규">신규 선임</option><option value="승진">승진</option><option value="계열사이동">계열사 이동</option><option value="nextout">다음 해 명단에서 빠짐</option></select>
       <select id="fnf" aria-label="기능"><option value="">기능 전체</option>${M().funcs.filter(f => f !== "이사회(비상근)").map(f => `<option>${f}</option>`).join("")}</select>
       <input id="flt" type="search" placeholder="이름·직위·업무로 거르기" aria-label="이름, 직위, 업무로 거르기" style="flex:1 1 160px">
     </div>
@@ -1053,15 +1066,16 @@ function bindRoster(compIdx, years, title) {
       { k: "reg", t: "구분", v: x => x.r[2], f: x => `<span class="pill ${x.r[2] === 0 ? "" : "reg"}">${esc(PEOPLE.reg[x.r[2]])}</span>`, xv: x => PEOPLE.reg[x.r[2]] },
       { k: "pos", t: "직위", cls: "nw", v: x => PEOPLE.ranks.length - x.r[4], f: x => esc(x.r[3]), xv: x => x.r[3] },
       { k: "age", t: "나이", n: 1, v: x => yr - +x.p[2].slice(0, 4), f: x => yr - +x.p[2].slice(0, 4), xv: x => yr - +x.p[2].slice(0, 4) },
+      { k: "birth", t: "출생", cls: "nw", v: x => x.p[2], f: x => `<span class="num">${esc(x.p[2].replace("-", "."))}</span>`, xv: x => x.p[2].replace("-", ".") },
       { k: "fn", t: "기능", v: x => M().funcs[x.r[6]], f: x => `<span class="pill">${esc(M().funcs[x.r[6]])}</span>`, xv: x => M().funcs[x.r[6]] },
       { k: "duty", t: "담당 업무", cls: "wrap", v: x => x.r[5], f: x => esc(x.r[5]), xv: x => x.r[5] },
-      { k: "ev", t: "그해 사건", v: x => x.evs.join(","), f: x => x.evs.filter(e => !["직급체계변경"].includes(e)).map(e => `<span class="ev ${e === "신규" ? "new" : e === "승진" ? "up" : ""}">${esc(evLabel(e))}</span>`).join(" ") + (x.nextOut ? ` <span class="ev out">다음 해 빠짐</span>` : ""), xv: x => x.evs.join("|") + (x.nextOut ? "|다음해빠짐" : "") },
+      { k: "ev", t: "인사 변동", v: x => x.evs.join(","), f: x => x.evs.filter(e => !["직급체계변경"].includes(e)).map(e => `<span class="ev ${e === "신규" ? "new" : e === "승진" ? "up" : ""}">${esc(evLabel(e))}</span>`).join(" ") + (x.nextOut ? ` <span class="ev out">다음 해 빠짐</span>` : ""), xv: x => x.evs.join("|") + (x.nextOut ? "|다음해빠짐" : "") },
       { k: "or", t: "출신(추정)", v: x => PEOPLE.origins[x.p[9]], f: x => `<button type="button" class="pill org" data-ev="${esc(x.p[10] || "판정 근거 문구 없음")}" aria-label="${esc(PEOPLE.origins[x.p[9]])}, 근거: ${esc(x.p[10] || "없음")}" style="cursor:pointer;font:inherit;font-size:11.5px">${esc(PEOPLE.origins[x.p[9]])}</button>`, xv: x => PEOPLE.origins[x.p[9]] },
       { k: "first", t: "첫 공시", n: 1, v: x => x.first, f: x => x.censored ? `${x.first} 이전부터` : `${x.first}`, xv: x => x.censored ? `${x.first} 이전부터` : `${x.first}` },
     ];
     $("#roster").innerHTML = rows.length
       ? table({ cols, rows, limit: 300, key: "pos", dir: -1, href: x => `p${x.p[0]}`, title: `${title}_${yr}_명단`, countLabel: `${fmt(rows.length)}명 · 명단 기준일 ${[...new Set(compIdx.map(ci => compAt(ci).asof?.[yr]).filter(Boolean))].join(", ").replace(/-/g, ".") || ylab(yr)}${compIdx.some(ci => compAt(ci).asof_odd?.includes(String(yr))) ? " (보고서 제출일 기준으로 적힌 명단 포함)" : ""}`,
-        note: "출신 태그를 누르면 판정 근거 문구가 나옵니다. 첫 공시가 ‘이전부터’면 그 회사가 처음 공시된 해에 이미 있던 사람이라 실제 취임은 더 이를 수 있습니다. 나이는 기준 연도 − 출생연도입니다." })
+        note: "출신 태그를 누르면 판정 근거 문구가 나옵니다. 첫 공시가 ‘이전부터’면 그 회사가 처음 공시된 해에 이미 있던 사람이라 실제 취임은 더 이를 수 있습니다. 나이는 기준 연도 − 출생연도라 만 나이와 최대 1세 차이가 납니다. 출생은 공시된 연월입니다." })
       : `<p class="empty">조건에 맞는 사람이 없습니다. 연도나 필터를 바꿔 보세요.</p>`;
   }
   draw();
@@ -1090,7 +1104,7 @@ function viewCompany(id) {
     <section class="panel"><div class="panel-head"><h3>경영진 수 (연말, 마지막은 반기 말)</h3></div>${lineChart([{ name: "경영진", values: c.heads, color: "var(--accent)" }], { label: "경영진 수" })}</section>
     <section class="panel"><div class="panel-head"><h3>신규 선임 · 승진 · 이탈</h3></div>${flowChart(c.ev, c.heads, { hidden: c.hidden_by_year })}</section>
   </div>
-  <section class="panel"><div class="panel-head"><h2>임원 명단</h2><p>연도와 사건으로 거르면 ‘올해 새로 선임된 임원’ 같은 명단이 바로 나옵니다. 이름을 누르면 경력이 나옵니다.</p></div>
+  <section class="panel"><div class="panel-head"><h2>임원 명단</h2><p>연도와 인사 변동으로 거르면 ‘올해 새로 선임된 임원’ 같은 명단이 바로 나옵니다. 이름을 누르면 경력이 나옵니다.</p></div>
     ${rosterHtml([ci], years, c.name)}
     <p class="note"><a id="srcl" target="_blank" rel="noopener">선택한 연도의 원문 보기</a></p></section>`;
   const setSrc = () => { $("#srcl").href = c.src[$("#yr").value] || "#"; };
@@ -1215,7 +1229,11 @@ function syncMine() {
   s.innerHTML = `<option value="">내 그룹 고르기</option>` + CORE.groups.filter(g => g.has_data).map(g => `<option value="${g.rank}" ${g.rank === me ? "selected" : ""}>${g.rank}. ${esc(g.name)}</option>`).join("");
 }
 $("#mine").addEventListener("change", e => { store.set("mineGroup", e.target.value || null); route(true); });
-function applyTheme(t) { if (t) document.documentElement.setAttribute("data-theme", t); else document.documentElement.removeAttribute("data-theme"); }
+function applyTheme(t) {
+  if (t) document.documentElement.setAttribute("data-theme", t); else document.documentElement.removeAttribute("data-theme");
+  const dark = (t || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark", lab = dark ? "밝게 보기" : "어둡게 보기";
+  const b = $("#theme"); if (b) { b.setAttribute("aria-label", lab); b.title = lab; }
+}
 applyTheme(store.get("theme"));
 $("#theme").addEventListener("click", () => {
   const cur = document.documentElement.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");

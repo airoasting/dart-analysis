@@ -427,8 +427,6 @@ def main():
                   "mix": pm, "out": ob, "hire": pooled_hire},
         "groups": group_list, "companies": companies,
     }
-    (OUT / "core.json").write_text(json.dumps(core, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-
     # ---------- 인물 ----------
     cidx = {c["id"]: i for i, c in enumerate(companies)}
     gidx = {g["ftc_name"]: i for i, g in enumerate(group_list)}
@@ -459,9 +457,12 @@ def main():
              FIELDS.index(cp.get("edu_field", "")) if cp.get("edu_field", "") in FIELDS else 6,
              1 if cp.get("edu_overseas") else 0, cp.get("edu_top_school", "")],
         ])
-    (OUT / "people.json").write_text(json.dumps({"reg": REG, "ranks": RANKS, "events": EVENTS, "funcs": FUNCS, "origins": ORIGINS,
-                                                 "degrees": DEGREES, "fields": FIELDS, "people": people},
-                                                ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    people_txt = json.dumps({"reg": REG, "ranks": RANKS, "events": EVENTS, "funcs": FUNCS, "origins": ORIGINS,
+                             "degrees": DEGREES, "fields": FIELDS, "people": people}, ensure_ascii=False, separators=(",", ":"))
+    (OUT / "people.json").write_text(people_txt, encoding="utf-8")
+    # 서버가 압축해서 보내면 content-length는 압축 크기라 진행 막대가 일찍 찬다. 풀린 크기를 따로 알려 준다.
+    core["meta"]["people_bytes"] = len(people_txt.encode("utf-8"))
+    (OUT / "core.json").write_text(json.dumps(core, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     build_html()
     for f in ("core.json", "people.json"):
         print(f"{f}: {(OUT / f).stat().st_size / 1e6:.1f}MB")
