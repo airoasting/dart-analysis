@@ -1288,10 +1288,15 @@ const EV_CLASS = { 신규: "new", 승진: "up", 이탈: "out", 계열사이동: 
 const EV_LABEL = { 신규: "신규 선임", 승진: "승진", 이탈: "명단에서 빠짐", 계열사이동: "계열사 이동", 등기전환: "등기이사 선임", 공시확대: "공시 범위 확대로 처음 공시",
   공시축소: "공시 범위 축소로 빠짐", 대상편입: "회사가 공시 대상에 들어옴", 관찰종료: "회사가 공시 대상에서 빠짐", 복귀: "다시 등장", 직급하향: "직위 변경" };
 const evLabel = e => EV_LABEL[e] || e;
+/* 학위 줄임말 풀기: (박) → (박사), (석/박) → (석사/박사) */
+const DEG = { "박": "박사", "석": "석사", "학": "학사" };
+function expandDeg(s) {
+  return String(s || "").replace(/\(([박석학](?:\s*[/·,]\s*[박석학])*)\)/g, (m, inner) => "(" + inner.replace(/[박석학]/g, c => DEG[c]) + ")");
+}
 function careerLines(t) {
   // 1) 원문 줄바꿈 정리: 다음 줄이 새 항목의 시작일 때만 줄을 바꾸고, 칸 폭 때문에 단어 중간에서 끊긴 줄은 앞 줄에 붙인다
   const START = /^(?:[-·ㆍ○▣•※]|ㅇ\s|\(?[現前]\)?|\(\s*['’`]?\d{2}|['’`]\d{2}|\d{2,4}\s*[~∼～.년-])/;
-  const parts = String(t || "").split("\n").map(x => x.trim()).filter(Boolean);
+  const parts = expandDeg(t).split("\n").map(x => x.trim()).filter(Boolean);
   let s = "";
   for (const p of parts) {
     if (!s) { s = p; continue; }
@@ -1386,7 +1391,7 @@ function viewPerson(id) {
         ${lines.length ? `<ul class="career">${lines.map(l => `<li>${esc(l)}</li>`).join("")}</ul>` : `<p class="empty">공시된 경력이 없습니다.</p>`}
         <dl class="facts" style="margin-top:14px">
           <dt>출생</dt><dd>${esc(p[2].replace("-", "년 "))}월</dd>
-          <dt>학력</dt><dd>${p[8] ? esc(p[8]) : PEOPLE.degrees[edu[0]] ? `${esc(PEOPLE.degrees[edu[0]])}${PEOPLE.fields[edu[1]] ? ` · ${esc(PEOPLE.fields[edu[1]])}` : ""}${edu[2] ? " · 해외 학위" : ""}${edu[3] ? ` · ${esc(edu[3].split("|").join(", "))}` : ""} <span class="na">(경력 문구에서 추정)</span>` : "공시 없음"}</dd>
+          <dt>학력</dt><dd>${p[8] ? esc(expandDeg(p[8])) : PEOPLE.degrees[edu[0]] ? `${esc(PEOPLE.degrees[edu[0]])}${PEOPLE.fields[edu[1]] ? ` · ${esc(PEOPLE.fields[edu[1]])}` : ""}${edu[2] ? " · 해외 학위" : ""}${edu[3] ? ` · ${esc(edu[3].split("|").join(", "))}` : ""} <span class="na">(경력 문구에서 추정)</span>` : "공시 없음"}</dd>
         </dl></section>
     </div>`;
     app.querySelectorAll("[data-cite]").forEach(b => b.addEventListener("click", async () => {
