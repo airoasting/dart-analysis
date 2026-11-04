@@ -41,7 +41,7 @@ if __name__=="__main__":
 
 # ---------- 머리 비율 보정: 턱(y=1015)을 기준으로 머리 부분만 세로로 줄인다 ----------
 import re as _re
-HEAD_SCALE = 0.85
+HEAD_SCALE = 0.93
 CHIN = 1015
 def _sy(y): return CHIN - (CHIN - y) * HEAD_SCALE
 def _squash(d):
@@ -62,8 +62,9 @@ def _squash(d):
     return ' '.join(out).replace(' M','M')
 HEAD_OUTLINE_IDX = [1, 2, 3, 4, 5, 6, 7]          # 왼쪽 머리, 오른쪽 머리, 분할, 눈가리개, 얼굴 사선, 귀 2개
 HEAD_CIRCUIT_IDX = [0, 1, 2, 3, 4, 5, 6, 7, 8]   # 얼굴 안 회로
+DROP_OUTLINE_IDX = [5]   # 얼굴 사선은 빼기로 함(2026-11-04 사용자 요청)
 def scaled():
-    o=[(_squash(d) if i in HEAD_OUTLINE_IDX else d) for i,d in enumerate(OUTLINE)]
+    o=[(_squash(d) if i in HEAD_OUTLINE_IDX else d) for i,d in enumerate(OUTLINE) if i not in DROP_OUTLINE_IDX]
     c=[(_squash(d) if i in HEAD_CIRCUIT_IDX else d) for i,d in enumerate(CIRCUIT)]
     p=[(x, round(_sy(y),1) if y <= CHIN else y) for x,y in PADS]
     return o,c,p

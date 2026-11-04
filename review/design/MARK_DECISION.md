@@ -24,5 +24,5 @@
 
 사용자가 1차 재설계(반은 사람, 반은 회로 인물과 눈금 50개)를 보고 "별로"라고 해서, AI ROASTING 로고를 원본 비율 그대로 선으로 옮겼습니다.
 - 좌표는 로고 원본(1656×1687) 좌표계에서 잡았습니다. 원본 위에 겹쳐 확인한 결과는 `mark_logo_overlay.png`, 적용 화면은 `mark_logo.png`입니다.
-- 선 좌표 정본은 `pipeline/tools_logo_lineart.py`(OUTLINE 11개, CIRCUIT 22개, PADS 20개)입니다. 사이트에는 `scaled()` 결과를 씁니다(턱을 기준으로 머리만 세로 85%, 원본은 얼굴이 세로로 길어 보인다는 피드백 반영). 고칠 때는 이 파일을 바꾸고 `site/index.html`의 `.hero-mark`를 다시 만듭니다.
+- 선 좌표 정본은 `pipeline/tools_logo_lineart.py`(OUTLINE 11개, CIRCUIT 22개, PADS 20개)입니다. 사이트에는 `scaled()` 결과를 씁니다(턱을 기준으로 머리만 세로 93%, 원본은 얼굴이 세로로 길어 보인다는 피드백 반영). 고칠 때는 이 파일을 바꾸고 `site/index.html`의 `.hero-mark`를 다시 만듭니다.
 - 1차의 원칙(선 굵기 고정, 불투명도 위계, 글 묶음 세로 중앙, 900px 이하 숨김, 처음 한 번 그리기)은 그대로 둡니다.
