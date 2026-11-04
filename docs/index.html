@@ -1037,7 +1037,6 @@ function insights() {
     <a href="#${c.to}">${c.tl} →</a></li>`).join("")}</ol></section>`;
 }
 function methodHtml() {
-  const v = M().validation, ac = M().asof_check;
   return `<section class="panel" id="method"><div class="panel-head"><h2>자료와 기준</h2></div><div class="method">
     <div><h3>출처</h3><ul>
       <li>그룹 순위와 소속회사는 공정거래위원회가 2026년 4월 30일 발표한 공시대상기업집단 지정 결과를 따랐습니다.</li>
@@ -1048,12 +1047,6 @@ function methodHtml() {
       <li><b>신규</b>는 전년도 그룹 명단에 없다가 새로 오른 사람입니다. 같은 그룹의 다른 계열사에서 옮겨 온 사람은 신규가 아니라 ‘계열사 이동’으로 분류합니다.</li>
       <li><b>이탈</b>은 다음 해 그룹 명단에서 빠진 사람입니다. 퇴임한 사람과 비상장 계열사로 옮긴 사람이 함께 포함됩니다.</li>
       <li><b>직급 비공개</b>는 상무, 전무 같은 직급 대신 ‘임원’, ‘리더’ 또는 보직명만 공시한 경우입니다. 이 경우 승진 여부를 판단할 수 없어 차트에 빗금으로 표시했습니다.</li></ul></div>
-    <div><h3>검증</h3><ul>
-      <li>등기임원 명단은 DART가 제공하는 정형 데이터와 ${v.api_reg_match} 일치했습니다.</li>
-      <li>미등기 임원 명단의 인원은 같은 보고서의 보수 현황 인원보다 연도별로 ${v.pay_count_gap.replace(/\+/g, "")} 많았습니다.</li>
-      <li>명단을 연도별로 이어 붙여 계산한 취임 연도는 공시된 선임일과 ${v.start_year_match.replace(" (", " 일치했고, 1년 오차까지 포함하면 ").replace("±1년 ", "").replace(")", " 일치했습니다")}.</li>
-      <li>회사별·연도별 명단 ${fmt(ac.n)}건 가운데 ${fmt(ac.n - ac.odd - (ac.blank || 0))}건은 명단 기준일이 보고서 기준일과 같았습니다. ${fmt(ac.odd)}건은 보고서 제출일 기준으로 작성됐고, ${fmt(ac.blank || 0)}건은 기준일이 적혀 있지 않았습니다. 제출일 기준 명단은 회사 화면에 따로 표시했습니다.</li>
-      <li>담당 업무, 학력, 출신은 공시 문구에 규칙을 적용해 자동으로 분류했습니다. 정확도를 점검하기 위해 무작위 표본(${v.classify_sample.replace("기능", "담당 업무").replace("행", "건")})을 자동 분류 결과를 보지 않은 별도의 AI 검수자가 원문과 분류 기준표만 보고 다시 분류했고, 두 결과를 비교했습니다. 일치율은 ${Object.entries(v.classify).map(([k, x]) => `${k === "기능" ? "담당 업무" : k} ${x}`).join(", ")}입니다. 이 표본을 보면서 규칙을 고쳤기 때문에 실제 정확도는 이보다 낮을 수 있습니다.</li></ul></div>
     <div><h3>한계</h3><ul>
       <li>비상장 계열사의 임원은 공시되지 않아 포함하지 못했습니다. 다만 비상장이지만 사업보고서를 내는 두나무는 포함했습니다.</li>
       <li>2018년이나 회사가 처음 공시된 해에 이미 임원이었던 사람은 실제 취임 연도를 알 수 없습니다.</li>
@@ -1101,7 +1094,7 @@ function viewGroup(rank) {
       ${sum(g.ev["직급체계변경"]) || sum(g.ev["공시확대"]) ? `<p class="note">신규·승진 집계에서 제외한 항목: 직급 체계를 바꾼 해의 직위 변화 ${fmt(sum(g.ev["직급체계변경"]))}건, 회사가 공시 범위를 넓혀 처음 공시된 사람 ${fmt(sum(g.ev["공시확대"]))}명.</p>` : ""}</section>
     <section class="panel"><div class="panel-head"><h3>경영진 수 (연말 기준, 2026년은 반기 말)</h3></div>${lineChart([{ name: "경영진", values: g.heads, color: "var(--accent)" }], { label: "경영진 수", zero: false })}<p class="note">축이 0에서 시작하지 않습니다. 변화를 보려고 범위를 좁혔습니다.</p></section>
     <section class="panel"><div class="panel-head"><h3>나이 분포 (${ASOF()})</h3></div>${ageHist(k.age_hist)}</section>
-    <section class="panel"><div class="panel-head"><h3>맡은 일 (${ASOF()})</h3><p>담당업무 문구로 나눈 기능. 정확도 ${M().validation.classify["기능"]}</p></div>${compareBars(fnItems.slice(0, 10), { refName: "50대 전체" })}</section>
+    <section class="panel"><div class="panel-head"><h3>맡은 일 (${ASOF()})</h3><p>담당 업무 문구로 나눈 기능입니다.</p></div>${compareBars(fnItems.slice(0, 10), { refName: "50대 전체" })}</section>
     <section class="panel"><div class="panel-head"><h3>직급별 인원과 나이 (${ASOF()})</h3></div>${rankStack(k.ranks)}${rankAgeTable(g)}${(g.v.rank_hidden || 0) > 30 ? `<p class="note">경영진의 ${pct(g.v.rank_hidden)}가 직급 없이 공시되어 직급 기준의 승진 집계가 어렵습니다.</p>` : ""}</section>
     <section class="panel"><div class="panel-head"><h3>사외이사 ${fmt(g.out.n)}명</h3><p>여성 ${g.out.n ? `${pct(g.out.female)} (${g.out.female_n}명)` : "–"} · 평균 ${g.out.n ? f1(g.out.avg_age) + "세" : "–"} · 전체 여성 ${pct(B.out_female.all)}</p></div>${originStack(g.out.origin, g.out.n)}${boardMandate(g)}</section>
     <section class="panel"><div class="panel-head"><h3>신규 임원은 어디서 왔나 (${M().flow[0]}–${M().flow[1]}) ${defBtn("ext_hire")}</h3></div>
@@ -1180,7 +1173,7 @@ function viewReport(rank, peers = []) {
     </div>
     <div class="foot"><div>정의: 경영진 = 사내이사 + 미등기 임원 + 집행임원(그룹 안 겸직 1명). 신규율 = 해마다 신규 선임 ÷ 전년 말 경영진의 평균. 전체 = 모든 그룹 경영진을 합산한 값, 중앙값·순위 = 경영진 ${M().min_n}명 이상 그룹.</div>
       <div>비교 그룹 수가 지표마다 다른 이유: 사외이사 지표는 사외이사 5명 이상, 이사회 지표는 공시 회사 3곳 이상, 학력은 학력 공시자가 절반 이상·30명 이상(석·박사는 학위 없이 학교만 적힌 사람이 절반 이하일 때만), 외부 경력은 판단 가능한 신규가 절반 이상·30명 이상인 그룹만 넣었습니다. ‘근거 부족’은 이 조건에 못 미친 값입니다.</div>
-      <div>범위: ${esc(g.name)} 공시 회사 ${g.companies.length}곳 기준(비상장 계열사 임원 제외). 출신·기능·학력은 공시 문구에 규칙을 적용한 추정(표본 검수 120명·150행, 출신 ${M().validation.classify["출신"]}).</div>
+      <div>범위: ${esc(g.name)} 공시 회사 ${g.companies.length}곳 기준(비상장 계열사 임원 제외). 출신·기능·학력은 공시 문구에 규칙을 적용해 분류한 값입니다.</div>
       <div>출처: DART 사업보고서·반기보고서 VIII-1 임원 현황, 공정거래위원회 2026년 공시대상기업집단 지정. 50대 그룹 경영진 지도, 갱신 ${M().built}.</div></div>
   </article>`;
   app.querySelectorAll("[data-peer]").forEach(sel => sel.addEventListener("change", () => {
