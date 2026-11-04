@@ -176,6 +176,7 @@ td.wrap { min-width: 200px; color: var(--ink-2); }
 .pill.reg { background: var(--accent-soft); color: var(--accent); }
 .pill.org { background: transparent; border: 1px solid var(--line); }
 td.nw { white-space: nowrap; }
+.delta { font-weight: 600; color: var(--ink-2); }
 .pill.warn { background: var(--seal-soft); color: var(--seal); font-weight: 600; }
 .tblbar { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 8px; }
 .tblbar .left { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -706,7 +707,7 @@ function kpiCard(m, g, { label, sub } = {}) {
   const rank = g?.rank_of?.[m];
   return `<div class="kpi"><span>${label || mm.t} ${defBtn(m)}</span>
     <b>${v == null ? "–" : mm.f(v)}${mm.unit && v != null && !String(mm.f(v)).endsWith(mm.unit) ? `<small>${mm.unit}</small>` : ""}</b>
-    ${g && m === "executives" ? `<span class="cmp">50대 그룹 경영진 ${fmt(b.all)}명의 <em>${(100 * v / b.all).toFixed(1)}%</em> · 그룹 중앙값 ${fmt(b.median)}명</span>${strip(m, g)}` : g ? `<span class="cmp">전체 <em>${b.all == null ? "–" : mm.f(b.all)}</em> · 중앙값 ${b.median == null ? "–" : mm.f(b.median)}</span>
+    ${g && m === "executives" ? `<span class="cmp">${prevDelta(g.heads)}50대 그룹 경영진 ${fmt(b.all)}명의 <em>${(100 * v / b.all).toFixed(1)}%</em> · 그룹 중앙값 ${fmt(b.median)}명</span>${strip(m, g)}` : g ? `<span class="cmp">전체 <em>${b.all == null ? "–" : mm.f(b.all)}</em> · 중앙값 ${b.median == null ? "–" : mm.f(b.median)}</span>
       ${m === "ext_hire" ? `<span class="rank">${esc(coverage(m, g))}</span>` : ""}
       ${rank && m !== "executives" ? `<span class="rank">경영진 ${M().min_n}명 이상${m === "ext_hire" ? "·근거 충분" : ""} ${b.n}개 그룹 중 ${rankText(rank, b.n)}${mm.rate && v != null && b.all != null ? ` · ${diffText(m, v, b.all)}` : ""}</span>` : ""}${m !== "executives" ? strip(m, g) : ""}`
       : `<span class="cmp">${sub || timeLabel(mm.time)}</span>`}</div>`;
@@ -723,6 +724,13 @@ function footer() {
 function jong(w) { const c = String(w).trim().slice(-1).charCodeAt(0); if (c >= 0xAC00 && c <= 0xD7A3) return (c - 0xAC00) % 28; return /[0-9]$/.test(w) ? [1, 8, 0, 1, 0, 0, 1, 8, 8, 0][+String(w).slice(-1)] : 0; }   // 영 일 이 삼 사 오 육 칠 팔 구
 const ro = w => { const j = jong(w); return `${w}${j && j !== 8 ? "으로" : "로"}`; };
 const ida = w => `${w}${jong(w) ? "이었" : "였"}`;
+/* 직전 시점(전년 말) 대비 증감: 반기 말이면 6개월 변화다 */
+function prevDelta(heads) {
+  const ys = YEARS(), i = ys.length - 1, cur = heads?.[i], prev = heads?.[i - 1];
+  if (cur == null || prev == null || !prev) return "";
+  const d = cur - prev, cls = d > 0 ? "up" : d < 0 ? "down" : "";
+  return `<span class="delta ${cls}">${ys[i - 1]}년 말 ${fmt(prev)}명 대비 ${d === 0 ? "변동 없음" : `${d > 0 ? "+" : "−"}${fmt(Math.abs(d))}명(${d > 0 ? "+" : "−"}${(Math.abs(d) / prev * 100).toFixed(1)}%)`}</span><br>`;
+}
 /* ---------- 화면: 첫 화면 ---------- */
 let homeView = store.get("homeView") || "comp";
 function groupRowsForHome() {
@@ -802,7 +810,7 @@ function viewHome() {
   ${mineG ? "" : `<div class="band info no-print" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span>내 그룹을 고르면 표 맨 위에 고정되고, 숫자마다 전체·중앙값·순위가 붙습니다.</span>
     <select id="mine2" aria-label="내 그룹 고르기"><option value="">그룹 고르기</option>${CORE.groups.filter(g => g.has_data).map(g => `<option value="${g.rank}">${g.rank}. ${esc(g.name)}</option>`).join("")}</select></div>`}
   <div class="kpis">
-    ${kpiCard("executives", mineG, { label: mineG ? `${mineG.name} 경영진` : "경영진", sub: `${M().n_groups_data}개 그룹 ${M().n_companies}곳, 겸직자는 한 번만 셈` })}
+    ${kpiCard("executives", mineG, { label: mineG ? `${mineG.name} 경영진` : "경영진", sub: `${prevDelta(mineG ? mineG.heads : T.heads)}${M().n_groups_data}개 그룹 ${M().n_companies}곳, 겸직자는 한 번만 셈` })}
     ${kpiCard("avg_age", mineG, { label: mineG ? `${mineG.name} 평균 나이` : "평균 나이" })}
     ${kpiCard("female", mineG, { label: mineG ? `${mineG.name} 여성` : "여성 비율" })}
     ${kpiCard("new_rate", mineG, { label: mineG ? `${mineG.name} 신규율` : "연평균 신규율" })}
