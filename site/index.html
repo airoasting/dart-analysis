@@ -301,9 +301,10 @@ details.nums summary { cursor: pointer; color: var(--accent); font-size: 12.5px;
 .hb .track i { position: absolute; inset: 0 auto 0 0; border-radius: 3px; background: var(--bar); }
 .hb .track u { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); opacity: .55; }
 .hb .v { font-variant-numeric: tabular-nums; color: var(--ink-2); white-space: nowrap; min-width: 92px; text-align: right; }
-.stack { display: flex; height: 22px; border-radius: 5px; overflow: hidden; gap: 2px; }
-.stack div { min-width: 2px; }
-.stackleg { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 4px 12px; font-size: 12.5px; margin-top: 10px; color: var(--ink-2); }
+.stack { display: flex; height: 48px; border-radius: 6px; overflow: hidden; gap: 3px; }
+.stack div { min-width: 2px; display: flex; align-items: center; padding-left: 10px; color: #fff; font-size: 13px; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; }
+.report .stack { height: 22px; gap: 2px; } .report .stack div { font-size: 0; padding: 0; }
+.stackleg { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 10px 16px; font-size: 13.5px; margin-top: 18px; color: var(--ink-2); }
 .stackleg b { font-weight: 650; color: var(--ink); margin-left: 4px; font-variant-numeric: tabular-nums; }
 .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
 
@@ -552,7 +553,7 @@ function niceMax(v) { if (v <= 5) return 5; const p = 10 ** Math.floor(Math.log1
 function lineChart(series, { label = "", unit = "명", fmtv = fmt, zero = true, valueLabel = true, from = 0, to = 0 } = {}) {
   const off = from ? Math.max(0, YEARS().indexOf(from)) : 0, end = to && YEARS().includes(to) ? YEARS().indexOf(to) + 1 : YEARS().length;
   if (off || end < YEARS().length) series = series.map(s => ({ ...s, values: s.values.slice(off, end) }));
-  const ys = YEARS().slice(off, end), W = 560, H = 210, L = 46, R = 46, T = 14, B = 26;
+  const ys = YEARS().slice(off, end), W = 560, H = 210, L = 46, R = series.some(s => s.tag) ? 120 : 46, T = 14, B = 26;   // 꼬리표가 있으면 오른쪽 여백을 넓힌다
   const all = series.flatMap(s => s.values.filter(v => v != null));
   if (!all.length) return `<p class="empty">추이를 그릴 자료가 없습니다.</p>`;
   let lo = zero ? 0 : Math.min(...all), hi = Math.max(...all);
@@ -575,7 +576,7 @@ function lineChart(series, { label = "", unit = "명", fmtv = fmt, zero = true, 
     if (part.length && full.length) out += `<path d="M${x(full.at(-1)[0])},${y(full.at(-1)[1])}L${x(part[0][0])},${y(part[0][1])}" fill="none" stroke="${s.color}" stroke-width="${s.width || 2}" stroke-dasharray="3 3"/>`;
     const last = pts.at(-1);
     out += `<circle cx="${x(last[0])}" cy="${y(last[1])}" r="4" fill="${isPartial(last[0]) ? "var(--surface)" : s.color}" stroke="${s.color}" stroke-width="2"/>`;
-    if (valueLabel && (si === 0 || series.length < 3)) labs.push({ x: x(last[0]) + 8, y: y(last[1]) + 4, t: fmtv(last[1]) });
+    if (valueLabel && (si === 0 || series.length < 3)) labs.push({ x: x(last[0]) + 8, y: y(last[1]) + 4, t: fmtv(last[1]) + (s.tag ? ` ${s.tag}` : "") });
   });
   labs.sort((a, b) => a.y - b.y).forEach((l, i, a) => { if (i && l.y - a[i - 1].y < 13) l.y = a[i - 1].y + 13; });   // 끝 숫자가 겹치지 않게 아래로 민다
   out += labs.map(l => `<text class="lbl" x="${l.x}" y="${l.y}">${l.t}</text>`).join("");
@@ -624,7 +625,8 @@ function flowChart(ev, heads, { hidden = null, partialUp = false } = {}) {
     out += rUp(xa, sy(nw[j]), "var(--ev-new)");
     if (!noUpY[j]) out += rUp(xb, sy(up[j]), "var(--ev-up)");
     const ho = sy(ot[j]);
-    if (ho > 0) out += `<path d="M${xa},${y0}V${y0 + ho - Math.min(3, ho)}Q${xa},${y0 + ho} ${xa + Math.min(3, ho)},${y0 + ho}H${xa + bw * 2 + 2 - Math.min(3, ho)}Q${xa + bw * 2 + 2},${y0 + ho} ${xa + bw * 2 + 2},${y0 + ho - Math.min(3, ho)}V${y0}Z" fill="var(--ev-out)" fill-opacity=".75"/>`;
+    const xo = cx - bw / 2;   // 이탈 막대도 신규·승진과 같은 폭, 가운데 정렬
+    if (ho > 0) out += `<path d="M${xo},${y0}V${y0 + ho - Math.min(3, ho)}Q${xo},${y0 + ho} ${xo + Math.min(3, ho)},${y0 + ho}H${xo + bw - Math.min(3, ho)}Q${xo + bw},${y0 + ho} ${xo + bw},${y0 + ho - Math.min(3, ho)}V${y0}Z" fill="var(--ev-out)" fill-opacity=".75"/>`;
     net.push([cx, y0 - sy(nw[j] - ot[j])]);
     out += `<rect class="hit" data-j="${j}" x="${cx - band / 2}" y="${T}" width="${band}" height="${H - T - B}" fill="transparent"/>`;
   });
@@ -692,7 +694,7 @@ function originStack(origin, n) {
   const id = uid("o");
   after(() => { const el = document.getElementById(id); if (!el) return;
     el.querySelectorAll("[data-k]").forEach(d => { d.addEventListener("mousemove", e => showTip(e, `${d.dataset.k} <b>${fmt(+d.dataset.v)}명</b> (${(100 * d.dataset.v / n).toFixed(1)}%)`)); d.addEventListener("mouseleave", hideTip); }); });
-  return `<div id="${id}"><div class="stack" role="img" aria-label="출신 구성">${items.map(([k, v, c]) => `<div data-k="${k}" data-v="${v}" style="flex:${v};background:${c}"></div>`).join("")}</div>
+  return `<div id="${id}"><div class="stack" role="img" aria-label="출신 구성">${items.map(([k, v, c]) => `<div data-k="${k}" data-v="${v}" style="flex:${v};background:${c}">${v / n >= .08 ? `${(100 * v / n).toFixed(0)}%` : ""}</div>`).join("")}</div>
     <div class="stackleg">${items.map(([k, v, c]) => `<span><i class="sw" style="background:${c}"></i>${k}<b>${fmt(v)}</b> <span style="color:var(--muted)">${(100 * v / n).toFixed(0)}%</span></span>`).join("")}</div></div>`;
 }
 /* 46개 그룹 사이 위치 띠 */
@@ -971,7 +973,7 @@ function viewHome() {
     <section class="panel"><div class="panel-head"><h3>신규 선임 · 승진 · 이탈 (전체)</h3></div>${flowChart(T.ev, T.heads, { partialUp: true })}
       <p class="note">직급 개편, 공시 범위 변화, 회사 상장·편입에 따른 증감은 제외했습니다. 승진은 직급이 공시된 경영진만 집계할 수 있어 실제보다 적게 나타납니다. 정기 인사 발표가 해를 넘기면 해당 연도 신규 선임이 다음 해로 집계됩니다(예: 삼성 2019년 말 인사가 2020년 1월로 미뤄진 해). 2026년 상반기는 기간이 반년이라 넣지 않았습니다.</p></section>
     <section class="panel"><div class="panel-head"><h3>경영진 수 (연말, 마지막은 반기 말)</h3></div>
-      ${lineChart([{ name: `9개 시점 모두 공시된 ${fmt(M().n_const)}곳`, values: T.const_heads, color: "var(--accent)" }, { name: "해마다 공시된 회사 전체", values: T.heads, color: "var(--faint)", dash: true, width: 1.5 }], { label: "경영진 수", unit: "명" })}
+      ${lineChart([{ name: `9개 시점 모두 공시된 ${fmt(M().n_const)}곳`, tag: `같은 회사 ${fmt(M().n_const)}곳`, values: T.const_heads, color: "var(--accent)" }, { name: "해마다 공시된 회사 전체", tag: "공시 회사 전체", values: T.heads, color: "var(--faint)", dash: true, width: 1.5 }], { label: "경영진 수", unit: "명" })}
       <p class="note">회사 수 증가 효과를 제외하기 위해 9개 시점 모두 공시된 회사만으로 별도의 선을 표시했습니다(겸직자는 1명으로 집계). 이 선에도 공시 범위를 넓힌 회사의 증가분이 들어 있습니다: ${YEARS().map((y, i) => [y, M().const_expand[i]]).filter(x => x[1] > 20).map(x => `${x[0]}년 ${fmt(x[1])}명`).join(", ") || "없음"}.</p></section>
     <section class="panel"><div class="panel-head"><h3>사외이사 출신 (전체 ${fmt(T.out.n)}명)</h3></div>${originStack(T.out.origin, T.out.n)}
       <p class="note">공시 경력 문구에서 규칙으로 판정한 주 출신입니다(표본 검수 정확도 ${M().validation.classify["출신"]}).</p></section>
