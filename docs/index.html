@@ -176,6 +176,9 @@ section.panel { background: transparent; border: 0; border-top: 2px solid var(--
               radial-gradient(900px 600px at 0% 100%, rgba(8, 20, 40, .55), transparent 60%),
               linear-gradient(135deg, var(--hero-a) 0%, var(--hero-b) 48%, var(--hero-c) 100%); }
 .hero-copy { display: grid; gap: 14px; margin-block: auto; padding-block: 24px; }
+/* 조직도 표식: 대표 1명 아래 임원 3명, 그 아래 실무 임원으로 갈라지는 계층. 글자 뒤에 반투명으로 깐다 */
+.hero-mark { position: absolute; z-index: -1; right: 0; bottom: 250px; width: min(30vw, 420px); height: auto; color: #ffffff; opacity: .16; pointer-events: none; }
+@media (max-width: 900px) { .hero-mark { width: 62vw; bottom: auto; top: 70px; opacity: .08; } }
 .hero .scroll-cue { align-self: center; margin-top: 18px; font-size: 13px; color: var(--muted); display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
 .hero .scroll-cue:hover { color: var(--ink); text-decoration: none; }
 .hero .scroll-cue svg { animation: cue 1.8s ease-in-out infinite; }
@@ -339,7 +342,7 @@ footer.site { max-width: 1440px; margin: 0 auto; padding-block: 18px 36px; paddi
   *, .num, td.n, .kpi b, .chart text, .hb .v, .tl-year { font-variant-numeric: normal !important; font-feature-settings: normal !important; }
   body { background: #fff; }
   main { padding: 0; }
-  .hero::before, .hero .scroll-cue { display: none !important; }
+  .hero::before, .hero .scroll-cue, .hero-mark { display: none !important; }
   .hero { min-height: 0; margin: 0; padding: 0;
     --ink: #111; --ink-2: #333; --muted: #555; --faint: #888; --line: #ccc; --line-2: #e5e5e5; --rule: #111; --accent: #1d4e89; }
   .report { border: 0; padding: 0; }
@@ -916,16 +919,17 @@ function viewHome() {
   <div class="hero">
     <div class="hero-copy">
     ${timeChips()}
-    <h1>50대 대기업 경영진은 어떤 특성을 보이고 있을까요</h1>
+    <h1>50대 대기업 경영진은 어떤 특성을 보이고 있을까요?</h1>
     <p class="lede">공정위가 지정한 자산 상위 50개 그룹의 상장 계열사(일부 비상장 공시 회사 포함) 임원 정보를 DART 공시 원문에서 추출해 일관된 기준으로 정리했습니다. 관심 그룹을 선택하면 모든 표와 차트에 비교 기준으로 함께 표시됩니다.</p>
     ${mineG ? "" : `<button class="btn primary cta no-print" type="button" id="pickMine">관심 그룹과 비교하기</button>`}
     </div>
   <div class="kpis">
-    ${kpiCard("executives", mineG, { label: mineG ? `${mineG.name} 경영진` : "경영진", sub: `${prevDelta(mineG ? mineG.heads : T.heads)}${M().n_groups_data}개 그룹 ${M().n_companies}곳, 겸직자는 1명으로 집계했습니다` })}
+    ${kpiCard("executives", mineG, { label: mineG ? `${mineG.name} 경영진` : "경영진", sub: `${prevDelta(mineG ? mineG.heads : T.heads)}50개 그룹 중 ${M().n_groups_data}개 그룹, ${fmt(M().n_companies)}개 기업 대상<span class="na" style="display:block;font-size:11.5px">쿠팡·부영·한국지엠은 임원 명단 공시가 없습니다.</span>` })}
     ${kpiCard("avg_age", mineG, { label: mineG ? `${mineG.name} 평균 나이` : "평균 나이" })}
     ${kpiCard("female", mineG, { label: mineG ? `${mineG.name} 여성` : "여성 비율" })}
-    ${kpiCard("new_rate", mineG, { label: mineG ? `${mineG.name} 신규율` : "연평균 신규율" })}
+    ${kpiCard("new_rate", mineG, { label: mineG ? `${mineG.name} 연평균 신규 선임 비율` : "연평균 신규 선임 비율" })}
   </div>
+    <svg class="hero-mark" viewBox="0 0 420 330" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="210" cy="34" r="13.5"/><path d="M186.0,79.0 q24.0,-30.0 48.0,0"/><path d="M210,92 V118 M90,118 H330 M90,118 V140 M210,118 V140 M330,118 V140"/><circle cx="90" cy="156" r="10.3"/><path d="M71.6,190.5 q18.4,-23.0 36.8,0"/><circle cx="210" cy="156" r="10.3"/><path d="M191.6,190.5 q18.4,-23.0 36.8,0"/><circle cx="330" cy="156" r="10.3"/><path d="M311.6,190.5 q18.4,-23.0 36.8,0"/><path d="M90,205 V222 M56,222 H124 M56,222 V238 M90,222 V238 M124,222 V238"/><circle cx="56" cy="250" r="9"/><circle cx="90" cy="250" r="9"/><circle cx="124" cy="250" r="9"/><path d="M56,262 V276"/> <path d="M90,262 V276"/> <path d="M124,262 V276"/><circle cx="56" cy="284" r="4" fill="currentColor" stroke="none"/> <circle cx="90" cy="284" r="4" fill="currentColor" stroke="none"/> <circle cx="124" cy="284" r="4" fill="currentColor" stroke="none"/><path d="M210,205 V222 M176,222 H244 M176,222 V238 M210,222 V238 M244,222 V238"/><circle cx="176" cy="250" r="9"/><circle cx="210" cy="250" r="9"/><circle cx="244" cy="250" r="9"/><path d="M176,262 V276"/> <path d="M210,262 V276"/> <path d="M244,262 V276"/><circle cx="176" cy="284" r="4" fill="currentColor" stroke="none"/> <circle cx="210" cy="284" r="4" fill="currentColor" stroke="none"/> <circle cx="244" cy="284" r="4" fill="currentColor" stroke="none"/><path d="M330,205 V222 M296,222 H364 M296,222 V238 M330,222 V238 M364,222 V238"/><circle cx="296" cy="250" r="9"/><circle cx="330" cy="250" r="9"/><circle cx="364" cy="250" r="9"/><path d="M296,262 V276"/> <path d="M330,262 V276"/> <path d="M364,262 V276"/><circle cx="296" cy="284" r="4" fill="currentColor" stroke="none"/> <circle cx="330" cy="284" r="4" fill="currentColor" stroke="none"/> <circle cx="364" cy="284" r="4" fill="currentColor" stroke="none"/></svg>
     <a class="scroll-cue no-print" href="#finds" aria-label="주요 발견으로 내려가기">주요 발견과 그룹 비교<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
   </div>
   ${insights()}
@@ -1035,7 +1039,7 @@ function viewGroup(rank) {
   ${timeChips()}
   <div class="band info">공시 회사 ${comps.length}곳${comps.length > nListed ? `(상장 ${nListed}곳 + 비상장 사업보고서 제출사 ${comps.length - nListed}곳)` : "(모두 상장사)"} 기준입니다. 비상장 계열사 ${g.n_aff - comps.length}곳의 임원은 공시되지 않아 제외되었고, 해당 회사와 오간 인원은 신규·이탈로 집계됩니다.</div>
   <div class="kpis">
-    ${kpiCard("executives", g)}${kpiCard("avg_age", g)}${kpiCard("female", g)}${kpiCard("new_rate", g)}${kpiCard("ext_hire", g)}${kpiCard("pay", g)}
+    ${kpiCard("executives", g)}${kpiCard("avg_age", g)}${kpiCard("female", g)}${kpiCard("new_rate", g, { label: "연평균 신규 선임 비율" })}${kpiCard("ext_hire", g)}${kpiCard("pay", g)}
   </div>
   <div class="grid2">
     <section class="panel"><div class="panel-head"><h3>연도별 신규율 ${defBtn("new_rate")}</h3></div>${lineChart(nr, { label: "연도별 신규율", unit: "%", fmtv: v => `${(+v).toFixed(1)}%`, from: +M().flow[0], to: FLOW_END() })}</section>
