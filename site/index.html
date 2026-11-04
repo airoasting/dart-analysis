@@ -174,12 +174,12 @@ section.panel { background: transparent; border: 0; border-top: 2px solid var(--
 .hero-copy { display: grid; gap: 14px; margin-block: auto; padding-block: 24px; }
 /* 경영진 표식: AI ROASTING 아이콘 갤러리의 여러 사용자·막대 차트·선 차트·검색을 점선으로 이은 구성(경영진을 찾고 비교하는 데이터). 글자 뒤 반투명, 처음 한 번 선을 그린다 */
 .hero-mark { position: absolute; z-index: -1; right: 0; top: 70px; width: min(30vw, 420px); height: auto; color: #ffffff; opacity: .26; pointer-events: none; }
-.hero-mark .ic path, .hero-mark .ic circle { stroke-dasharray: 1; stroke-dashoffset: 1; animation: markDraw 1.5s cubic-bezier(.65, 0, .35, 1) var(--d, 0s) forwards; }
+.hero-mark .ic path, .hero-mark .ic circle { stroke-dasharray: 1.02 1; stroke-dashoffset: 1.02; animation: markDraw 1.5s cubic-bezier(.65, 0, .35, 1) var(--d, 0s) forwards; }   /* 대시를 경로보다 조금 길게 해 다 그린 뒤 틈이 남지 않게 */
 .hero-mark .cn { opacity: 0; animation: markFade 1s ease 1.2s forwards; }
 .hero-mark .cn.dots { opacity: 0; }
 @keyframes markDraw { to { stroke-dashoffset: 0; } }
 @keyframes markFade { to { opacity: .8; } }
-@media (prefers-reduced-motion: reduce) { .hero-mark .ic path, .hero-mark .ic circle { animation: none; stroke-dashoffset: 0; } .hero-mark .cn { animation: none; opacity: .8; } }
+@media (prefers-reduced-motion: reduce) { .hero-mark .ic path, .hero-mark .ic circle { animation: none; stroke-dasharray: none; stroke-dashoffset: 0; } .hero-mark .cn { animation: none; opacity: .8; } }
 @media (max-width: 900px) { .hero-mark { width: 58vw; top: 40px; opacity: .1; } }
 .hero .scroll-cue { align-self: center; margin-top: 18px; font-size: 13px; color: var(--muted); display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
 .hero .scroll-cue:hover { color: var(--ink); text-decoration: none; }
@@ -717,7 +717,7 @@ function table({ cols, rows, pinned = [], key, dir = -1, href, rowClass, groupsH
     if (more) {
       if (moreAll) {   // 상위 몇 개만 먼저 보이고, 한 번에 모두 펼치거나 접는다
         more.innerHTML = sorted.length <= limit ? "" : vis.length < sorted.length
-          ? `<button class="btn" type="button">${fmt(sorted.length)}개 모두 보기</button> <span class="na">지금 정렬 기준 상위 ${fmt(vis.length)}개를 보여 줍니다. 표 복사·CSV에는 전체가 나갑니다.</span>`
+          ? `<button class="btn" type="button">전체 보기</button> <span class="na">지금 정렬 기준 상위 ${fmt(vis.length)}개를 보여 줍니다. 표 복사·CSV에는 전체가 나갑니다.</span>`
           : `<button class="btn" type="button">상위 ${fmt(limit)}개만 보기</button>`;
         more.querySelector("button")?.addEventListener("click", () => { lim = vis.length < sorted.length ? 0 : limit; draw(); });
       } else {
