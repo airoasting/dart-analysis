@@ -802,7 +802,6 @@ function table({ cols, rows, pinned = [], key, dir = -1, href, rowClass, groupsH
   });
   return `${tools}<div class="tbl"><table id="${id}"><thead></thead><tbody></tbody></table></div>${limit ? `<p id="${id}-more"></p>` : ""}${note ? `<p class="note">${note}</p>` : ""}`;
 }
-const bar = (v, max, txt, ref, tip = "") => v == null ? `<span class="na">–</span>` : `<span class="cellbar">${txt}<span class="trk"${tip ? ` title="${esc(tip)}"` : ""}><i style="width:${Math.max(3, 100 * (v || 0) / max)}%"></i>${ref != null && max ? `<u style="left:${Math.min(100, 100 * ref / max)}%"></u>` : ""}</span></span>`;
 
 /* ---------- 인물 데이터: 첫 화면 뒤 미리 받기, 진행률 ---------- */
 function loadPeople() {
@@ -924,9 +923,7 @@ function metricCell(m, r) {
   if (v == null && coverage(m, r)) return `<span class="na">${coverage(m, r).startsWith("검수") ? "검수 필요" : "근거 부족"}</span><div class="na" style="font-size:11px">${esc(coverage(m, r).replace(/^검수 필요 · /, ""))}</div>`;
   if (v == null) return `<span class="na">–</span>`;
   if (r.small && mm.rate) return `<span class="na" title="경영진 ${r.k?.n || 0}명: 표본이 작아 비율을 비교하지 않습니다">표본 작음</span>`;
-  const max = Math.max(...CORE.groups.filter(g => g.has_data && !g.small && g.v[m] != null).map(g => g.v[m]));
-  const ref = m === "executives" || m === "out_n" ? CORE.bench[m].median : CORE.bench[m].all;   // 인원은 중앙값, 비율은 50대 전체에 눈금
-  return ["executives", "female", "out_n", "pay", "ext_hire", "new_rate"].includes(m) ? bar(v, max, mm.f(v), ref, `막대: ${r.name} ${mm.f(v)} (가장 큰 그룹이 끝까지) · 세로선: ${m === "executives" || m === "out_n" ? "그룹 중앙값" : "50대 전체"} ${ref == null ? "–" : mm.f(ref)}`) : mm.f(v);
+  return mm.f(v);
 }
 function homeTable() {
   const view = HOME_VIEWS[homeView], ms = view.cols, B = CORE.bench, me = mineRank();
@@ -951,7 +948,7 @@ function homeTable() {
   return table({ cols, rows, pinned, key: "rank", dir: 1, href: r => r.has_data ? `g${r.rank}` : null, rowClass: r => (!r.has_data ? "nodata" : r.small ? "small" : "") + (r._mine ? " mine" : ""),
     groupsHdr: grpHdr, title: `50대 그룹 비교_${view.t}`, countLabel: `50개 그룹 · 비율 비교 대상 ${fmt(nCmp)}개`,
     limit: 10, moreAll: true, sep: 5, inPlaceKey: "rank",
-    note: `<b>읽는 법</b> 맨 위 회색 띠가 비교 기준입니다. ‘전체’는 모든 그룹 경영진을 합산한 값(인원 가중)이고, ‘중앙값’과 순위는 경영진 ${M().min_n}명 이상 그룹만으로 산출합니다. 숫자 옆 막대의 길이는 그 열에서 값이 가장 큰 그룹을 끝까지로 잡은 상대 크기이고, 막대 위 세로선은 비교 기준(비율은 50대 전체, 인원은 그룹 중앙값)입니다. 막대가 세로선보다 길면 기준보다 높다는 뜻입니다. ‘이사회 법정 요건’은 자산 2조 원 이상 비금융 상장 계열사(대상)가 사외이사 과반과 이사회 성별 구성 요건을 지켰는지 점검한 결과입니다. 회색 줄은 비율 비교에서 제외한 그룹입니다. 경영진 ${M().min_n}명 미만 그룹은 ‘표본 작음’으로 표시하고, 쿠팡·부영·한국지엠은 임원 명단 공시가 없습니다. 지표 열로 정렬하면 회색 줄은 맨 아래로 내려갑니다.` });
+    note: `<b>읽는 법</b> 맨 위 회색 띠가 비교 기준입니다. ‘전체’는 모든 그룹 경영진을 합산한 값(인원 가중)이고, ‘중앙값’과 순위는 경영진 ${M().min_n}명 이상 그룹만으로 산출합니다. ‘이사회 법정 요건’은 자산 2조 원 이상 비금융 상장 계열사(대상)가 사외이사 과반과 이사회 성별 구성 요건을 지켰는지 점검한 결과입니다. 회색 줄은 비율 비교에서 제외한 그룹입니다. 경영진 ${M().min_n}명 미만 그룹은 ‘표본 작음’으로 표시하고, 쿠팡·부영·한국지엠은 임원 명단 공시가 없습니다. 지표 열로 정렬하면 회색 줄은 맨 아래로 내려갑니다.` });
 }
 function excludedGroups(out) {   // 비교에서 뺀 그룹: 표본이 작거나 임원 명단 공시가 없는 그룹
   if (!out.length) return "";
@@ -1065,11 +1062,10 @@ function viewGroup(rank) {
   if (!g.has_data) { app.innerHTML = `<div><div class="crumb"><a href="#home">50대 그룹</a><span>›</span><span>${rank}위</span></div><h1>${esc(g.name)}</h1><p class="lede">${esc(g.reason)}</p></div>`; return; }
   const k = g.k || {}, T = CORE.total, B = CORE.bench, comps = g.companies.map(id => byId[id]), isMine = mineRank() === g.rank;
   const nListed = comps.filter(c => !c.market.startsWith("비상장")).length;
-  const maxE = Math.max(1, ...comps.map(c => c.k?.n || 0));
   const cols = [
     { k: "name", t: "회사", cls: "name", f: r => `<a href="#c${r.id}">${esc(r.name)}</a>`, xv: r => r.name },
     { k: "market", t: "시장", f: r => `<span class="pill">${esc(r.market)}</span>` },
-    { k: "n", t: "경영진", n: 1, gl: 1, v: r => r.k?.n ?? 0, f: r => bar(r.k?.n || 0, maxE, fmt(r.k?.n ?? 0)), xv: r => r.k?.n ?? 0 },
+    { k: "n", t: "경영진", n: 1, gl: 1, v: r => r.k?.n ?? 0, f: r => fmt(r.k?.n ?? 0), xv: r => r.k?.n ?? 0 },
     { k: "age", t: "평균 나이", n: 1, v: r => r.k?.avg_age, f: r => r.k ? f1(r.k.avg_age) : "–" },
     { k: "fem", t: "여성", n: 1, v: r => (r.k && r.k.n >= 10) ? r.k.female : null, f: r => !r.k ? "–" : r.k.n < 10 ? `<span class="na">${r.k.female_n}/${r.k.n}명</span>` : `${pct(r.k.female)} <span class="na">${r.k.female_n}/${r.k.n}</span>`, xv: r => r.k?.female ?? "" },
     { k: "out", t: "사외이사", n: 1, gl: 1, v: r => r.board["사외이사"], f: r => fmt(r.board["사외이사"]) },
