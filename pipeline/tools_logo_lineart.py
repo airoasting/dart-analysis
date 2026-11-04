@@ -68,3 +68,40 @@ def scaled():
     c=[(_squash(d) if i in HEAD_CIRCUIT_IDX else d) for i,d in enumerate(CIRCUIT)]
     p=[(x, round(_sy(y),1) if y <= CHIN else y) for x,y in PADS]
     return o,c,p
+
+
+# ---------- 좌우대칭: 가운데 x=826을 축으로 왼쪽 윤곽을 뒤집어 오른쪽을 만든다 ----------
+AXIS = 826
+def _mirror(d):
+    out=[]; toks=_re.findall(r'[MLHVCAZ]|-?\d+(?:\.\d+)?', d); i=0; cmd=None
+    mx=lambda x: f'{2*AXIS-float(x):g}'
+    while i < len(toks):
+        t=toks[i]
+        if t.isalpha(): cmd=t; out.append(t); i+=1; continue
+        if cmd in 'ML': out+= [mx(toks[i]), toks[i+1]]; i+=2
+        elif cmd=='H': out.append(mx(toks[i])); i+=1
+        elif cmd=='V': out.append(toks[i]); i+=1
+        elif cmd=='C':
+            for k in range(3): out+= [mx(toks[i+2*k]), toks[i+2*k+1]]
+            i+=6
+        elif cmd=='A':
+            rx,ry,rot,la,sw,x,y=toks[i:i+7]; out+= [rx, ry, rot, la, str(1-int(sw)), mx(x), y]; i+=7
+        else: i+=1
+    return ' '.join(out).replace(' M','M')
+VISOR_W = 490   # 눈가리개 전체 폭(둥근 끝 포함), 가운데 정렬
+def _visor():
+    r=57; x0=AXIS-VISOR_W/2+r; x1=AXIS+VISOR_W/2-r
+    return f"M{x0:g} 558H{x1:g}A{r} {r} 0 0 1 {x1:g} 672H{x0:g}A{r} {r} 0 0 1 {x0:g} 558Z"
+def symmetric():
+    o=list(OUTLINE)
+    o[2]=_mirror(o[1])      # 오른쪽 머리 = 왼쪽 머리 뒤집기
+    o[4]=_visor()           # 눈가리개 가운데로
+    o[7]=_mirror(o[6])      # 오른쪽 귀
+    o[10]=_mirror(o[8])     # 오른쪽 어깨
+    return o
+def scaled_symmetric():
+    o=symmetric()
+    o=[(_squash(d) if i in HEAD_OUTLINE_IDX else d) for i,d in enumerate(o) if i not in DROP_OUTLINE_IDX]
+    c=[(_squash(d) if i in HEAD_CIRCUIT_IDX else d) for i,d in enumerate(CIRCUIT)]
+    p=[(x, round(_sy(y),1) if y <= CHIN else y) for x,y in PADS]
+    return o,c,p
