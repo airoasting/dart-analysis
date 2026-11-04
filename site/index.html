@@ -972,7 +972,7 @@ function viewHome() {
       <p class="note">해마다 신규 선임 ÷ 전년 말 경영진. ${mineG ? "" : "관심 그룹을 선택하면 같은 축에 함께 표시합니다."}</p></section>
     <section class="panel"><div class="panel-head"><h3>신규 선임 · 승진 · 이탈 (전체)</h3></div>${flowChart(T.ev, T.heads, { partialUp: true })}
       <p class="note">직급 개편, 공시 범위 변화, 회사 상장·편입에 따른 증감은 제외했습니다. 승진은 직급이 공시된 경영진만 집계할 수 있어 실제보다 적게 나타납니다. 정기 인사 발표가 해를 넘기면 해당 연도 신규 선임이 다음 해로 집계됩니다(예: 삼성 2019년 말 인사가 2020년 1월로 미뤄진 해). 2026년 상반기는 기간이 반년이라 넣지 않았습니다.</p></section>
-    <section class="panel"><div class="panel-head"><h3>경영진 수 (연말, 마지막은 반기 말)</h3></div>
+    <section class="panel"><div class="panel-head"><h3>경영진 수 (연말 기준, 2026년은 반기 말)</h3></div>
       ${lineChart([{ name: `9개 시점 모두 공시된 ${fmt(M().n_const)}곳`, tag: `같은 회사 ${fmt(M().n_const)}곳`, values: T.const_heads, color: "var(--accent)" }, { name: "해마다 공시된 회사 전체", tag: "공시 회사 전체", values: T.heads, color: "var(--faint)", dash: true, width: 1.5 }], { label: "경영진 수", unit: "명" })}
       <p class="note">회사 수 증가 효과를 제외하기 위해 9개 시점 모두 공시된 회사만으로 별도의 선을 표시했습니다(겸직자는 1명으로 집계). 이 선에도 공시 범위를 넓힌 회사의 증가분이 들어 있습니다: ${YEARS().map((y, i) => [y, M().const_expand[i]]).filter(x => x[1] > 20).map(x => `${x[0]}년 ${fmt(x[1])}명`).join(", ") || "없음"}.</p></section>
     <section class="panel"><div class="panel-head"><h3>사외이사 출신 (전체 ${fmt(T.out.n)}명)</h3></div>${originStack(T.out.origin, T.out.n)}
@@ -1082,7 +1082,7 @@ function viewGroup(rank) {
     <section class="panel"><div class="panel-head"><h3>연도별 신규율 ${defBtn("new_rate")}</h3></div>${lineChart(nr, { label: "연도별 신규율", unit: "%", fmtv: v => `${(+v).toFixed(1)}%`, from: +M().flow[0], to: FLOW_END() })}</section>
     <section class="panel"><div class="panel-head"><h3>신규 선임 · 승진 · 이탈</h3></div>${flowChart(g.ev, g.heads, { hidden: g.hidden_by_year })}
       ${sum(g.ev["직급체계변경"]) || sum(g.ev["공시확대"]) ? `<p class="note">신규·승진 집계에서 제외한 항목: 직급 체계를 바꾼 해의 직위 변화 ${fmt(sum(g.ev["직급체계변경"]))}건, 회사가 공시 범위를 넓혀 처음 공시된 사람 ${fmt(sum(g.ev["공시확대"]))}명.</p>` : ""}</section>
-    <section class="panel"><div class="panel-head"><h3>경영진 수 (연말, 마지막은 반기 말)</h3></div>${lineChart([{ name: "경영진", values: g.heads, color: "var(--accent)" }], { label: "경영진 수", zero: false })}<p class="note">축이 0에서 시작하지 않습니다. 변화를 보려고 범위를 좁혔습니다.</p></section>
+    <section class="panel"><div class="panel-head"><h3>경영진 수 (연말 기준, 2026년은 반기 말)</h3></div>${lineChart([{ name: "경영진", values: g.heads, color: "var(--accent)" }], { label: "경영진 수", zero: false })}<p class="note">축이 0에서 시작하지 않습니다. 변화를 보려고 범위를 좁혔습니다.</p></section>
     <section class="panel"><div class="panel-head"><h3>나이 분포 (${ASOF()})</h3></div>${ageHist(k.age_hist)}</section>
     <section class="panel"><div class="panel-head"><h3>맡은 일 (${ASOF()})</h3><p>담당업무 문구로 나눈 기능. 정확도 ${M().validation.classify["기능"]}</p></div>${compareBars(fnItems.slice(0, 10), { refName: "50대 전체" })}</section>
     <section class="panel"><div class="panel-head"><h3>직급별 인원과 나이 (${ASOF()})</h3></div>${rankStack(k.ranks)}${rankAgeTable(g)}${(g.v.rank_hidden || 0) > 30 ? `<p class="note">경영진의 ${pct(g.v.rank_hidden)}가 직급 없이 공시되어 직급 기준의 승진 집계가 어렵습니다.</p>` : ""}</section>
@@ -1251,7 +1251,7 @@ function viewCompany(id) {
     <div class="kpi"><span>사외이사</span><b>${fmt(c.out.n)}<small>명</small></b><span class="cmp">${c.out.n ? `여성 ${c.out.female_n}명 · 평균 ${f1(c.out.avg_age)}세` : "–"}</span></div>
   </div>
   <div class="grid2">
-    <section class="panel"><div class="panel-head"><h3>경영진 수 (연말, 마지막은 반기 말)</h3></div>${lineChart([{ name: "경영진", values: c.heads, color: "var(--accent)" }], { label: "경영진 수" })}</section>
+    <section class="panel"><div class="panel-head"><h3>경영진 수 (연말 기준, 2026년은 반기 말)</h3></div>${lineChart([{ name: "경영진", values: c.heads, color: "var(--accent)" }], { label: "경영진 수" })}</section>
     <section class="panel"><div class="panel-head"><h3>신규 선임 · 승진 · 이탈</h3></div>${flowChart(c.ev, c.heads, { hidden: c.hidden_by_year })}</section>
   </div>
   <section class="panel"><div class="panel-head"><h2>임원 명단</h2><p>연도와 인사 변동으로 거르면 ‘올해 새로 선임된 임원’ 같은 명단을 바로 확인할 수 있습니다. 이름을 누르면 경력이 표시됩니다.</p></div>
