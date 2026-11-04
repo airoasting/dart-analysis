@@ -4,7 +4,7 @@
 
 - 분류: Prototype (Core Asset 후보)
 - 현재 단계: 50대 그룹 + 2026 반기 + 분류 v2 + 사이트 5차(멀티 페르소나 4라운드 평가 반영, 4차 평균 8.9) (2026-10-31)
-- 사이트: `docs/index.html` (GitHub Pages에 그대로 올릴 수 있는 정적 사이트), 아티팩트 https://claude.ai/artifact/RPyEYUq7rpnEynWfkrdjro (비공개)
+- 사이트: `docs/index.html` (GitHub Pages에 그대로 올릴 수 있는 정적 사이트), 공개 주소 https://airoasting.github.io/dart-analysis/
 
 ## 범위
 
