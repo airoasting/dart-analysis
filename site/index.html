@@ -154,7 +154,8 @@ h3 { font-size: 15px; font-weight: 700; color: var(--ink); }
   .kpis:has(> .kpi:nth-child(5)) .kpi:nth-child(3n+1) { border-left: 0; padding-left: 0; }
   .kpis:has(> .kpi:nth-child(5)) .kpi:nth-child(n+4) { border-top: 1px solid var(--line); }
 }
-.kpi { background: transparent; padding: 14px 20px 6px; display: grid; gap: 4px; align-content: start; min-width: 0; border-left: 1px solid var(--line); }
+.kpi { background: transparent; padding: 14px 20px 6px; display: flex; flex-direction: column; gap: 4px; min-width: 0; border-left: 1px solid var(--line); }
+.kpi .kpi-when { margin-top: auto; padding-top: 4px; font-size: 12.5px; color: var(--ink-2); }   /* 기준일은 카드 맨 아래에 맞춘다 */
 .kpi:first-child { border-left: 0; padding-left: 0; }
 .kpi > span:first-child { font-size: 12.5px; color: var(--muted); display: flex; gap: 4px; align-items: center; }
 .kpi b { font-size: 40px; font-weight: 700; letter-spacing: -.03em; line-height: 1.1; }
@@ -835,7 +836,7 @@ function kpiCard(m, g, { label, sub } = {}) {
     ${g && m === "executives" ? `<span class="cmp">${prevDelta(g.heads)}50대 그룹 경영진 ${fmt(b.all)}명의 <em>${(100 * v / b.all).toFixed(1)}%</em> · 그룹 중앙값 ${fmt(b.median)}명</span>${strip(m, g)}` : g ? `<span class="cmp">${pv}전체 <em>${b.all == null ? "–" : mm.f(b.all)}</em> · 중앙값 ${b.median == null ? "–" : mm.f(b.median)}</span>
       ${m === "ext_hire" ? `<span class="rank">${esc(coverage(m, g))}</span>` : ""}
       ${rank && m !== "executives" ? `<span class="rank">경영진 ${M().min_n}명 이상${m === "ext_hire" ? "·근거 충분" : ""} ${b.n}개 그룹 중 ${rankText(rank, b.n)}${mm.rate && v != null && b.all != null ? `이고, ${diffText(m, v, b.all)}.` : "입니다."}</span>` : ""}${m !== "executives" ? strip(m, g) : ""}`
-      : `<span class="cmp">${pv}${sub || timeLabel(mm.time)}</span>`}</div>`;
+      : `<span class="cmp">${pv}${sub || ""}</span>${sub ? "" : `<span class="kpi-when">${timeLabel(mm.time)}</span>`}`}</div>`;
 }
 function footer() {
   $("#foot").innerHTML = `<div>자료: DART 사업보고서·반기보고서 'VIII-1. 임원 및 직원 등의 현황'(2018–2026.6), 공정거래위원회 2026년 공시대상기업집단 지정 결과.</div>
@@ -1295,6 +1296,13 @@ function careerLines(t) {
     else if (/[가-힣]$/.test(s) && /^[가-힣]/.test(p) && (prevTok.length === 1 || nextTok.length === 1)) s += p;   // 한 글자씩 끊긴 단어
     else s += " " + p;
   }
+  s = s
+    // 한글 '현)', '전)' 표지 앞(괄호 짝 '(현)'과 기간 '~ 현)'은 제외)
+    .replace(/(?<![(~∼～-]\s?)\s*([현전]\)\s)/g, "\n$1")
+    // 한글 직위 바로 뒤에 붙은 영문 이름(Stanford 등) 앞
+    .replace(/([가-힣])(?=[A-Z][a-z]{2,})/g, "$1\n")
+    // 학위 뒤에 바로 붙은 다음 항목 앞
+    .replace(/(학사|석사|박사|졸업|수료)(?!과정|수료|졸업|학위|논문|과\b)(?=[가-힣A-Z])/g, "$1\n");
   // 괄호 없이 항목 앞에 붙인 기간('21~'24, '25~現, 2019~2021) 앞에서 줄을 바꾸고 기간 뒤를 띄운다
   s = s.replace(/(^|[^(\d'’`~∼～-])(['’`]\d{2}\s*[~∼～-]\s*(?:['’`]?\d{2}(?!\d)|現|현재)|(?:19|20)\d{2}\s*[~∼～-]\s*(?:(?:19|20)\d{2}|現|현재))(?!\s*\))\s*(?=\S)/g,
     (m, pre, r) => `${pre.trimEnd()}${pre && pre !== "\n" ? "\n" : ""}${r.replace(/\s+/g, "")} `);
@@ -1316,7 +1324,7 @@ function careerLines(t) {
     // '·학력:', '·경력:' 같은 머리말 앞에서 줄을 바꾼다
     .replace(/\s*·(?=\s?[가-힣]{2,4}\s?:)/g, "\n");
   // 2) 항목 표지에서 나눈다. '(現)'은 앞에 띄어쓰기가 있을 때만 새 줄(붙어 있으면 앞 항목의 꼬리표)
-  return s.split(/\n|(?=\s*-\s)|(?<=^|\s)(?=\((?:現|前)\))|(?<!(?:[~∼～-]\s?|\())(?=現\)|前\)|現\s|前\s)|\s\/\s|\sㅇ\s|·(?=\s?\d{2,4})/)
+  return s.split(/\n|(?=\s*-\s)|(?<=^|\s)(?=\((?:現|前|현|전)\))|(?<!(?:[~∼～-]\s?|\())(?=現\)|前\)|現\s|前\s)|\s\/\s|\sㅇ\s|·(?=\s?\d{2,4})/)
     .map(x => x.replace(/^\s*(?:[-·ㆍ○▣•/]|ㅇ(?=\s))\s*/, "").trim()).filter(x => x && !/^[-·ㆍ,/]+$/.test(x));
 }
 
