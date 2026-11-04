@@ -67,7 +67,19 @@ def pct(a, b):
 
 # 공시 원문에서 붙어 나온 직위·담당 업무 띄어쓰기: 직책 약어 앞뒤, 연달아 붙은 '위원' 사이만 띄운다(회사 이름 'LG전자' 등은 건드리지 않는다)
 _ROLE_ABBR = r"(?:CEO|CFO|COO|CTO|CHO|CSO|CRO|CIO|CMO|CDO|CPO|CCO|CISO|CPRO|ESG|IR|HR|PR)"
+_ROLE_SET = ["CISO", "CPRO", "CEO", "CFO", "COO", "CTO", "CHO", "CSO", "CRO", "CIO", "CMO", "CDO", "CPO", "CCO", "ESG", "IR", "HR", "PR"]
+def _split_abbr(run):
+    """'CEOESG'처럼 붙은 대문자 묶음을 직책 약어로 끝까지 나눌 수 있으면 나눈다(못 나누면 그대로)."""
+    best = {0: []}
+    for i in range(len(run)):
+        if i not in best:
+            continue
+        for a in _ROLE_SET:
+            if run.startswith(a, i) and i + len(a) not in best:
+                best[i + len(a)] = best[i] + [a]
+    return " ".join(best[len(run)]) if len(run) in best and len(best[len(run)]) > 1 else run
 def spaced(text):
+    text = re.sub(r"[A-Z]{4,}", lambda m: _split_abbr(m.group(0)), text)
     t = re.sub(rf"(?<=[가-힣)])(?={_ROLE_ABBR}(?![A-Za-z]))", " ", text)
     t = re.sub(rf"(?<![A-Za-z])({_ROLE_ABBR})(?=[가-힣(])", r"\1 ", t)
     t = re.sub(r"(위원회|위원장|위원(?!회))(?=[가-힣]{1,12}위원)", r"\1 ", t)
