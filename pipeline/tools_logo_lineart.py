@@ -105,3 +105,32 @@ def scaled_symmetric():
     c=[(_squash(d) if i in HEAD_CIRCUIT_IDX else d) for i,d in enumerate(CIRCUIT)]
     p=[(x, round(_sy(y),1) if y <= CHIN else y) for x,y in PADS]
     return o,c,p
+
+
+# ---------- 머리 크기: 턱 가운데(826, 1015)를 기준으로 가로·세로를 함께 줄인다 ----------
+HEAD_SX, HEAD_SY = 0.88, 0.82
+def _scale(d, sx=HEAD_SX, sy=HEAD_SY, cx=AXIS, cy=CHIN):
+    fx=lambda x: f'{cx-(cx-float(x))*sx:.1f}'; fy=lambda y: f'{cy-(cy-float(y))*sy:.1f}'
+    out=[]; toks=_re.findall(r'[MLHVCAZ]|-?\d+(?:\.\d+)?', d); i=0; cmd=None
+    while i < len(toks):
+        t=toks[i]
+        if t.isalpha(): cmd=t; out.append(t); i+=1; continue
+        if cmd in 'ML': out+= [fx(toks[i]), fy(toks[i+1])]; i+=2
+        elif cmd=='H': out.append(fx(toks[i])); i+=1
+        elif cmd=='V': out.append(fy(toks[i])); i+=1
+        elif cmd=='C':
+            for k in range(3): out+= [fx(toks[i+2*k]), fy(toks[i+2*k+1])]
+            i+=6
+        elif cmd=='A':
+            rx,ry,rot,la,sw,x,y=toks[i:i+7]; out+= [f'{float(rx)*sx:.1f}', f'{float(ry)*sy:.1f}', rot, la, sw, fx(x), fy(y)]; i+=7
+        else: i+=1
+    return ' '.join(out).replace(' M','M')
+def final():
+    """사이트에 쓰는 최종본: 좌우대칭 윤곽 + 머리 크기 축소 + 얼굴 사선 제외"""
+    o=symmetric()
+    o=[(_scale(d) if i in HEAD_OUTLINE_IDX else d) for i,d in enumerate(o) if i not in DROP_OUTLINE_IDX]
+    c=[(_scale(d) if i in HEAD_CIRCUIT_IDX else d) for i,d in enumerate(CIRCUIT)]
+    p=[((round(AXIS-(AXIS-x)*HEAD_SX,1), round(CHIN-(CHIN-y)*HEAD_SY,1)) if y <= CHIN else (x,y)) for x,y in PADS]
+    return o,c,p
+
+FIGURE_DY = -50   # 인물 전체를 원 안에서 위로 올려 가운데에 맞춘다
