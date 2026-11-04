@@ -841,7 +841,7 @@ function kpiCard(m, g, { label, sub } = {}) {
 }
 function footer() {
   $("#foot").innerHTML = `<div>자료: DART 사업보고서·반기보고서 'VIII-1. 임원 및 직원 등의 현황'(2018–2026.6), 공정거래위원회 2026년 공시대상기업집단 지정 결과.</div>
-    <div>이 사이트는 공시 원문에 기재된 개인 정보 항목(이름, 출생연월, 성별, 직위, 경력)만 사용했습니다. 갱신일 ${M().built}.</div>
+    <div>이 사이트는 공시 원문에 기재된 개인 정보 항목(이름, 출생연월, 성별, 직위, 경력)만 사용했습니다.</div><div>최종 갱신일 ${M().built}.</div>
     ${M().owner ? `<div>만든 곳: ${esc(M().owner)}</div>` : ""}
     ${M().contact ? `<div>공시와 다르거나 다른 사람과 합쳐진 기록을 보시면 ${esc(M().contact)}로 알려 주세요.</div>` : ""}`;
 }
