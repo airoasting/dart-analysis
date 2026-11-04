@@ -70,7 +70,7 @@ _ROLE_ABBR = r"(?:CEO|CFO|COO|CTO|CHO|CSO|CRO|CIO|CMO|CDO|CPO|CCO|CISO|CPRO|ESG|
 def spaced(text):
     t = re.sub(rf"(?<=[가-힣)])(?={_ROLE_ABBR}(?![A-Za-z]))", " ", text)
     t = re.sub(rf"(?<![A-Za-z])({_ROLE_ABBR})(?=[가-힣(])", r"\1 ", t)
-    t = re.sub(r"(위원장?)(?=[가-힣]{1,12}위원)", r"\1 ", t)
+    t = re.sub(r"(위원회|위원장|위원(?!회))(?=[가-힣]{1,12}위원)", r"\1 ", t)
     return re.sub(r"[ \t]{2,}", " ", t)
 
 
