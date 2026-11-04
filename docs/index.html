@@ -161,11 +161,11 @@ section.panel { background: transparent; border: 0; border-top: 2px solid var(--
 .excluded p b { font-weight: 600; margin-right: 6px; }
 .finds-h { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: 0; margin-bottom: 10px; }
 .finds ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 18px 32px; counter-reset: f; }
-.finds li { counter-increment: f; display: grid; gap: 6px; align-content: start; }
+.finds li { counter-increment: f; display: flex; flex-direction: column; gap: 6px; }
 .finds li::before { content: counter(f, decimal-leading-zero); font-size: 13px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
 .finds h3 { font-size: 16px; line-height: 1.4; }
 .finds p { margin: 0; color: var(--ink-2); font-size: 14px; }
-.finds a { font-size: 13px; font-weight: 600; }
+.finds a { font-size: 13px; font-weight: 600; margin-top: auto; padding-top: 4px; align-self: flex-start; }   /* 문단 길이가 달라도 링크는 같은 높이 */
 /* 히어로: 첫 화면을 열면 이 구역만 보인다. 배경은 화면 폭 전체 그라디언트(가상 요소), 안쪽 글자·선 토큰은 흰색 계열 */
 .hero { --hero-a: #0c2341; --hero-b: #13345e; --hero-c: #1f5592; display: flex; flex-direction: column; gap: 14px; position: relative; isolation: isolate;
   min-height: calc(100svh - var(--barh, 58px)); margin-top: -26px; padding: 40px 0 30px;
@@ -176,9 +176,15 @@ section.panel { background: transparent; border: 0; border-top: 2px solid var(--
               radial-gradient(900px 600px at 0% 100%, rgba(8, 20, 40, .55), transparent 60%),
               linear-gradient(135deg, var(--hero-a) 0%, var(--hero-b) 48%, var(--hero-c) 100%); }
 .hero-copy { display: grid; gap: 14px; margin-block: auto; padding-block: 24px; }
-/* 조직도 표식: 대표 1명 아래 임원 3명, 그 아래 실무 임원으로 갈라지는 계층. 글자 뒤에 반투명으로 깐다 */
-.hero-mark { position: absolute; z-index: -1; right: 0; bottom: 250px; width: min(30vw, 420px); height: auto; color: #ffffff; opacity: .16; pointer-events: none; }
-@media (max-width: 900px) { .hero-mark { width: 62vw; bottom: auto; top: 70px; opacity: .08; } }
+/* 경영진 표식: AI ROASTING 아이콘 갤러리의 여러 사용자·막대 차트·선 차트·검색을 점선으로 이은 구성(경영진을 찾고 비교하는 데이터). 글자 뒤 반투명, 처음 한 번 선을 그린다 */
+.hero-mark { position: absolute; z-index: -1; right: 0; top: 70px; width: min(30vw, 420px); height: auto; color: #ffffff; opacity: .26; pointer-events: none; }
+.hero-mark .ic path, .hero-mark .ic circle { stroke-dasharray: 1; stroke-dashoffset: 1; animation: markDraw 1.5s cubic-bezier(.65, 0, .35, 1) var(--d, 0s) forwards; }
+.hero-mark .cn { opacity: 0; animation: markFade 1s ease 1.2s forwards; }
+.hero-mark .cn.dots { opacity: 0; }
+@keyframes markDraw { to { stroke-dashoffset: 0; } }
+@keyframes markFade { to { opacity: .8; } }
+@media (prefers-reduced-motion: reduce) { .hero-mark .ic path, .hero-mark .ic circle { animation: none; stroke-dashoffset: 0; } .hero-mark .cn { animation: none; opacity: .8; } }
+@media (max-width: 900px) { .hero-mark { width: 58vw; top: 40px; opacity: .1; } }
 .hero .scroll-cue { align-self: center; margin-top: 18px; font-size: 13px; color: var(--muted); display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
 .hero .scroll-cue:hover { color: var(--ink); text-decoration: none; }
 .hero .scroll-cue svg { animation: cue 1.8s ease-in-out infinite; }
@@ -775,7 +781,7 @@ const ORIGIN_EXT = () => new Set(M().external);
 
 /* ---------- 공통 조각 ---------- */
 function timeChips() {
-  return `<div class="eyebrow"><span class="chip">명단·구성 <b>${ASOF()}</b> (반기보고서)</span><span class="chip">인사 흐름 <b>${M().flow[0]}–${M().flow[1]}</b> 연평균</span><span class="chip">보수 <b>${M().pay_year}</b> 연간</span></div>`;
+  return `<div class="eyebrow"><span class="chip">명단·구성 <b>${ASOF()}</b> (반기보고서)</span><span class="chip">보수 <b>${M().pay_year}</b> 연간</span></div>`;
 }
 function kpiCard(m, g, { label, sub } = {}) {
   const mm = MET[m], v = g ? g.v[m] : CORE.bench[m].all, b = CORE.bench[m];
@@ -881,7 +887,7 @@ function metricCell(m, r) {
 function homeTable() {
   const view = HOME_VIEWS[homeView], ms = view.cols, B = CORE.bench, me = mineRank();
   const cols = [
-    { k: "rank", t: "순위", n: 1, f: r => r._ref ? "" : `<span class="num">${r.rank}</span>`, x: "순위", xv: r => r._ref ? "" : r.rank },
+    { k: "rank", t: "자산 순위", n: 1, f: r => r._ref ? "" : `<span class="num">${r.rank}</span>`, x: "공정위 자산 순위", xv: r => r._ref ? "" : r.rank },
     { k: "name", t: "그룹", cls: "name", f: r => r._ref ? esc(r.name) : r.has_data ? `<a href="#g${r.rank}">${esc(r.name)}</a>${r.unlisted?.length ? ` <span class="pill org" title="비상장이지만 사업보고서를 내는 회사로 집계">비상장 포함</span>` : ""}` : esc(r.name), xv: r => r.name },
     { k: "companies", t: "대상 회사", n: 1, v: r => r.companies?.length, f: r => r._ref ? (r._companies || "") : r.has_data ? fmt(r.companies.length) : "", xv: r => r._ref ? "" : r.companies?.length ?? "" },
     ...ms.map((m, i) => ({ k: m, t: MET[m].t, n: 1, def: m, gl: i === 0 || (view.hdr.length > 1 && i === view.hdr[0][2]), v: r => r._ref ? null : (r.has_data && !(r.small && MET[m].rate) ? r.v[m] : null),
@@ -929,7 +935,7 @@ function viewHome() {
     ${kpiCard("female", mineG, { label: mineG ? `${mineG.name} 여성` : "여성 비율" })}
     ${kpiCard("new_rate", mineG, { label: mineG ? `${mineG.name} 연평균 신규 선임 비율` : "연평균 신규 선임 비율" })}
   </div>
-    <svg class="hero-mark" viewBox="0 0 420 330" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="210" cy="34" r="13.5"/><path d="M186.0,79.0 q24.0,-30.0 48.0,0"/><path d="M210,92 V118 M90,118 H330 M90,118 V140 M210,118 V140 M330,118 V140"/><circle cx="90" cy="156" r="10.3"/><path d="M71.6,190.5 q18.4,-23.0 36.8,0"/><circle cx="210" cy="156" r="10.3"/><path d="M191.6,190.5 q18.4,-23.0 36.8,0"/><circle cx="330" cy="156" r="10.3"/><path d="M311.6,190.5 q18.4,-23.0 36.8,0"/><path d="M90,205 V222 M56,222 H124 M56,222 V238 M90,222 V238 M124,222 V238"/><circle cx="56" cy="250" r="9"/><circle cx="90" cy="250" r="9"/><circle cx="124" cy="250" r="9"/><path d="M56,262 V276"/> <path d="M90,262 V276"/> <path d="M124,262 V276"/><circle cx="56" cy="284" r="4" fill="currentColor" stroke="none"/> <circle cx="90" cy="284" r="4" fill="currentColor" stroke="none"/> <circle cx="124" cy="284" r="4" fill="currentColor" stroke="none"/><path d="M210,205 V222 M176,222 H244 M176,222 V238 M210,222 V238 M244,222 V238"/><circle cx="176" cy="250" r="9"/><circle cx="210" cy="250" r="9"/><circle cx="244" cy="250" r="9"/><path d="M176,262 V276"/> <path d="M210,262 V276"/> <path d="M244,262 V276"/><circle cx="176" cy="284" r="4" fill="currentColor" stroke="none"/> <circle cx="210" cy="284" r="4" fill="currentColor" stroke="none"/> <circle cx="244" cy="284" r="4" fill="currentColor" stroke="none"/><path d="M330,205 V222 M296,222 H364 M296,222 V238 M330,222 V238 M364,222 V238"/><circle cx="296" cy="250" r="9"/><circle cx="330" cy="250" r="9"/><circle cx="364" cy="250" r="9"/><path d="M296,262 V276"/> <path d="M330,262 V276"/> <path d="M364,262 V276"/><circle cx="296" cy="284" r="4" fill="currentColor" stroke="none"/> <circle cx="330" cy="284" r="4" fill="currentColor" stroke="none"/> <circle cx="364" cy="284" r="4" fill="currentColor" stroke="none"/></svg>
+    <svg class="hero-mark" viewBox="0 0 440 380" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><g class="cn" stroke-width="1.2" stroke-dasharray="2 7"><circle cx="215" cy="195" r="128"/><path d="M276 146 L334 92"/><path d="M158 252 L108 290"/><path d="M276 250 L338 296"/></g><g class="cn dots" fill="currentColor" stroke="none"><circle cx="276" cy="146" r="3"/><circle cx="334" cy="92" r="3"/><circle cx="158" cy="252" r="3"/><circle cx="108" cy="290" r="3"/><circle cx="276" cy="250" r="3"/><circle cx="338" cy="296" r="3"/><circle cx="87" cy="195" r="2.5"/><circle cx="343" cy="195" r="2.5"/><circle cx="215" cy="67" r="2.5"/></g><svg class="ic" x="135" y="112" width="166" height="166" viewBox="0 0 24 24" stroke-width=".4" style="--d:0s"><path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" pathLength="1"/><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" pathLength="1"/><path d="M16 3.13a4 4 0 0 1 0 7.75" pathLength="1"/><path d="M21 21v-2a4 4 0 0 0 -3 -3.85" pathLength="1"/></svg><svg class="ic" x="322" y="8" width="92" height="92" viewBox="0 0 24 24" stroke-width="0.7" style="--d:0.35s"><path d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" pathLength="1"/><path d="M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" pathLength="1"/><path d="M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" pathLength="1"/><path d="M4 20h14" pathLength="1"/></svg><svg class="ic" x="18" y="262" width="100" height="100" viewBox="0 0 24 24" stroke-width="0.62" style="--d:0.55s"><path d="M4 19l16 0" pathLength="1"/><path d="M4 15l4 -6l4 2l4 -5l4 4" pathLength="1"/></svg><svg class="ic" x="334" y="282" width="84" height="84" viewBox="0 0 32 32" stroke-width="0.95" style="--d:0.75s"><path d="m21.393,18.565l7.021,7.021c.781.781.781,2.047,0,2.828h0c-.781.781-2.047.781-2.828,0l-7.021-7.021" pathLength="1"/><circle cx="13" cy="13" r="10" pathLength="1"/></svg></svg>
     <a class="scroll-cue no-print" href="#finds" aria-label="주요 발견으로 내려가기">주요 발견과 그룹 비교<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
   </div>
   ${insights()}
