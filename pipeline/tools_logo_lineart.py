@@ -134,3 +134,35 @@ def final():
     return o,c,p
 
 FIGURE_DY = -50   # 인물 전체를 원 안에서 위로 올려 가운데에 맞춘다
+
+
+# ---------- 황금비 조정 (2026-11-04, 비평가 4명 합의: review/design/phi_*.md) ----------
+PHI = (1 + 5 ** 0.5) / 2
+PHI_TARGET = {
+    "figure_over_circle": 1 / PHI,      # 인물 높이 / 원 지름
+    "head_over_figure": 1 / PHI,        # 머리 높이 / 인물 높이 (몸은 1/φ²)
+    "head_h_over_w": PHI ** 0.5,        # 머리 높이 / 폭 = √φ
+    "visor_over_head_w": 1 / PHI ** 0.5,  # 눈가리개 폭 / 머리 폭 = 1/√φ
+}
+FIGURE_CENTER_Y = 810                   # 인물 세로 중심(원 중심 843보다 조금 위, 시각 중심)
+def golden():
+    """머리를 (sx, sy)로 줄이고 인물 전체를 k배 한 뒤 세로 위치를 맞춘다. 반환: o, c, p, transform, 측정값"""
+    D = 815 * 2
+    H = D * PHI_TARGET["figure_over_circle"]
+    h = H * PHI_TARGET["head_over_figure"]
+    w = h / PHI_TARGET["head_h_over_w"]
+    body0 = 1372 - CHIN                  # 원본 몸 길이(턱~아래 끝)
+    k = (H - h) / body0                  # 몸이 H-h가 되도록 전체 배율
+    sx = w / ((1104 - 548) * k); sy = h / ((CHIN - 243) * k)
+    global VISOR_W
+    VISOR_W = w * PHI_TARGET["visor_over_head_w"] / (sx * k)
+    o = symmetric()
+    o = [(_scale(d, sx, sy) if i in HEAD_OUTLINE_IDX else d) for i, d in enumerate(o) if i not in DROP_OUTLINE_IDX]
+    c = [(_scale(d, sx, sy) if i in HEAD_CIRCUIT_IDX else d) for i, d in enumerate(CIRCUIT)]
+    p = [((round(AXIS - (AXIS - x) * sx, 1), round(CHIN - (CHIN - y) * sy, 1)) if y <= CHIN else (x, y)) for x, y in PADS]
+    top = CHIN - (CHIN - 243) * sy; top_k = CHIN - (CHIN - top) * k; bot_k = CHIN + body0 * k
+    dy = FIGURE_CENTER_Y - (top_k + bot_k) / 2
+    tx = AXIS * (1 - k); ty = CHIN * (1 - k) + dy
+    m = {"H/D": (bot_k - top_k) / D, "h/H": h / H, "h/w": h / w, "visor/w": VISOR_W * sx * k / w,
+         "shoulder/w": 1056 * k / w, "k": k, "sx": sx, "sy": sy, "top": top_k + dy, "bottom": bot_k + dy}
+    return o, c, p, f"translate({tx:.1f} {ty:.1f}) scale({k:.4f})", m
