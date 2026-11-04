@@ -1288,13 +1288,40 @@ const EV_LABEL = { 신규: "신규 선임", 승진: "승진", 이탈: "명단에
   공시축소: "공시 범위 축소로 빠짐", 대상편입: "회사가 공시 대상에 들어옴", 관찰종료: "회사가 공시 대상에서 빠짐", 복귀: "다시 등장", 직급하향: "직위 변경" };
 const evLabel = e => EV_LABEL[e] || e;
 function careerLines(t) {
-  const s = String(t || "")
-    // '(15 ~ '16)', '(2019~현재)'처럼 기간 괄호로 끝나는 항목 뒤에서 줄을 바꾼다
-    .replace(/(\(\s*['’`]?\d{2,4}(?:\.\d{1,2})?\s*[~∼～-]\s*(?:['’`]?\d{2,4}(?:\.\d{1,2})?|현재|現|present)?\s*\))\s*(?=\S)/gi, "$1\n")
+  // 1) 원문 줄바꿈 정리: 다음 줄이 새 항목의 시작일 때만 줄을 바꾸고, 칸 폭 때문에 단어 중간에서 끊긴 줄은 앞 줄에 붙인다
+  const START = /^(?:[-·ㆍ○▣•※]|ㅇ\s|\(?[現前]\)?|\(\s*['’`]?\d{2}|['’`]\d{2}|\d{2,4}\s*[~∼～.년-])/;
+  const parts = String(t || "").split("\n").map(x => x.trim()).filter(Boolean);
+  let s = "";
+  for (const p of parts) {
+    if (!s) { s = p; continue; }
+    const prevTok = s.split(/\s/).pop(), nextTok = p.split(/\s/)[0];
+    const lastLine = s.slice(s.lastIndexOf("\n") + 1);
+    if (START.test(p) || /[)）.]$/.test(s) && !/^[,)]/.test(p) || (p.length > 5 && lastLine.length > 5)) s += "\n" + p;   // 짧게 끊긴 조각(5자 이하)만 잇는다
+    else if (/[가-힣]$/.test(s) && /^[가-힣]/.test(p) && (prevTok.length === 1 || nextTok.length === 1)) s += p;   // 한 글자씩 끊긴 단어
+    else s += " " + p;
+  }
+  const RANGE = /\(\s*['’`]?\d{2,4}(?:\.\d{1,2})?\s*[~∼～-]\s*(?:['’`]?\d{2,4}(?:\.\d{1,2})?|현재|現|present)?\s*\)/gi;
+  // 기간을 항목 앞에 쓰는지(줄 맨 앞) 뒤에 쓰는지(앞 단어에 붙음, 줄 끝) 원문에서 세어 많은 쪽을 따른다
+  const raw = parts.join("\n"); let pre = 0, post = 0;
+  for (const m of raw.matchAll(RANGE)) {
+    const b = raw[m.index - 1], a = raw[m.index + m[0].length];
+    if (m.index === 0 || b === "\n" || (b === " " && a === " ")) pre++;
+    if ((b && /\S/.test(b)) || a === undefined || a === "\n") post++;
+  }
+  const prefixStyle = pre > post;
+  if (!prefixStyle) s = s.replace(new RegExp("\\n(?=" + RANGE.source + ")", "gi"), "");   // 뒤 표기인데 기간만 따로 떨어진 줄은 앞 항목에 붙인다
+  s = (prefixStyle
+      // '('14~'20) ㈜LS 재경팀 팀장'처럼 기간이 앞에 오면 기간 괄호 앞에서 줄을 바꾼다
+      ? s.replace(RANGE, (m, i) => (i > 0 && s[i - 1] !== "\n" ? "\n" : "") + m)
+      // '(15 ~ '16)', '(2019~현재)'처럼 기간이 뒤에 오면 기간 괄호 뒤에서 줄을 바꾼다
+      : s.replace(new RegExp(RANGE.source + "\\s*(?=\\S)", "gi"), m => m.trimEnd() + "\n"))
     // '·학력:', '·경력:' 같은 머리말 앞에서 줄을 바꾼다
     .replace(/\s*·(?=\s?[가-힣]{2,4}\s?:)/g, "\n");
-  return s.split(/\n|(?=\s*-\s)|(?=\(現\)|\(前\))|(?<!(?:[~∼～-]\s?|\())(?=現\)|前\)|現\s|前\s)|\s\/\s|·(?=\s?\d{2,4})/).map(s => s.replace(/^\s*[-·]\s*/, "").trim()).filter(Boolean);
+  // 2) 항목 표지에서 나눈다. '(現)'은 앞에 띄어쓰기가 있을 때만 새 줄(붙어 있으면 앞 항목의 꼬리표)
+  return s.split(/\n|(?=\s*-\s)|(?<=^|\s)(?=\((?:現|前)\))|(?<!(?:[~∼～-]\s?|\())(?=現\)|前\)|現\s|前\s)|\s\/\s|\sㅇ\s|·(?=\s?\d{2,4})/)
+    .map(x => x.replace(/^\s*(?:[-·ㆍ○▣•/]|ㅇ(?=\s))\s*/, "").trim()).filter(x => x && !/^[-·ㆍ,/]+$/.test(x));
 }
+
 function viewPerson(id) {
   app.innerHTML = `<div class="skel"><i style="width:30%"></i><i style="width:60%"></i><i style="width:45%"></i></div><p class="loading">인물 명단을 불러오고 있습니다. 처음 한 번만 몇 초 걸립니다.</p>`;
   loadPeople().then(() => {
