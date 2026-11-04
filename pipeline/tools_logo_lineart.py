@@ -145,24 +145,46 @@ PHI_TARGET = {
     "visor_over_head_w": 1 / PHI ** 0.5,  # 눈가리개 폭 / 머리 폭 = 1/√φ
 }
 FIGURE_CENTER_Y = 810                   # 인물 세로 중심(원 중심 843보다 조금 위, 시각 중심)
+NECK_EXTRA = 60   # 목을 늘리는 길이(원본 좌표). 머리를 이만큼 위로 올리고 목 선을 이어 붙인다
+def _shift(d, dy):
+    out=[]; toks=_re.findall(r'[MLHVCAZ]|-?\d+(?:\.\d+)?', d); i=0; cmd=None
+    fy=lambda y: f'{float(y)+dy:.1f}'
+    while i < len(toks):
+        t=toks[i]
+        if t.isalpha(): cmd=t; out.append(t); i+=1; continue
+        if cmd in 'ML': out+= [toks[i], fy(toks[i+1])]; i+=2
+        elif cmd=='H': out.append(toks[i]); i+=1
+        elif cmd=='V': out.append(fy(toks[i])); i+=1
+        elif cmd=='C':
+            for k in range(3): out+= [toks[i+2*k], fy(toks[i+2*k+1])]
+            i+=6
+        elif cmd=='A':
+            out+= toks[i:i+5] + [toks[i+5], fy(toks[i+6])]; i+=7
+        else: i+=1
+    return ' '.join(out).replace(' M','M')
 def golden():
-    """머리를 (sx, sy)로 줄이고 인물 전체를 k배 한 뒤 세로 위치를 맞춘다. 반환: o, c, p, transform, 측정값"""
+    """머리를 (sx, sy)로 줄여 NECK_EXTRA만큼 올리고, 인물 전체를 k배 한 뒤 세로 위치를 맞춘다. 반환: o, c, p, transform, 측정값"""
+    N = NECK_EXTRA
     D = 815 * 2
     H = D * PHI_TARGET["figure_over_circle"]
     h = H * PHI_TARGET["head_over_figure"]
     w = h / PHI_TARGET["head_h_over_w"]
-    body0 = 1372 - CHIN                  # 원본 몸 길이(턱~아래 끝)
+    body0 = (1372 - CHIN) + N            # 원본 몸 길이(턱~아래 끝) + 늘린 목
     k = (H - h) / body0                  # 몸이 H-h가 되도록 전체 배율
     sx = w / ((1104 - 548) * k); sy = h / ((CHIN - 243) * k)
     global VISOR_W
     VISOR_W = w * PHI_TARGET["visor_over_head_w"] / (sx * k)
     o = symmetric()
-    o = [(_scale(d, sx, sy) if i in HEAD_OUTLINE_IDX else d) for i, d in enumerate(o) if i not in DROP_OUTLINE_IDX]
-    c = [(_scale(d, sx, sy) if i in HEAD_CIRCUIT_IDX else d) for i, d in enumerate(CIRCUIT)]
-    p = [((round(AXIS - (AXIS - x) * sx, 1), round(CHIN - (CHIN - y) * sy, 1)) if y <= CHIN else (x, y)) for x, y in PADS]
-    top = CHIN - (CHIN - 243) * sy; top_k = CHIN - (CHIN - top) * k; bot_k = CHIN + body0 * k
+    # 목 선 위쪽 끝을 N만큼 위로 늘린다(왼쪽 어깨 8, 오른쪽 어깨 10)
+    for i in (8, 10):
+        o[i] = _re.sub(r'^M\s*(-?[\d.]+)\s+975', lambda m: f'M{m.group(1)} {975 - N}', o[i])
+    head = lambda d: _shift(_scale(d, sx, sy), -N)
+    o = [(head(d) if i in HEAD_OUTLINE_IDX else d) for i, d in enumerate(o) if i not in DROP_OUTLINE_IDX]
+    c = [(head(d) if i in HEAD_CIRCUIT_IDX else d) for i, d in enumerate(CIRCUIT)]
+    p = [((round(AXIS - (AXIS - x) * sx, 1), round(CHIN - (CHIN - y) * sy - N, 1)) if y <= CHIN else (x, y)) for x, y in PADS]
+    top = CHIN - N - (CHIN - 243) * sy; top_k = CHIN - (CHIN - top) * k; bot_k = CHIN + (1372 - CHIN) * k
     dy = FIGURE_CENTER_Y - (top_k + bot_k) / 2
     tx = AXIS * (1 - k); ty = CHIN * (1 - k) + dy
     m = {"H/D": (bot_k - top_k) / D, "h/H": h / H, "h/w": h / w, "visor/w": VISOR_W * sx * k / w,
-         "shoulder/w": 1056 * k / w, "k": k, "sx": sx, "sy": sy, "top": top_k + dy, "bottom": bot_k + dy}
+         "shoulder/w": 1056 * k / w, "neck": N * k, "k": k}
     return o, c, p, f"translate({tx:.1f} {ty:.1f}) scale({k:.4f})", m
