@@ -83,6 +83,12 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .brand-logo-wrap::before, .brand-logo-wrap::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid #df7b0a; opacity: 0; pointer-events: none; }
 .brand:hover .brand-logo-wrap::before, .brand:focus-visible .brand-logo-wrap::before { animation: brandRipple 1.6s cubic-bezier(.2, .6, .35, 1) infinite; }
 .brand:hover .brand-logo-wrap::after, .brand:focus-visible .brand-logo-wrap::after { animation: brandRipple 1.6s cubic-bezier(.2, .6, .35, 1) .8s infinite; }
+/* 글자 물결: 한 글자씩 차례로 위아래로 */
+.brand .wv { display: inline-block; }
+.brand .wv.sp { width: .28em; }
+.brand:hover .wv, .brand:focus-visible .wv { animation: brandWave 1.4s ease-in-out calc(var(--i, 0) * 60ms) infinite; }
+@keyframes brandWave { 0%, 60%, 100% { transform: translateY(0); } 20% { transform: translateY(-4px); } 40% { transform: translateY(1.5px); } }
+@media (prefers-reduced-motion: reduce) { .brand:hover .wv, .brand:focus-visible .wv { animation: none; } }
 @keyframes brandRipple { 0% { transform: scale(1); opacity: .75; } 100% { transform: scale(2); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .brand:hover .brand-logo-wrap::before, .brand:hover .brand-logo-wrap::after, .brand:focus-visible .brand-logo-wrap::before, .brand:focus-visible .brand-logo-wrap::after { animation: none; } }
 .brand { gap: 9px; }
@@ -417,7 +423,7 @@ footer.site { max-width: 1440px; margin: 0 auto; padding-block: 18px 36px; paddi
 <body>
 <header class="bar">
   <div class="bar-in">
-    <a class="brand" href="#home" aria-label="AI ROASTING 경영진 분석, 첫 화면"><span class="brand-logo-wrap"><img class="brand-logo" src="assets/logo-airoasting.png" width="28" height="28" alt=""></span><span class="brand-mark">AI ROASTING</span><span class="brand-sep" aria-hidden="true"></span><span class="brand-sub">경영진 분석</span></a>
+    <a class="brand" href="#home" aria-label="AI ROASTING 경영진 분석, 첫 화면"><span class="brand-logo-wrap"><img class="brand-logo" src="assets/logo-airoasting.png" width="28" height="28" alt=""></span><span class="brand-mark"><span class="wv" style="--i:0">A</span><span class="wv" style="--i:1">I</span><span class="wv sp" aria-hidden="true"> </span><span class="wv" style="--i:3">R</span><span class="wv" style="--i:4">O</span><span class="wv" style="--i:5">A</span><span class="wv" style="--i:6">S</span><span class="wv" style="--i:7">T</span><span class="wv" style="--i:8">I</span><span class="wv" style="--i:9">N</span><span class="wv" style="--i:10">G</span></span><span class="brand-sep" aria-hidden="true"></span><span class="brand-sub"><span class="wv" style="--i:12">경</span><span class="wv" style="--i:13">영</span><span class="wv" style="--i:14">진</span><span class="wv sp" aria-hidden="true"> </span><span class="wv" style="--i:16">분</span><span class="wv" style="--i:17">석</span></span></a>
     <nav class="nav" aria-label="주요 화면"><a href="#home">그룹 비교</a><a href="#method">자료와 기준</a></nav>
     <div class="tools">
       <label class="mine-pick" for="mine"><span>관심 그룹</span><select id="mine" aria-label="관심 그룹 선택"><option value="">관심 그룹 고르기</option></select></label>
@@ -835,7 +841,7 @@ function kpiCard(m, g, { label, sub } = {}) {
 }
 function footer() {
   $("#foot").innerHTML = `<div>자료: DART 사업보고서·반기보고서 'VIII-1. 임원 및 직원 등의 현황'(2018–2026.6), 공정거래위원회 2026년 공시대상기업집단 지정 결과.</div>
-    <div>이 사이트는 공시 원문에 기재된 개인 정보 항목(이름, 출생연월, 성별, 직위, 경력)만 사용했습니다. 원문이 바뀌면 다음 갱신 때 반영합니다. 갱신일 ${M().built}.</div>
+    <div>이 사이트는 공시 원문에 기재된 개인 정보 항목(이름, 출생연월, 성별, 직위, 경력)만 사용했습니다. 갱신일 ${M().built}.</div>
     ${M().owner ? `<div>만든 곳: ${esc(M().owner)}</div>` : ""}
     ${M().contact ? `<div>공시와 다르거나 다른 사람과 합쳐진 기록을 보시면 ${esc(M().contact)}로 알려 주세요.</div>` : ""}`;
 }
