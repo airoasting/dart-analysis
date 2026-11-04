@@ -37,3 +37,33 @@ if __name__=="__main__":
     <div class="w"><img src="logo.png"><svg viewBox="0 0 1656 1687">{inner}</svg></div>
     <div class="w b"><svg viewBox="0 0 1656 1687">{inner}</svg></div>'''
     open('compare.html','w').write(html)
+
+
+# ---------- 머리 비율 보정: 턱(y=1015)을 기준으로 머리 부분만 세로로 줄인다 ----------
+import re as _re
+HEAD_SCALE = 0.85
+CHIN = 1015
+def _sy(y): return CHIN - (CHIN - y) * HEAD_SCALE
+def _squash(d):
+    """절대좌표 경로(M L H V C A Z)의 y만 줄인다. A는 ry도 줄인다."""
+    out=[]; toks=_re.findall(r'[MLHVCAZ]|-?\d+(?:\.\d+)?', d); i=0; cmd=None
+    while i < len(toks):
+        t=toks[i]
+        if t.isalpha(): cmd=t; out.append(t); i+=1; continue
+        if cmd in 'ML': x,y=float(toks[i]),float(toks[i+1]); out+= [f'{x:g}', f'{_sy(y):.1f}']; i+=2
+        elif cmd=='H': out.append(toks[i]); i+=1
+        elif cmd=='V': out.append(f'{_sy(float(toks[i])):.1f}'); i+=1
+        elif cmd=='C':
+            for k in range(3): out+= [toks[i+2*k], f'{_sy(float(toks[i+2*k+1])):.1f}']
+            i+=6
+        elif cmd=='A':
+            rx,ry,rot,la,sw,x,y=toks[i:i+7]; out+= [rx, f'{float(ry)*HEAD_SCALE:.1f}', rot, la, sw, x, f'{_sy(float(y)):.1f}']; i+=7
+        else: i+=1
+    return ' '.join(out).replace(' M','M')
+HEAD_OUTLINE_IDX = [1, 2, 3, 4, 5, 6, 7]          # 왼쪽 머리, 오른쪽 머리, 분할, 눈가리개, 얼굴 사선, 귀 2개
+HEAD_CIRCUIT_IDX = [0, 1, 2, 3, 4, 5, 6, 7, 8]   # 얼굴 안 회로
+def scaled():
+    o=[(_squash(d) if i in HEAD_OUTLINE_IDX else d) for i,d in enumerate(OUTLINE)]
+    c=[(_squash(d) if i in HEAD_CIRCUIT_IDX else d) for i,d in enumerate(CIRCUIT)]
+    p=[(x, round(_sy(y),1) if y <= CHIN else y) for x,y in PADS]
+    return o,c,p
