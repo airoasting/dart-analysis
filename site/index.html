@@ -89,8 +89,8 @@ select, input[type="search"] { font: inherit; font-size: 14px; padding: 7px 10px
 .ico-sun { display: none !important; }
 :root[data-theme="dark"] .ico-sun { display: block !important; }
 :root[data-theme="dark"] .ico-moon { display: none !important; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .hero { --hero-a: #0b1526; --hero-b: #15243c; --hero-c: #23406a; } }
-:root[data-theme="dark"] .hero { --hero-a: #0b1526; --hero-b: #15243c; --hero-c: #23406a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .hero { --hero-a: #0f0e0d; --hero-b: #241713; --hero-c: #7a3b26; } }
+:root[data-theme="dark"] .hero { --hero-a: #0f0e0d; --hero-b: #241713; --hero-c: #7a3b26; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .ico-sun { display: block !important; }
   :root:not([data-theme="light"]) .ico-moon { display: none !important; }
@@ -162,14 +162,14 @@ section.panel { background: transparent; border: 0; border-top: 2px solid var(--
 .finds h3 { font-size: 16px; line-height: 1.4; }
 .finds p { margin: 0; color: var(--ink-2); font-size: 14px; }
 .finds a { font-size: 13px; font-weight: 600; margin-top: auto; padding-top: 4px; align-self: flex-start; }   /* 문단 길이가 달라도 링크는 같은 높이 */
-/* 히어로: 첫 화면을 열면 이 구역만 보인다. 배경은 화면 폭 전체 그라디언트(가상 요소), 안쪽 글자·선 토큰은 흰색 계열 */
-.hero { --hero-a: #0c2341; --hero-b: #13345e; --hero-c: #1f5592; display: flex; flex-direction: column; gap: 14px; position: relative; isolation: isolate;
+/* 히어로: 첫 화면을 열면 이 구역만 보인다. 배경은 AI ROASTING 브랜드색(먹 #1A1917 → 테라코타 #D97757 계열) 그라디언트, 안쪽 글자·선 토큰은 흰색 계열 */
+.hero { --hero-a: #1a1917; --hero-b: #3a221b; --hero-c: #b4573a; display: flex; flex-direction: column; gap: 14px; position: relative; isolation: isolate;
   min-height: calc(100svh - var(--barh, 58px)); margin-top: -26px; padding: 40px 0 30px;
   --ink: #ffffff; --ink-2: rgba(255,255,255,.86); --muted: rgba(255,255,255,.68); --faint: rgba(255,255,255,.5);
   --line: rgba(255,255,255,.22); --line-2: rgba(255,255,255,.12); --rule: rgba(255,255,255,.9); --accent: #ffffff; color: var(--ink); }
 .hero::before { content: ""; position: absolute; z-index: -1; top: 0; bottom: 0; left: 50%; width: 100vw; transform: translateX(-50%);
-  background: radial-gradient(1100px 520px at 85% 12%, rgba(120, 170, 235, .28), transparent 62%),
-              radial-gradient(900px 600px at 0% 100%, rgba(8, 20, 40, .55), transparent 60%),
+  background: radial-gradient(1100px 520px at 85% 12%, rgba(217, 119, 87, .34), transparent 62%),
+              radial-gradient(900px 600px at 0% 100%, rgba(10, 9, 8, .6), transparent 60%),
               linear-gradient(135deg, var(--hero-a) 0%, var(--hero-b) 48%, var(--hero-c) 100%); }
 .hero-copy { display: grid; gap: 14px; margin-block: auto; padding-block: 24px; }
 /* 경영진 표식: AI ROASTING 아이콘 갤러리의 여러 사용자·막대 차트·선 차트·검색을 점선으로 이은 구성(경영진을 찾고 비교하는 데이터). 글자 뒤 반투명, 처음 한 번 선을 그린다 */
@@ -188,8 +188,8 @@ section.panel { background: transparent; border: 0; border-top: 2px solid var(--
 .hero h1 { font-size: clamp(28px, 3.3vw, 46px); line-height: 1.2; }
 @media (min-width: 901px) { .hero h1 { white-space: nowrap; } }
 .hero .lede { font-size: 16.5px; color: var(--ink-2); max-width: 78ch; }
-.hero .cta { justify-self: start; margin: 4px 0 18px; background: #ffffff; border-color: #ffffff; color: #13345e; font-weight: 700; padding: 9px 16px; }
-.hero .cta:hover { filter: none; background: #e6edf6; }
+.hero .cta { justify-self: start; margin: 4px 0 18px; background: #ffffff; border-color: #ffffff; color: #1a1917; font-weight: 700; padding: 9px 16px; }
+.hero .cta:hover { filter: none; background: #f6e7e0; }
 .hero .chip { color: var(--muted); border-color: var(--line); }
 .hero .chip b { color: var(--ink); }
 .hero .kpis { border-top-color: var(--rule); }
