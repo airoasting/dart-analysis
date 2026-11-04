@@ -93,6 +93,9 @@ select, input[type="search"] { font: inherit; font-size: 14px; padding: 7px 10px
 .ico-sun { display: none !important; }
 :root[data-theme="dark"] .ico-sun { display: block !important; }
 :root[data-theme="dark"] .ico-moon { display: none !important; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .hero { --hero-bg: #1b2c46; } }
+:root[data-theme="dark"] .hero { --hero-bg: #1b2c46; }
+:root[data-theme="dark"] .hero .cta { color: #1b2c46; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .ico-sun { display: block !important; }
   :root:not([data-theme="light"]) .ico-moon { display: none !important; }
@@ -158,9 +161,22 @@ section.panel { background: transparent; border: 0; border-top: 2px solid var(--
 .finds h3 { font-size: 16px; line-height: 1.4; }
 .finds p { margin: 0; color: var(--ink-2); font-size: 14px; }
 .finds a { font-size: 13px; font-weight: 600; }
-.hero { display: grid; gap: 10px; }
-.hero .lede { font-size: 16px; }
-.hero .cta { justify-self: start; }
+/* 히어로: 첫 화면 맨 위, 화면 폭 전체 남색 띠. 안쪽에서는 글자색 토큰을 흰색 계열로 바꾼다 */
+.hero { --hero-bg: #13345e; display: grid; gap: 14px; position: relative;
+  background: var(--hero-bg); box-shadow: 0 0 0 100vmax var(--hero-bg); clip-path: inset(0 -100vmax);
+  margin-top: -26px; padding: 48px 0 34px;
+  --ink: #ffffff; --ink-2: rgba(255,255,255,.86); --muted: rgba(255,255,255,.68); --faint: rgba(255,255,255,.5);
+  --line: rgba(255,255,255,.22); --line-2: rgba(255,255,255,.12); --rule: rgba(255,255,255,.9); --accent: #ffffff; color: var(--ink); }
+.hero h1 { font-size: clamp(30px, 4.2vw, 46px); line-height: 1.18; max-width: 22ch; }
+.hero .lede { font-size: 16.5px; color: var(--ink-2); max-width: 78ch; }
+.hero .cta { justify-self: start; margin: 4px 0 18px; background: #ffffff; border-color: #ffffff; color: #13345e; font-weight: 700; padding: 9px 16px; }
+.hero .cta:hover { filter: none; background: #e6edf6; }
+.hero .chip { color: var(--muted); border-color: var(--line); }
+.hero .chip b { color: var(--ink); }
+.hero .kpis { border-top-color: var(--rule); }
+.hero .kpi b small { color: var(--muted); }
+.hero .def { color: var(--ink-2); border-color: var(--muted); }
+.hero .strip svg circle, .hero .strip svg text { fill: var(--ink-2); }
 .note b { color: var(--ink-2); font-weight: 600; }
 
 /* ---------- 표 ---------- */
@@ -307,6 +323,8 @@ footer.site { max-width: 1440px; margin: 0 auto; padding-block: 18px 36px; paddi
   *, .num, td.n, .kpi b, .chart text, .hb .v, .tl-year { font-variant-numeric: normal !important; font-feature-settings: normal !important; }
   body { background: #fff; }
   main { padding: 0; }
+  .hero { background: none; box-shadow: none; clip-path: none; margin: 0; padding: 0;
+    --ink: #111; --ink-2: #333; --muted: #555; --faint: #888; --line: #ccc; --line-2: #e5e5e5; --rule: #111; --accent: #1d4e89; }
   .report { border: 0; padding: 0; }
   .tbl { max-height: none; overflow: visible; border: 0; }
   thead th, td.sticky, th.sticky { position: static !important; }
