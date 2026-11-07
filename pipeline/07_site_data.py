@@ -40,7 +40,7 @@ EXEC = ("미등기", "사내이사", "집행임원")
 REG = ["미등기", "사내이사", "집행임원", "사외이사", "기타비상무이사", "감사", "등기"]
 RANKS = ["회장", "부회장", "사장", "부사장", "전무", "상무", "이사(미등기)", "이사대우",
          "직급비공개", "전문임원", "고문", "이사", "감사", "기타"]
-EVENTS = ["신규", "승진", "이탈", "계열사이동", "등기전환", "직급체계변경", "공시확대", "공시축소", "대상편입", "관찰종료", "복귀", "직급하향"]
+EVENTS = ["신규", "승진", "이탈", "계열사이동", "등기전환", "직급체계변경", "공시확대", "공시축소", "대상편입", "관찰종료", "복귀", "직급하향", "그룹간이동"]
 FUNCS = ["최고경영", "사업부문장", "영업·마케팅", "연구개발·기술", "생산·품질·안전", "전략·기획", "재무·IR", "인사·조직",
          "법무·준법·감사", "대외·홍보·ESG", "IT·디지털", "구매·SCM", "금융업무", "해외", "경영지원", "고문·자문", "미분류", "이사회(비상근)"]
 ORIGINS = ["오너일가", "관료·공공", "법조", "학계", "회계·세무", "컨설팅", "군", "언론", "타 그룹 출신", "외국계 기업",
@@ -333,11 +333,14 @@ def main():
     group_list = []
     for g in groups:
         name, rank = g["group"], int(g["rank"])
-        if rank > 50:
+        if g.get("top") != "Y":   # 01_groups.py --top N 으로 표시한 그룹만
             continue
         base = {"rank": rank, "name": LABEL.get(name, name), "ftc_name": name, "owner": g["owner"], "assets": float(g["assets_bn_krw"]), "n_aff": int(g["n_affiliates"])}
         if name not in gs:
-            group_list.append({**base, "has_data": False, "reason": NO_DISCLOSURE.get(name, "임원 명단 공시가 없습니다"),
+            has_filer = any(c["group"] == name for c in comps)   # 공시 회사는 있지만 최신 시점(반기) 명단이 없는 경우
+            reason = NO_DISCLOSURE.get(name) or ("2026년 반기보고서에 경영진 명단이 없어 최신 시점 비교에서 제외했습니다" if has_filer
+                                                  else "소속회사가 사업보고서를 내지 않아 임원 명단 공시가 없습니다")
+            group_list.append({**base, "has_data": False, "reason": reason,
                                "companies": []})
             continue
         s = gs[name]

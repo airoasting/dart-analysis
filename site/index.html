@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>50대 그룹 경영진 지도</title>
+<title>대기업집단 경영진 지도</title>
 <link rel="icon" type="image/png" href="assets/favicon-32.png">
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -26,7 +26,7 @@
   --accent: #1d4e89;          /* 선택·관심 그룹 */
   --accent-ink: #ffffff;
   --accent-soft: #e6edf6;
-  --base: #8c8780;            /* 50대 전체 기준선 */
+  --base: #8c8780;            /* 전체 기준선 */
   --others: #cfcac2;          /* 나머지 그룹 */
   --mine: #fff3cc;
   --mine-line: #1d4e89;
@@ -468,6 +468,8 @@ const sum = a => a.reduce((x, y) => x + (y || 0), 0);
 const uid = p => p + Math.random().toString(36).slice(2, 8);
 const after = fn => setTimeout(fn);
 const M = () => CORE.meta;
+const NG = () => CORE.groups.length;               // 공정위 지정 그룹 수
+const ALL = () => `${NG()}개 그룹 전체`;
 const YEARS = () => M().years.map(Number);
 const FLOW_END = () => +M().flow_end;
 const isPartial = y => !!M().partial?.[String(y)];
@@ -558,7 +560,7 @@ function niceStep(v) { const p = 10 ** Math.floor(Math.log10(v)); const m = v / 
 function numsTable(headers, rows) {   // 차트 아래 '숫자로 보기': 마우스 없이도 값을 읽고 복사할 수 있게
   const id = uid("n");
   after(() => document.querySelector(`[data-ncopy="${id}"]`)?.addEventListener("click", async () => {
-    const tsv = [headers, ...rows].map(r => r.join("\t")).join("\n") + `\n출처: DART 정기보고서·공정위 2026 지정, 50대 그룹 경영진 지도 (${ASOF()} 기준)`;
+    const tsv = [headers, ...rows].map(r => r.join("\t")).join("\n") + `\n출처: DART 정기보고서·공정위 2026 지정, 대기업집단 경영진 지도 (${ASOF()} 기준)`;
     try { await navigator.clipboard.writeText(tsv); toast("숫자를 복사했습니다."); } catch { toast("복사가 막혀 있습니다. 표를 드래그해 복사해 주세요."); }
   }));
   return `<details class="nums no-print"><summary>숫자로 보기</summary><div class="tbl" style="max-height:none;margin-top:6px"><table><thead><tr>${headers.map((h, i) => `<th class="${i ? "n" : ""}">${esc(h)}</th>`).join("")}</tr></thead>
@@ -782,7 +784,7 @@ function table({ cols, rows, pinned = [], key, dir = -1, href, rowClass, groupsH
   after(() => {
     draw();
     document.querySelector(`[data-copy="${id}"]`)?.addEventListener("click", async () => {
-      const tsv = exportRows().map(r => r.map(x => String(x).replace(/\t|\n/g, " ")).join("\t")).join("\n") + `\n출처: DART 정기보고서·공정위 2026 지정, 50대 그룹 경영진 지도 (${ASOF()} 기준)`;
+      const tsv = exportRows().map(r => r.map(x => String(x).replace(/\t|\n/g, " ")).join("\t")).join("\n") + `\n출처: DART 정기보고서·공정위 2026 지정, 대기업집단 경영진 지도 (${ASOF()} 기준)`;
       try { await navigator.clipboard.writeText(tsv); toast("표를 복사했습니다. 엑셀에 붙여 넣으면 칸이 나뉩니다."); }
       catch { toast("이 화면에서는 복사가 막혀 있습니다. 표를 드래그해 복사해 주세요."); }
     });
@@ -833,7 +835,7 @@ function kpiCard(m, g, { label, sub } = {}) {
   const rank = g?.rank_of?.[m], pv = prevLine(m, g, v);
   return `<div class="kpi"><span>${label || mm.t} ${defBtn(m)}</span>
     <b>${v == null ? "–" : mm.f(v)}${mm.unit && v != null && !String(mm.f(v)).endsWith(mm.unit) ? `<small>${mm.unit}</small>` : ""}</b>
-    ${g && m === "executives" ? `<span class="cmp">${prevDelta(g.heads)}50대 그룹 경영진 ${fmt(b.all)}명의 <em>${(100 * v / b.all).toFixed(1)}%</em> · 그룹 중앙값 ${fmt(b.median)}명</span>${strip(m, g)}` : g ? `<span class="cmp">${pv}전체 <em>${b.all == null ? "–" : mm.f(b.all)}</em> · 중앙값 ${b.median == null ? "–" : mm.f(b.median)}</span>
+    ${g && m === "executives" ? `<span class="cmp">${prevDelta(g.heads)}${ALL()} 경영진 ${fmt(b.all)}명의 <em>${(100 * v / b.all).toFixed(1)}%</em> · 그룹 중앙값 ${fmt(b.median)}명</span>${strip(m, g)}` : g ? `<span class="cmp">${pv}전체 <em>${b.all == null ? "–" : mm.f(b.all)}</em> · 중앙값 ${b.median == null ? "–" : mm.f(b.median)}</span>
       ${m === "ext_hire" ? `<span class="rank">${esc(coverage(m, g))}</span>` : ""}
       ${rank && m !== "executives" ? `<span class="rank">경영진 ${M().min_n}명 이상${m === "ext_hire" ? "·근거 충분" : ""} ${b.n}개 그룹 중 ${rankText(rank, b.n)}${mm.rate && v != null && b.all != null ? `이고, ${diffText(m, v, b.all)}.` : "입니다."}</span>` : ""}${m !== "executives" ? strip(m, g) : ""}`
       : `<span class="cmp">${pv}${sub || ""}</span>${sub ? "" : `<span class="kpi-when">${timeLabel(mm.time)}</span>`}`}</div>`;
@@ -932,19 +934,19 @@ function homeTable() {
   ];
   const lawTot = () => { const G = CORE.groups.filter(g => g.boardx?.n_mand); const n = G.reduce((a, g) => a + g.boardx.n_mand, 0), bad = new Set(G.flatMap(g => [...g.boardx.no_major, ...g.boardx.no_fem])).size; return `대상 ${fmt(n)}곳 중 미충족 ${fmt(bad)}곳`; };
   const lawCol = { k: "law", t: MET.law.t, def: "law", v: r => r._ref || !r.boardx?.n_mand ? null : -new Set([...r.boardx.no_major, ...r.boardx.no_fem]).size,
-    f: r => r._ref ? (r.name === "50대 그룹 전체" ? lawTot() : "") : lawCell(r), xv: r => r._ref ? (r.name === "50대 그룹 전체" ? lawTot() : "") : lawText(r) };
+    f: r => r._ref ? (r.name === ALL() ? lawTot() : "") : lawCell(r), xv: r => r._ref ? (r.name === ALL() ? lawTot() : "") : lawText(r) };
   cols.forEach((c, i) => { if (c.k === "law") cols[i] = { ...lawCol, gl: c.gl }; });
   const ref = (name, kind, extra = {}) => ({ _ref: true, name, ...Object.fromEntries(ms.map(m => [m, kind === "all" ? B[m]?.all : kind === "median" ? B[m]?.median : B[m]?.top10])), ...extra });
-  const pinned = [ref("50대 그룹 전체", "all", { _companies: fmt(M().n_companies) }), ref(`그룹 중앙값 (경영진 ${M().min_n}명 이상)`, "median"), ref("상위 10대 그룹 평균", "top10")];
+  const pinned = [ref(ALL(), "all", { _companies: fmt(M().n_companies) }), ref(`그룹 중앙값 (경영진 ${M().min_n}명 이상)`, "median"), ref("상위 10대 그룹 평균", "top10")];
   const mine = me ? CORE.groups.find(g => g.rank === me && g.has_data) : null;
   if (mine) pinned.push({ ...mine, _mine: true, _href: `g${mine.rank}`, name: `관심 그룹: ${mine.name}`,
     ...Object.fromEntries(ms.map(m => [m, mine.small && MET[m].rate ? null : mine.v[m]])) });
   const rows = groupRowsForHome().map(r => r.has_data ? r : { ...r, _span: `${esc(r.name)} · ${esc(r.reason)}`, _spanText: r.reason }), nCmp = rows.filter(r => r.has_data && !r.small).length;
   const grpHdr = [{ t: "", span: 3 }, ...view.hdr.map(([t, time, span]) => ({ t: `${t} · ${timeLabel(time)}`, span, cls: "" }))];
   return table({ cols, rows, pinned, key: "rank", dir: 1, href: r => r.has_data ? `g${r.rank}` : null, rowClass: r => (!r.has_data ? "nodata" : r.small ? "small" : "") + (r._mine ? " mine" : ""),
-    groupsHdr: grpHdr, title: `50대 그룹 비교_${view.t}`, countLabel: `50개 그룹 · 비율 비교 대상 ${fmt(nCmp)}개`,
+    groupsHdr: grpHdr, title: `대기업집단 비교_${view.t}`, countLabel: `${NG()}개 그룹 · 비율 비교 대상 ${fmt(nCmp)}개`,
     limit: 10, moreAll: true, sep: 5, inPlaceKey: "rank",
-    note: `<b>읽는 법</b> 맨 위 회색 띠가 비교 기준입니다. ‘전체’는 모든 그룹 경영진을 합산한 값(인원 가중)이고, ‘중앙값’과 순위는 경영진 ${M().min_n}명 이상 그룹만으로 산출합니다. ‘이사회 법정 요건’은 자산 2조 원 이상 비금융 상장 계열사(대상)가 사외이사 과반과 이사회 성별 구성 요건을 지켰는지 점검한 결과입니다. 회색 줄은 비율 비교에서 제외한 그룹입니다. 경영진 ${M().min_n}명 미만 그룹은 ‘표본 작음’으로 표시하고, 쿠팡·부영·한국지엠은 임원 명단 공시가 없습니다. 지표 열로 정렬하면 회색 줄은 맨 아래로 내려갑니다.` });
+    note: `<b>읽는 법</b> 맨 위 회색 띠가 비교 기준입니다. ‘전체’는 모든 그룹 경영진을 합산한 값(인원 가중)이고, ‘중앙값’과 순위는 경영진 ${M().min_n}명 이상 그룹만으로 산출합니다. ‘이사회 법정 요건’은 자산 2조 원 이상 비금융 상장 계열사(대상)가 사외이사 과반과 이사회 성별 구성 요건을 지켰는지 점검한 결과입니다. 회색 줄은 비율 비교에서 제외한 그룹입니다. 경영진 ${M().min_n}명 미만 그룹은 ‘표본 작음’으로 표시하고, 임원 명단 공시가 없는 그룹: ${CORE.groups.filter(g => !g.has_data).map(g => g.name).join(", ")}. 지표 열로 정렬하면 회색 줄은 맨 아래로 내려갑니다.` });
 }
 function excludedGroups(out) {   // 비교에서 뺀 그룹: 표본이 작거나 임원 명단 공시가 없는 그룹
   if (!out.length) return "";
@@ -956,18 +958,18 @@ function excludedGroups(out) {   // 비교에서 뺀 그룹: 표본이 작거나
 function viewHome() {
   const B = CORE.bench, T = CORE.total, me = mineRank(), mineG = me ? CORE.groups.find(g => g.rank === me && g.has_data) : null;
   const tabs = Object.entries(HOME_VIEWS).map(([k, v]) => `<button role="tab" type="button" aria-selected="${k === homeView}" data-view="${k}">${v.t}</button>`).join("");
-  const nr = [{ name: "50대 그룹 전체", values: T.new_rate, color: "var(--ink)" }];
+  const nr = [{ name: ALL(), values: T.new_rate, color: "var(--ink)" }];
   if (mineG) nr.unshift({ name: `관심 그룹: ${mineG.name}`, values: mineG.new_rate, color: "var(--accent)" });
   app.innerHTML = `
   <div class="hero">
     <div class="hero-copy">
     ${timeChips()}
-    <h1>50대 대기업 경영진은 어떤 특성을 보이고 있을까요?</h1>
-    <p class="lede">공정위가 지정한 자산 상위 50개 그룹의 상장 계열사(일부 비상장 공시 회사 포함) 임원 정보를 DART 공시 원문에서 추출해 일관된 기준으로 정리했습니다. 관심 그룹을 선택하면 모든 표와 차트에 비교 기준으로 함께 표시됩니다.</p>
+    <h1>${NG()}개 대기업집단 경영진은 어떤 특성을 보이고 있을까요?</h1>
+    <p class="lede">공정위가 지정한 공시대상기업집단 ${NG()}개의 상장 계열사(일부 비상장 공시 회사 포함) 임원 정보를 DART 공시 원문에서 추출해 일관된 기준으로 정리했습니다. 관심 그룹을 선택하면 모든 표와 차트에 비교 기준으로 함께 표시됩니다.</p>
     ${mineG ? "" : `<button class="btn primary cta no-print" type="button" id="pickMine">관심 그룹과 비교하기</button>`}
     </div>
   <div class="kpis">
-    ${kpiCard("executives", mineG, { label: mineG ? `${mineG.name} 경영진` : "경영진", sub: `${prevDelta(mineG ? mineG.heads : T.heads)}50개 그룹 중 ${M().n_groups_data}개 그룹, ${fmt(M().n_companies)}개 기업 대상<span class="na" style="display:block;font-size:11.5px">쿠팡·부영·한국지엠은 임원 명단 공시가 없습니다.</span>` })}
+    ${kpiCard("executives", mineG, { label: mineG ? `${mineG.name} 경영진` : "경영진", sub: `${prevDelta(mineG ? mineG.heads : T.heads)}${NG()}개 그룹 중 ${M().n_groups_data}개 그룹, ${fmt(M().n_companies)}개 기업 대상<span class="na" style="display:block;font-size:11.5px">임원 명단이 없는 ${CORE.groups.filter(g => !g.has_data).length}개 그룹은 비교에서 제외했습니다.</span>` })}
     ${kpiCard("avg_age", mineG, { label: mineG ? `${mineG.name} 평균 나이` : "평균 나이" })}
     ${kpiCard("female", mineG, { label: mineG ? `${mineG.name} 여성` : "여성 비율" })}
     ${kpiCard("new_rate", mineG, { label: mineG ? `${mineG.name} 연평균 신규 선임 비율` : "연평균 신규 선임 비율" })}
@@ -1024,11 +1026,11 @@ function insights() {
   const fem = by("female"), b80 = by("b80");
   const i0 = ys.indexOf(+M().flow[0]), i1 = ys.indexOf(FLOW_END());
   const cards = [
-    { h: `여성 경영진 비율은 그룹마다 크게 다릅니다`, b: `${esc(fem[0].name)} ${pct(fem[0].v.female)}, ${esc(fem[1].name)} ${pct(fem[1].v.female)}가 높고 ${esc(fem.at(-1).name)} ${pct(fem.at(-1).v.female)}가 가장 낮습니다(경영진 ${M().min_n}명 이상 그룹). 50대 전체는 ${pct(B.female.all)}.`, to: `g${fem[0].rank}`, tl: `${esc(fem[0].name)} 보기` },
+    { h: `여성 경영진 비율은 그룹마다 크게 다릅니다`, b: `${esc(fem[0].name)} ${pct(fem[0].v.female)}, ${esc(fem[1].name)} ${pct(fem[1].v.female)}가 높고 ${esc(fem.at(-1).name)} ${pct(fem.at(-1).v.female)}가 가장 낮습니다(경영진 ${M().min_n}명 이상 그룹). 전체는 ${pct(B.female.all)}.`, to: `g${fem[0].rank}`, tl: `${esc(fem[0].name)} 보기` },
     (() => { const a = T.new_rate[i0], b = T.new_rate[i1], dir = b < a - 0.5 ? ["줄었습니다", "내려갔습니다"] : b > a + 0.5 ? ["늘었습니다", "올라갔습니다"] : ["비슷합니다", "움직였습니다"];
       return { h: `새로 선임되는 임원 비율이 ${dir[0]}`, b: `연간 신규율이 ${M().flow[0]}년 ${pct(a)}에서 ${FLOW_END()}년 ${pct(b)}로 ${dir[1]}. 신규율은 그해 신규 선임 ÷ 전년 말 경영진입니다.`, to: "cmp-flow", tl: "그룹별 인사 흐름 보기" }; })(),
     { h: `사외이사는 관료·법조·학계 출신이 많습니다`, b: `사외이사 ${fmt(T.out.n)}명 중 관료·법조 ${pct(B.out_gov.all)}, 학계 ${pct(B.out_acad.all)}입니다(공시 경력 규칙 분류).`, to: "cmp-board", tl: "그룹별 이사회 보기" },
-    { h: `80년대생 경영진은 아직 드뭅니다`, b: `50대 전체 경영진 중 1980년대생은 ${pct(B.b80.all)}입니다. 가장 높은 곳은 ${esc(b80[0].name)}(${pct(b80[0].v.b80)}), 그다음 ${esc(b80[1].name)}(${pct(b80[1].v.b80)})입니다.`, to: "cmp-comp", tl: "그룹별 구성 보기" },
+    { h: `80년대생 경영진은 아직 드뭅니다`, b: `전체 경영진 중 1980년대생은 ${pct(B.b80.all)}입니다. 가장 높은 곳은 ${esc(b80[0].name)}(${pct(b80[0].v.b80)}), 그다음 ${esc(b80[1].name)}(${pct(b80[1].v.b80)})입니다.`, to: "cmp-comp", tl: "그룹별 구성 보기" },
   ];
   return `<section class="finds" id="finds" aria-label="주요 발견"><h2 class="finds-h">주요 발견</h2><ol>${cards.map(c => `<li><h3>${c.h}</h3><p>${c.b}</p>
     <a href="#${c.to}">${c.tl} →</a></li>`).join("")}</ol></section>`;
@@ -1055,7 +1057,7 @@ function methodHtml() {
 /* ---------- 화면: 그룹 ---------- */
 function viewGroup(rank) {
   const g = byRank[rank]; if (!g) return viewHome();
-  if (!g.has_data) { app.innerHTML = `<div><div class="crumb"><a href="#home">50대 그룹</a><span>›</span><span>${rank}위</span></div><h1>${esc(g.name)}</h1><p class="lede">${esc(g.reason)}</p></div>`; return; }
+  if (!g.has_data) { app.innerHTML = `<div><div class="crumb"><a href="#home">전체 그룹</a><span>›</span><span>${rank}위</span></div><h1>${esc(g.name)}</h1><p class="lede">${esc(g.reason)}</p></div>`; return; }
   const k = g.k || {}, T = CORE.total, B = CORE.bench, comps = g.companies.map(id => byId[id]), isMine = mineRank() === g.rank;
   const nListed = comps.filter(c => !c.market.startsWith("비상장")).length;
   const cols = [
@@ -1070,11 +1072,11 @@ function viewGroup(rank) {
   ];
   const fnItems = M().funcs.filter(f => f !== "이사회(비상근)" && f !== "미분류").map(f => ({ k: f, v: k.n ? 100 * (k.func?.[f] || 0) / k.n : null, ref: 100 * (T.func[f] || 0) / CORE.bench.executives.all }))
     .filter(i => (i.v || 0) > 0.4 || (i.ref || 0) > 2).sort((a, b) => (b.v || 0) - (a.v || 0));
-  const nr = [{ name: g.name, values: g.new_rate, color: "var(--accent)" }, { name: "50대 그룹 전체", values: T.new_rate, color: "var(--faint)", dash: true }];
+  const nr = [{ name: g.name, values: g.new_rate, color: "var(--accent)" }, { name: ALL(), values: T.new_rate, color: "var(--faint)", dash: true }];
   const h = g.hire;
   app.innerHTML = `
   <div class="headrow"><div>
-    <div class="crumb"><a href="#home">50대 그룹</a><span>›</span><span>${rank}위</span></div>
+    <div class="crumb"><a href="#home">전체 그룹</a><span>›</span><span>${rank}위</span></div>
     <h1>${esc(g.name)}</h1>
     <p class="lede">총수(동일인) ${esc(g.owner)} · 자산(공정위 기준) ${fmt(Math.round(g.assets / 1000))}조 원 · 소속회사 ${g.n_aff}곳 중 공시 대상 ${comps.length}곳</p></div>
     <div class="actions no-print"><button class="btn" type="button" id="setmine">${isMine ? "관심 그룹 해제" : "관심 그룹으로 지정"}</button><a class="btn primary" href="#r${rank}">보고서 한 장</a></div>
@@ -1090,11 +1092,11 @@ function viewGroup(rank) {
       ${sum(g.ev["직급체계변경"]) || sum(g.ev["공시확대"]) ? `<p class="note">신규·승진 집계에서 제외한 항목: 직급 체계를 바꾼 해의 직위 변화 ${fmt(sum(g.ev["직급체계변경"]))}건, 회사가 공시 범위를 넓혀 처음 공시된 사람 ${fmt(sum(g.ev["공시확대"]))}명.</p>` : ""}</section>
     <section class="panel"><div class="panel-head"><h3>경영진 수 (연말 기준, 2026년은 반기 말)</h3></div>${lineChart([{ name: "경영진", values: g.heads, color: "var(--accent)" }], { label: "경영진 수", zero: false })}<p class="note">축이 0에서 시작하지 않습니다. 변화를 보려고 범위를 좁혔습니다.</p></section>
     <section class="panel"><div class="panel-head"><h3>나이 분포 (${ASOF()})</h3></div>${ageHist(k.age_hist)}</section>
-    <section class="panel"><div class="panel-head"><h3>담당 업무 (${ASOF()})</h3><p>공시된 담당 업무 문구를 분야별로 나눈 비율입니다.</p></div>${compareBars(fnItems.slice(0, 10), { refName: "50대 전체" })}</section>
+    <section class="panel"><div class="panel-head"><h3>담당 업무 (${ASOF()})</h3><p>공시된 담당 업무 문구를 분야별로 나눈 비율입니다.</p></div>${compareBars(fnItems.slice(0, 10), { refName: "전체" })}</section>
     <section class="panel"><div class="panel-head"><h3>직급별 인원과 나이 (${ASOF()})</h3></div>${rankStack(k.ranks)}${rankAgeTable(g)}${(g.v.rank_hidden || 0) > 30 ? `<p class="note">경영진의 ${pct(g.v.rank_hidden)}가 직급 없이 공시되어 직급 기준의 승진 집계가 어렵습니다.</p>` : ""}</section>
     <section class="panel"><div class="panel-head"><h3>사외이사 ${fmt(g.out.n)}명</h3><p>여성 ${g.out.n ? `${pct(g.out.female)} (${g.out.female_n}명)` : "–"} · 평균 ${g.out.n ? f1(g.out.avg_age) + "세" : "–"} · 전체 여성 ${pct(B.out_female.all)}</p></div>${originStack(g.out.origin, g.out.n)}${boardMandate(g)}</section>
     <section class="panel"><div class="panel-head"><h3>신규 임원은 어디서 왔나 (${M().flow[0]}–${M().flow[1]}) ${defBtn("ext_hire")}</h3></div>
-      ${compareBars([{ k: "외부 경력 있음", v: h.n ? 100 * h.ext / h.n : null, ref: T.hire.n ? 100 * T.hire.ext / T.hire.n : null }, { k: "그룹 내부", v: h.n ? 100 * h.int / h.n : null, ref: T.hire.n ? 100 * T.hire.int / T.hire.n : null }, { k: "판단 불가", v: h.n ? 100 * h.unk / h.n : null, ref: T.hire.n ? 100 * T.hire.unk / T.hire.n : null }], { refName: "50대 전체" })}
+      ${compareBars([{ k: "외부 경력 있음", v: h.n ? 100 * h.ext / h.n : null, ref: T.hire.n ? 100 * T.hire.ext / T.hire.n : null }, { k: "그룹 내부", v: h.n ? 100 * h.int / h.n : null, ref: T.hire.n ? 100 * T.hire.int / T.hire.n : null }, { k: "판단 불가", v: h.n ? 100 * h.unk / h.n : null, ref: T.hire.n ? 100 * T.hire.unk / T.hire.n : null }], { refName: "전체" })}
       <p class="note">신규 ${fmt(h.n)}명 기준. 경력이 한 줄뿐이라 판단할 수 없는 사람을 따로 두었습니다. ${g.v.ext_hire != null ? `위 ‘외부 경력 확인’ ${pct(g.v.ext_hire)}는 판단할 수 있는 ${fmt(h.known)}명 중 외부 경력이 있는 비율입니다.` : `판단할 수 있는 사람이 ${fmt(h.known)}명(${pct(h.known_pct)})뿐이라 ‘외부 경력 확인’ 비율은 근거 부족으로 두었습니다.`}</p></section>
   </div>
   <section class="panel"><div class="panel-head"><h2>공시 회사</h2><p>회사를 누르면 연도별 임원 명단을 볼 수 있습니다.</p></div>
@@ -1104,16 +1106,16 @@ function viewGroup(rank) {
   bindDefs(app);
 }
 
-/* 직급별 인원·평균 나이(그룹 vs 50대 전체 같은 직급), 상무 → 첫 승진 소요 연수 */
+/* 직급별 인원·평균 나이(그룹 vs 전체 같은 직급), 상무 → 첫 승진 소요 연수 */
 function rankAgeTable(g) {
   const ra = g.rank_age || [];
   if (!ra.length) return "";
   const all = {};
   CORE.groups.filter(x => x.has_data).forEach(x => (x.rank_age || []).forEach(r => { (all[r.rank] ||= [0, 0]); all[r.rank][0] += r.n; all[r.rank][1] += r.n * r.avg; }));
   const pr = g.promo, PA = M().promo_all, hiddenNow = (g.v.rank_hidden || 0) >= 30;
-  return `<div class="tbl" style="margin-top:12px;max-height:none"><table><thead><tr><th>직급</th><th class="n">인원</th><th class="n">비율</th><th class="n">평균 나이</th><th class="n">최연소</th><th class="n">50대 전체 평균 나이</th></tr></thead><tbody>
+  return `<div class="tbl" style="margin-top:12px;max-height:none"><table><thead><tr><th>직급</th><th class="n">인원</th><th class="n">비율</th><th class="n">평균 나이</th><th class="n">최연소</th><th class="n">전체 평균 나이</th></tr></thead><tbody>
     ${ra.map(r => `<tr><td>${esc(r.rank)}</td><td class="n">${fmt(r.n)}</td><td class="n">${(100 * r.n / g.k.n).toFixed(1)}%</td><td class="n">${r.n >= 5 ? f1(r.avg) : `<span class="na">${f1(r.avg)}</span>`}</td><td class="n">${r.min}</td><td class="n">${all[r.rank] ? f1(all[r.rank][1] / all[r.rank][0]) : "–"}</td></tr>`).join("")}</tbody></table></div>
-    <p class="note"><b>상무 승진 속도</b> ${hiddenNow ? "직급 비공개 비중이 커서 집계할 수 없습니다." : pr && pr.cohort_pct != null ? `2019–2021년 상무로 처음 공시된 ${fmt(pr.cohort_n)}명 중 4년 안에 한 직급 이상 오른 사람 ${fmt(pr.cohort_up)}명(${pct(pr.cohort_pct)}). 50대 전체 ${pct(PA.cohort_pct)}(${fmt(PA.cohort_n)}명).` : `2019–2021년 신규 상무가 20명 미만이라 비율을 산출하지 않습니다.`} 모두 4년을 지켜본 같은 기간 코호트라 그룹끼리 비교할 수 있습니다. 직급 체계 개편에 따른 직위 변화는 승진으로 집계하지 않습니다.</p>`;
+    <p class="note"><b>상무 승진 속도</b> ${hiddenNow ? "직급 비공개 비중이 커서 집계할 수 없습니다." : pr && pr.cohort_pct != null ? `2019–2021년 상무로 처음 공시된 ${fmt(pr.cohort_n)}명 중 4년 안에 한 직급 이상 오른 사람 ${fmt(pr.cohort_up)}명(${pct(pr.cohort_pct)}). 전체 ${pct(PA.cohort_pct)}(${fmt(PA.cohort_n)}명).` : `2019–2021년 신규 상무가 20명 미만이라 비율을 산출하지 않습니다.`} 모두 4년을 지켜본 같은 기간 코호트라 그룹끼리 비교할 수 있습니다. 직급 체계 개편에 따른 직위 변화는 승진으로 집계하지 않습니다.</p>`;
 }
 /* 사외이사 과반·여성 이사: 법정 요건 대상(자산 2조 원 이상 비금융 상장사)만 센다 */
 function boardMandate(g) {
@@ -1139,7 +1141,7 @@ function viewReport(rank, peers = []) {
     { k: "time", t: "기준", f: r => `<span class="na" style="white-space:nowrap">${esc(MET[r.m].time === "now" ? `${ASOF()}` : MET[r.m].time === "flow" ? `${M().flow[0]}–${M().flow[1]} 평균` : `${M().pay_year} 연간`)}</span>`, xv: r => r.time },
     { k: "g", t: esc(g.name), n: 1, gl: 1, f: r => `<b>${cell(g, r.m)}</b>`, xv: r => cell(g, r.m) },
     ...peers.map(pg => ({ k: "p" + pg.rank, t: esc(pg.name), n: 1, f: r => cell(pg, r.m), xv: r => cell(pg, r.m) })),
-    { k: "all", t: "50대 전체", n: 1, gl: 1, f: r => B[r.m].all == null ? "–" : MET[r.m].f(B[r.m].all), xv: r => B[r.m].all ?? "" },
+    { k: "all", t: "전체", n: 1, gl: 1, f: r => B[r.m].all == null ? "–" : MET[r.m].f(B[r.m].all), xv: r => B[r.m].all ?? "" },
     { k: "med", t: "중앙값", n: 1, f: r => B[r.m].median == null ? "–" : MET[r.m].f(B[r.m].median), xv: r => B[r.m].median ?? "" },
     { k: "top", t: "상위 10대 평균", n: 1, f: r => B[r.m].top10 == null ? "–" : MET[r.m].f(B[r.m].top10), xv: r => B[r.m].top10 ?? "" },
     { k: "rank", t: "순위", n: 1, gl: 1, f: r => r.rank ? `${rankText(r.rank, r.n)}<span class="na"> / ${r.n}</span>` : "–", xv: r => r.rank ? `${r.rank}/${r.n}` : "" },
@@ -1154,13 +1156,13 @@ function viewReport(rank, peers = []) {
     `이사회 중 사외이사 ${pct(g.v.out_ratio)}, 사외이사 ${fmt(g.out.n)}명 중 여성 ${pct(g.out.female)}(전체 ${pct(B.out_female.all)}), 관료·법조 출신 ${pct(g.v.out_gov)}(전체 ${pct(B.out_gov.all)}).`,
   ];
   const peerSel = i => `<select data-peer="${i}" aria-label="비교 그룹 ${i + 1}"><option value="">비교 그룹 ${i + 1}</option>${CORE.groups.filter(x => x.has_data && x.rank !== rank).map(x => `<option value="${x.rank}" ${peers[i]?.rank === x.rank ? "selected" : ""}>${x.rank}. ${esc(x.name)}</option>`).join("")}</select>`;
-  const series = [{ name: g.name, values: g.new_rate, color: "var(--accent)", width: 2.5 }, ...peers.map((pg, i) => ({ name: pg.name, values: pg.new_rate, color: PEER_COLORS[i], width: 1.5 })), { name: "50대 그룹 전체", values: T.new_rate, color: "var(--faint)", dash: true }];
+  const series = [{ name: g.name, values: g.new_rate, color: "var(--accent)", width: 2.5 }, ...peers.map((pg, i) => ({ name: pg.name, values: pg.new_rate, color: PEER_COLORS[i], width: 1.5 })), { name: ALL(), values: T.new_rate, color: "var(--faint)", dash: true }];
   app.innerHTML = `
-  <div class="headrow no-print"><div><div class="crumb"><a href="#home">50대 그룹</a><span>›</span><a href="#g${rank}">${esc(g.name)}</a><span>›</span><span>보고서 한 장</span></div></div>
+  <div class="headrow no-print"><div><div class="crumb"><a href="#home">전체 그룹</a><span>›</span><a href="#g${rank}">${esc(g.name)}</a><span>›</span><span>보고서 한 장</span></div></div>
     <div class="actions"><div class="controls">${[0, 1, 2].map(peerSel).join("")}</div><button class="btn primary" type="button" id="printbtn">인쇄·PDF로 저장</button></div></div>
   <article class="report">
-    <div><div class="eyebrow"><span class="chip">50대 그룹 경영진 지도</span><span class="chip">명단 <b>${ASOF()}</b></span><span class="chip">흐름 <b>${y0}–${y1}</b></span><span class="chip">보수 <b>${M().pay_year}</b></span></div>
-      <h1>${esc(g.name)} 경영진, 상위 50개 그룹과 견주면</h1>
+    <div><div class="eyebrow"><span class="chip">대기업집단 경영진 지도</span><span class="chip">명단 <b>${ASOF()}</b></span><span class="chip">흐름 <b>${y0}–${y1}</b></span><span class="chip">보수 <b>${M().pay_year}</b></span></div>
+      <h1>${esc(g.name)} 경영진, ${NG()}개 그룹과 견주면</h1>
       <ul class="lede" style="padding-left:18px;margin-top:10px;display:grid;gap:4px">${lines.map(l => `<li>${l}</li>`).join("")}</ul></div>
     ${table({ cols, rows, key: null, dir: 1, title: `${g.name}_보고서한장`, stickyFirst: false })}
     <div class="grid2">
@@ -1170,7 +1172,7 @@ function viewReport(rank, peers = []) {
     <div class="foot"><div>정의: 경영진 = 사내이사 + 미등기 임원 + 집행임원(그룹 안 겸직 1명). 신규율 = 해마다 신규 선임 ÷ 전년 말 경영진의 평균. 전체 = 모든 그룹 경영진을 합산한 값, 중앙값·순위 = 경영진 ${M().min_n}명 이상 그룹.</div>
       <div>비교 그룹 수가 지표마다 다른 이유: 사외이사 지표는 사외이사 5명 이상, 이사회 지표는 공시 회사 3곳 이상, 학력은 학력 공시자가 절반 이상·30명 이상(석·박사는 학위 없이 학교만 적힌 사람이 절반 이하일 때만), 외부 경력은 판단 가능한 신규가 절반 이상·30명 이상인 그룹만 넣었습니다. ‘근거 부족’은 이 조건에 못 미친 값입니다.</div>
       <div>범위: ${esc(g.name)} 공시 회사 ${g.companies.length}곳 기준(비상장 계열사 임원 제외). 출신·기능·학력은 공시 문구에 규칙을 적용해 분류한 값입니다.</div>
-      <div>출처: DART 사업보고서·반기보고서 VIII-1 임원 현황, 공정거래위원회 2026년 공시대상기업집단 지정. 50대 그룹 경영진 지도, 갱신 ${M().built}.</div></div>
+      <div>출처: DART 사업보고서·반기보고서 VIII-1 임원 현황, 공정거래위원회 2026년 공시대상기업집단 지정. 대기업집단 경영진 지도, 갱신 ${M().built}.</div></div>
   </article>`;
   app.querySelectorAll("[data-peer]").forEach(sel => sel.addEventListener("change", () => {
     const ps = [...app.querySelectorAll("[data-peer]")].map(x => x.value).filter(Boolean);
@@ -1245,7 +1247,7 @@ function viewCompany(id) {
   const years = YEARS().filter((_, i) => c.heads[i] != null), k = c.k;
   app.innerHTML = `
   <div class="headrow"><div>
-    <div class="crumb"><a href="#home">50대 그룹</a><span>›</span><a href="#g${g.rank}">${esc(g.name)}</a></div>
+    <div class="crumb"><a href="#home">전체 그룹</a><span>›</span><a href="#g${g.rank}">${esc(g.name)}</a></div>
     <h1>${esc(c.name)}</h1>
     <p class="lede">${esc(c.market)}${c.fin ? " · 금융·보험" : ""} · 공시 ${yshort(years[0])}–${yshort(years.at(-1))} · <a href="${esc(c.src[years.at(-1)] || "#")}" target="_blank" rel="noopener">최근 보고서 원문</a></p></div></div>
   ${timeChips()}
@@ -1272,7 +1274,7 @@ function viewGroupRoster(rank) {
   const g = byRank[rank]; if (!g || !g.has_data) return viewHome();
   const idx = g.companies.map(id => CORE.companies.indexOf(byId[id]));
   const years = YEARS().filter(y => idx.some(ci => compAt(ci).heads[YEARS().indexOf(y)] != null));
-  app.innerHTML = `<div><div class="crumb"><a href="#home">50대 그룹</a><span>›</span><a href="#g${rank}">${esc(g.name)}</a><span>›</span><span>그룹 전체 명단</span></div>
+  app.innerHTML = `<div><div class="crumb"><a href="#home">전체 그룹</a><span>›</span><a href="#g${rank}">${esc(g.name)}</a><span>›</span><span>그룹 전체 명단</span></div>
     <h1>${esc(g.name)} 전체 임원 명단</h1><p class="lede">공시 회사 ${idx.length}곳을 합친 명단입니다. 계열사를 겸직한 경우 회사별로 한 줄씩 표시됩니다.</p></div>
     <section class="panel">${rosterHtml(idx, years, `${g.name}_전체`)}</section>`;
   bindRoster(idx, years, `${g.name}_전체`);
@@ -1280,7 +1282,7 @@ function viewGroupRoster(rank) {
 
 /* ---------- 화면: 인물 ---------- */
 const EV_CLASS = { 신규: "new", 승진: "up", 이탈: "out", 계열사이동: "", 등기전환: "" };
-const EV_LABEL = { 신규: "신규 선임", 승진: "승진", 이탈: "명단에서 빠짐", 계열사이동: "계열사 이동", 등기전환: "등기이사 선임", 공시확대: "공시 범위 확대로 처음 공시",
+const EV_LABEL = { 그룹간이동: "다른 그룹으로 이동", 신규: "신규 선임", 승진: "승진", 이탈: "명단에서 빠짐", 계열사이동: "계열사 이동", 등기전환: "등기이사 선임", 공시확대: "공시 범위 확대로 처음 공시",
   공시축소: "공시 범위 축소로 빠짐", 대상편입: "회사가 공시 대상에 들어옴", 관찰종료: "회사가 공시 대상에서 빠짐", 복귀: "다시 등장", 직급하향: "직위 변경" };
 const evLabel = e => EV_LABEL[e] || e;
 /* 학위 줄임말 풀기: (박) → (박사), (석/박) → (석사/박사) */
@@ -1371,7 +1373,7 @@ function viewPerson(id) {
     const lines = careerLines(p[7]);
     app.innerHTML = `
     <div>
-      <div class="crumb"><a href="#home">50대 그룹</a><span>›</span>${g ? `<a href="#g${g.rank}">${esc(g.name)}</a><span>›</span>` : ""}${lc ? `<a href="#c${lc.id}">${esc(lc.name)}</a>` : ""}</div>
+      <div class="crumb"><a href="#home">전체 그룹</a><span>›</span>${g ? `<a href="#g${g.rank}">${esc(g.name)}</a><span>›</span>` : ""}${lc ? `<a href="#c${lc.id}">${esc(lc.name)}</a>` : ""}</div>
       <h1>${esc(p[1])}</h1>
       <p class="lede">${lc ? esc(lc.name) : ""} ${esc(last[3])} <span class="na">(${ylab(last[0])} 공시)</span></p>
       <p style="margin:8px 0 0">${esc(summaryLine)}</p>
