@@ -516,6 +516,11 @@ const DEF = {
   out_female: "<b>사외이사 여성</b> = 여성 사외이사 ÷ 사외이사.",
   out_gov: "<b>관료·법조 출신 사외이사</b> = 공시 경력에 정부·공공기관(관료) 또는 법원·검찰·로펌(법조) 경력이 주 출신으로 나오는 사외이사 비율.",
   out_acad: "<b>학계 출신 사외이사</b> = 주 출신이 교수·총장인 사외이사 비율.",
+  emp: "<b>직원</b> = 공시 회사 사업보고서(2026년은 반기보고서) ‘직원 등 현황’의 합계(정규직 + 기간제, 회사가 적은 합계 칸 기준). 등기임원은 들어가지 않고, 일부 회사는 미등기 임원을 포함해 공시합니다.",
+  emp_chg: "<b>직원 증감</b> = 2020년 말과 2026년 6월 말 모두 직원 현황을 낸 회사만 더해 비교한 증감률. 새로 상장하거나 빠진 회사의 효과는 뺐습니다.",
+  sal: "<b>직원 평균 급여</b> = 2025년 회사가 공시한 직원 1인 평균 급여액(그룹은 회사별 값을 직원 수로 가중). 1인 평균이 없거나, 월 급여로 적혔거나, 단위가 맞지 않으면 연간 급여 총액 ÷ 직원 수를 씁니다.",
+  reg_pay: "<b>등기임원 평균 보수</b> = 2025년 ‘이사·감사 전체의 보수 현황’의 보수 총액 ÷ 인원(그룹·전체). 회사 화면은 회사가 공시한 1인 평균 보수액(기중 평균 인원 기준)을 그대로 씁니다. 사외이사·감사위원이 함께 들어가 사내이사만의 평균보다 낮게 나옵니다.",
+  pay_ratio: "<b>미등기 보수 ÷ 직원 급여</b> = 2025년 미등기 임원 1인 평균 보수를 직원 1인 평균 급여로 나눈 배수.",
 };
 function defBtn(key) { return DEF[key] ? `<button class="def" type="button" data-def="${key}" aria-label="정의 보기">i</button>` : ""; }
 function bindDefs(root = document) {
@@ -543,20 +548,25 @@ const MET = {
   out_ratio: { t: "사외이사 비율", f: v => pct(v), time: "now", rate: true, pp: true },
   fem_dir: { t: "여성 등기이사", f: v => pct(v), time: "now", rate: true, pp: true },
   law: { t: "이사회 법정 요건", f: v => v, time: "now", check: true },
-  pay: { t: "미등기 평균 보수", f: v => eok(v), time: "pay", rate: true },
+  pay: { t: "미등기 평균 보수", f: v => eok(v), time: "pay", rate: true, eok: true },
   grad: { t: "석·박사", f: v => pct(v), time: "now", rate: true, pp: true },
   overseas: { t: "해외 학위", f: v => pct(v), time: "now", rate: true, pp: true },
   out_n: { t: "사외이사", f: v => fmt(Math.round(v)), unit: "명", time: "now" },
   out_female: { t: "사외이사 여성", f: v => pct(v), time: "now", rate: true, pp: true },
   out_gov: { t: "관료·법조 출신", f: v => pct(v), time: "now", rate: true, pp: true },
   out_acad: { t: "학계 출신", f: v => pct(v), time: "now", rate: true, pp: true },
+  emp: { t: "직원", f: v => fmt(Math.round(v)), unit: "명", time: "now" },
+  emp_chg: { t: "직원 증감", f: v => `${v > 0 ? "+" : ""}${(+v).toFixed(1)}%`, time: "chg", pp: true },
+  sal: { t: "직원 평균 급여", f: v => eok(v), time: "pay", eok: true },
+  reg_pay: { t: "등기임원 평균 보수", f: v => eok(v), time: "pay", eok: true },
+  pay_ratio: { t: "미등기 보수 ÷ 직원 급여", f: v => `${(+v).toFixed(1)}배`, unit: "배", time: "pay", rate: true },
 };
-const timeLabel = t => t === "now" ? `${ASOF()} 기준` : t === "flow" ? `${M().flow[0]}–${M().flow[1]} 연평균` : `${M().pay_year}년 연간`;
+const timeLabel = t => t === "now" ? `${ASOF()} 기준` : t === "chg" ? `${M().chg_from}년 말 → ${ASOF()}` : t === "flow" ? `${M().flow[0]}–${M().flow[1]} 연평균` : `${M().pay_year}년 연간`;
 function diffText(m, v, ref) {
   if (v == null || ref == null) return "";
   const d = v - ref, mm = MET[m];
   if (Math.abs(d) < 0.05) return "전체와 같습니다";
-  const s = mm.pp ? `${Math.abs(d).toFixed(1)}%p` : m === "pay" ? `${Math.abs(d / 100).toFixed(2)}억` : `${Math.abs(d).toFixed(1)}${mm.unit || ""}`;
+  const s = mm.pp ? `${Math.abs(d).toFixed(1)}%p` : mm.eok ? `${Math.abs(d / 100).toFixed(2)}억` : `${Math.abs(d).toFixed(1)}${mm.unit || ""}`;
   return `전체보다 ${s} ${d > 0 ? "높습니다" : "낮습니다"}`;
 }
 
@@ -899,6 +909,7 @@ const HOME_VIEWS = {
   flow: { t: "인사 흐름", cols: ["executives", "new_rate", "exit_rate", "new_age", "ext_hire"], hdr: [["현재", "now", 1], ["인사 흐름", "flow", 4]] },
   board: { t: "이사회·사외이사", cols: ["out_n", "out_ratio", "fem_dir", "law", "out_female", "out_gov", "out_acad"], hdr: [["이사회 구성", "now", 4], ["사외이사 출신", "now", 3]] },
   edu: { t: "학력·보수", cols: ["executives", "grad", "overseas", "pay"], hdr: [["현재 단면", "now", 3], ["보수", "pay", 1]] },
+  staff: { t: "직원·보수", cols: ["emp", "emp_chg", "sal", "reg_pay", "pay", "pay_ratio"], hdr: [["직원", "now", 1], ["증감", "chg", 1], ["1인 평균", "pay", 4]] },
 };
 const rankText = (r, n) => r <= Math.ceil(n / 2) ? `높은 쪽에서 ${r}번째` : `낮은 쪽에서 ${n - r + 1}번째`;
 function coverage(m, g) {   // 근거가 부족해 비교하지 않는 지표의 설명
@@ -960,6 +971,22 @@ function excludedGroups(out) {   // 비교에서 뺀 그룹: 표본이 작거나
     ${small.length ? `<p><b>경영진 ${M().min_n}명 미만이라 비율을 비교하지 않는 그룹</b> ${small.map(r => `<a href="#g${r.rank}">${esc(r.name)}</a> <span class="na">${fmt(r.k?.n || 0)}명</span>`).join(" · ")}</p>` : ""}
     ${none.length ? `<p><b>임원 명단 공시가 없는 그룹</b> ${none.map(r => `${esc(r.name)} <span class="na">(${esc(r.reason)})</span>`).join(" · ")}</p>` : ""}</div>`;
 }
+/* 첫 화면 직원 추이: 직원 수(같은 회사 기준 + 공시 회사 전체), 경영진 1명당 직원 수(전체 vs 관심 그룹) */
+function homeStaff(T, mineG) {
+  const tr = T.tr; if (!tr || !tr.emp.some(v => v != null)) return "";
+  const ys = YEARS(), nConst = CORE.companies.filter(c => c.tr?.emp.every(v => v != null)).length;
+  const i0 = ys.findIndex((_, j) => tr.emp_const[j] != null), il = ys.length - 1;
+  const chg = tr.emp_const[i0] && tr.emp_const[il] != null ? 100 * (tr.emp_const[il] - tr.emp_const[i0]) / tr.emp_const[i0] : null;
+  const per = (t, heads) => t.emp.map((v, j) => v != null && heads[j] ? Math.round(v / heads[j]) : null);
+  const perSeries = [{ name: ALL(), values: per(tr, T.heads), color: "var(--accent)" }];
+  if (mineG?.tr) perSeries.push({ name: `관심 그룹: ${mineG.name}`, values: per(mineG.tr, mineG.heads), color: "#8e5bb5", dash: true });
+  return `<section class="panel"><div class="panel-head"><h3>직원 수 ${defBtn("emp")} (연말 기준, 2026년은 반기 말)</h3></div>
+      ${lineChart([{ name: `9개 시점 모두 공시된 ${fmt(nConst)}곳`, tag: `같은 회사 ${fmt(nConst)}곳`, values: tr.emp_const, color: "var(--accent)" }, { name: "해마다 공시된 회사 전체", tag: "공시 회사 전체", values: tr.emp, color: "var(--faint)", dash: true, width: 1.5 }], { label: "직원 수", unit: "명", zero: false })}
+      <p class="note">${chg != null ? `같은 회사 기준으로 ${ylab(ys[i0])} ${fmt(tr.emp_const[i0])}명에서 ${ylab(ys[il])} ${fmt(tr.emp_const[il])}명으로 ${chg >= 0 ? "+" : ""}${chg.toFixed(1)}% 변했습니다. ` : ""}직원은 사업보고서 ‘직원 등 현황’의 합계(정규직 + 기간제)입니다. 등기임원은 들어가지 않고, 일부 회사는 미등기 임원을 포함해 공시합니다. 축은 0에서 시작하지 않습니다.</p></section>
+    <section class="panel"><div class="panel-head"><h3>경영진 1명당 직원 수</h3></div>
+      ${lineChart(perSeries, { label: "경영진 1명당 직원 수", unit: "명" })}
+      <p class="note">해마다 공시 회사 직원 합계 ÷ 경영진(사내이사 + 미등기 임원 + 집행임원). 값이 줄면 직원보다 임원이 빠르게 늘었다는 뜻입니다. ${mineG ? "" : "관심 그룹을 선택하면 같은 축에 함께 표시합니다."}</p></section>`;
+}
 function viewHome() {
   const B = CORE.bench, T = CORE.total, me = mineRank(), mineG = me ? CORE.groups.find(g => g.rank === me && g.has_data) : null;
   const tabs = Object.entries(HOME_VIEWS).map(([k, v]) => `<button role="tab" type="button" aria-selected="${k === homeView}" data-view="${k}">${v.t}</button>`).join("");
@@ -998,6 +1025,7 @@ function viewHome() {
       <p class="note">회사 수 증가 효과를 제외하기 위해 9개 시점 모두 공시된 회사만으로 별도의 선을 표시했습니다(겸직자는 1명으로 집계). 이 선에도 공시 범위를 넓힌 회사의 증가분이 들어 있습니다: ${YEARS().map((y, i) => [y, M().const_expand[i]]).filter(x => x[1] > 20).map(x => `${x[0]}년 ${fmt(x[1])}명`).join(", ") || "없음"}.</p></section>
     <section class="panel"><div class="panel-head"><h3>사외이사 출신 (전체 ${fmt(T.out.n)}명)</h3></div>${originStack(T.out.origin, T.out.n)}
 </section>
+    ${homeStaff(T, mineG)}
   </div>
   ${methodHtml()}`;
   const tabsEl = app.querySelector('[role="tablist"]');
@@ -1045,7 +1073,8 @@ function methodHtml() {
     <div><h3>출처</h3><ul>
       <li>그룹 순위와 소속회사는 공정거래위원회가 2026년 4월 30일 발표한 공시대상기업집단 지정 결과를 따랐습니다.</li>
       <li>임원 명단은 DART 정기보고서의 ‘임원 및 직원 등의 현황’에서 가져왔습니다. 2018년부터 2025년까지는 사업보고서(12월 말 기준)를, 2026년은 반기보고서(6월 말 기준)를 사용했습니다.</li>
-      <li>보수는 같은 보고서의 ‘미등기임원 보수 현황’에 나온 2025년 연간 금액 기준으로 산출했습니다.</li></ul></div>
+      <li>보수는 같은 보고서의 ‘이사·감사 전체의 보수 현황’, ‘미등기임원 보수 현황’, 개인별 보수(5억 원 이상)에서 가져왔습니다. 그룹 비교표의 보수는 2025년 연간 금액이고, 연도별 추이는 2018~2025년 연간 금액입니다. 반기 보수는 반년치라 넣지 않았습니다.</li>
+      <li>직원 수와 직원 급여는 같은 보고서의 ‘직원 등 현황’에서 가져왔습니다. 직원 수는 2026년 6월 말까지, 급여는 2025년 연간까지입니다.</li></ul></div>
     <div><h3>용어</h3><ul>
       <li><b>경영진</b>은 사내이사, 미등기 임원, 집행임원을 합한 인원입니다. 사외이사, 기타비상무이사, 감사는 포함하지 않습니다.</li>
       <li><b>신규</b>는 전년도 그룹 명단에 없다가 새로 오른 사람입니다. 같은 그룹의 다른 계열사에서 옮겨 온 사람은 신규가 아니라 ‘계열사 이동’으로 분류합니다.</li>
@@ -1074,6 +1103,8 @@ function viewGroup(rank) {
     { k: "out", t: "사외이사", n: 1, gl: 1, v: r => r.board["사외이사"], f: r => fmt(r.board["사외이사"]) },
     { k: "nr", t: `${FLOW_END()} 신규`, n: 1, gl: 1, v: r => r.ev["신규"][YEARS().indexOf(FLOW_END())], f: r => { const i = YEARS().indexOf(FLOW_END()), p = r.heads[i - 1]; const n = r.ev["신규"][i]; return p ? `${fmt(n)} <span class="na">${(100 * n / p).toFixed(0)}%</span>` : fmt(n); } },
     { k: "pay", t: "미등기 평균 보수", n: 1, gl: 1, v: r => r.pay?.avg, f: r => eok(r.pay?.avg), xv: r => r.pay?.avg ?? "" },
+    { k: "emp", t: `직원 (${yshort(YEARS().at(-1))})`, n: 1, gl: 1, v: r => r.tr?.emp.at(-1), f: r => fmt(r.tr?.emp.at(-1)), xv: r => r.tr?.emp.at(-1) ?? "" },
+    { k: "sal", t: `직원 평균 급여 (${PAY_LAST()})`, n: 1, v: r => r.tr?.sal[YEARS().indexOf(PAY_LAST())], f: r => eok(r.tr?.sal[YEARS().indexOf(PAY_LAST())]), xv: r => r.tr?.sal[YEARS().indexOf(PAY_LAST())] ?? "" },
   ];
   const fnItems = M().funcs.filter(f => f !== "이사회(비상근)" && f !== "미분류").map(f => ({ k: f, v: k.n ? 100 * (k.func?.[f] || 0) / k.n : null, ref: 100 * (T.func[f] || 0) / CORE.bench.executives.all }))
     .filter(i => (i.v || 0) > 0.4 || (i.ref || 0) > 2).sort((a, b) => (b.v || 0) - (a.v || 0));
@@ -1104,6 +1135,8 @@ function viewGroup(rank) {
       ${compareBars([{ k: "외부 경력 있음", v: h.n ? 100 * h.ext / h.n : null, ref: T.hire.n ? 100 * T.hire.ext / T.hire.n : null }, { k: "그룹 내부", v: h.n ? 100 * h.int / h.n : null, ref: T.hire.n ? 100 * T.hire.int / T.hire.n : null }, { k: "판단 불가", v: h.n ? 100 * h.unk / h.n : null, ref: T.hire.n ? 100 * T.hire.unk / T.hire.n : null }], { refName: "전체" })}
       <p class="note">신규 ${fmt(h.n)}명 기준. 경력이 한 줄뿐이라 판단할 수 없는 사람을 따로 두었습니다. ${g.v.ext_hire != null ? `위 ‘외부 경력 확인’ ${pct(g.v.ext_hire)}는 판단할 수 있는 ${fmt(h.known)}명 중 외부 경력이 있는 비율입니다.` : `판단할 수 있는 사람이 ${fmt(h.known)}명(${pct(h.known_pct)})뿐이라 ‘외부 경력 확인’ 비율은 근거 부족으로 두었습니다.`}</p></section>
   </div>
+  ${staffPay(g.tr, { multi: true })}
+  ${topPay(g.top_pay, { multi: true })}
   <section class="panel"><div class="panel-head"><h2>공시 회사</h2><p>회사를 누르면 연도별 임원 명단을 볼 수 있습니다.</p></div>
     <div class="actions no-print" style="margin-bottom:10px"><a class="btn" href="#m${rank}">그룹 전체 명단 보기</a></div>
     ${table({ cols, rows: comps, key: "n", dir: -1, href: r => `c${r.id}`, title: `${g.name}_공시회사`, countLabel: `${comps.length}곳` })}</section>`;
@@ -1246,6 +1279,86 @@ function bindRoster(compIdx, years, title) {
 }
 
 /* ---------- 화면: 회사 ---------- */
+/* ---------- 직원·보수 연도별 추이 (회사·그룹 공통) ---------- */
+const PAY_LAST = () => YEARS().filter(y => !isPartial(y)).at(-1);
+function staffPay(tr, { src = null, multi = false, ref = null, title = "" } = {}) {
+  if (!tr || !tr.emp.some(v => v != null)) return `<section class="panel"><div class="panel-head"><h2>직원과 보수</h2></div><p class="empty">직원 현황 공시가 없습니다.</p></section>`;
+  const ys = YEARS(), toEok = a => a.map(v => v == null ? null : v / 100);
+  const empSeries = [{ name: multi ? "공시 회사 전체" : "직원 수", values: tr.emp, color: "var(--accent)" }];
+  if (multi && tr.emp_const.some(v => v != null) && tr.emp_const.join() !== tr.emp.join()) empSeries.push({ name: "9개 시점 모두 공시한 회사만", values: tr.emp_const, color: "var(--faint)", dash: true });
+  const paySeries = [{ name: "등기임원(이사·감사)", values: toEok(tr.reg_pay), color: "var(--accent)" },
+                     { name: "미등기임원", values: toEok(tr.unreg_pay), color: "#8e5bb5" },
+                     { name: "직원", values: toEok(tr.sal), color: "var(--faint)", dash: true }];
+  const i = ys.indexOf(PAY_LAST()), i0 = ys.findIndex((_, j) => tr.emp[j] != null), il = ys.length - 1;
+  const ratio = (a, b) => a != null && b ? `${(a / b).toFixed(1)}배` : null;
+  const lines = [];
+  if (tr.emp[il] != null && tr.emp[i0] != null && il !== i0) {
+    const d = tr.emp[il] - tr.emp[i0];
+    lines.push(`직원 수는 ${ylab(ys[i0])} ${fmt(tr.emp[i0])}명에서 ${ylab(ys[il])} ${fmt(tr.emp[il])}명으로 ${d >= 0 ? `${fmt(d)}명 늘었습니다` : `${fmt(-d)}명 줄었습니다`}${multi ? "(공시 회사가 바뀐 영향 포함)" : ""}.`);
+  }
+  const r1 = ratio(tr.reg_pay[i], tr.sal[i]), r2 = ratio(tr.unreg_pay[i], tr.sal[i]);
+  if (r1 || r2) lines.push(`${PAY_LAST()}년 1인 평균으로 ${[r1 && `등기임원 보수는 직원 급여의 ${r1}`, r2 && `미등기임원은 ${r2}`].filter(Boolean).join(", ")}입니다.`);
+  const rowYs = ys.slice().reverse().filter((_, j) => { const k = ys.length - 1 - j; return tr.emp[k] != null || tr.reg_pay[k] != null || tr.unreg_pay[k] != null; });
+  const withN = (v, n) => v == null ? "–" : `${eok(v)}${n ? ` <span class="na">${fmt(n)}명</span>` : ""}`;
+  const hdr = ["시점", ...(multi ? ["회사"] : []), "직원", "정규직", "기간제", "여성", "평균 근속", "직원 평균 급여", "등기임원 평균 보수", "미등기임원 평균 보수", ...(src ? ["원문"] : [])];
+  const body = rowYs.map(y => { const k = ys.indexOf(y);
+    return `<tr><td>${ylab(y)}</td>${multi ? `<td class="n">${fmt(tr.n_co[k])}</td>` : ""}<td class="n">${fmt(tr.emp[k])}</td><td class="n">${fmt(tr.reg[k])}</td><td class="n">${fmt(tr.con[k])}</td>
+      <td class="n">${pct(tr.fem[k])}</td><td class="n">${tr.ten[k] == null ? "–" : `${f1(tr.ten[k])}년`}</td><td class="n">${isPartial(y) ? `<span class="na">반기</span>` : eok(tr.sal[k])}</td>
+      <td class="n">${isPartial(y) ? `<span class="na">반기</span>` : withN(tr.reg_pay[k], tr.reg_n[k])}</td><td class="n">${isPartial(y) ? `<span class="na">반기</span>` : withN(tr.unreg_pay[k], tr.unreg_n[k])}</td>
+      ${src ? `<td>${src[y] ? `<a href="${esc(src[y])}" target="_blank" rel="noopener">보기</a>` : "–"}</td>` : ""}</tr>`; }).join("");
+  const tsv = [hdr.filter(h => h !== "원문"), ...rowYs.map(y => { const k = ys.indexOf(y);
+    return [ylab(y), ...(multi ? [tr.n_co[k] ?? ""] : []), tr.emp[k] ?? "", tr.reg[k] ?? "", tr.con[k] ?? "", tr.fem[k] ?? "", tr.ten[k] ?? "",
+      isPartial(y) ? "" : tr.sal[k] ?? "", isPartial(y) ? "" : tr.reg_pay[k] ?? "", isPartial(y) ? "" : tr.unreg_pay[k] ?? ""]; })];
+  const id = uid("sp");
+  after(() => document.querySelector(`[data-spcopy="${id}"]`)?.addEventListener("click", async () => {
+    const txt = tsv.map(r => r.join("\t")).join("\n") + `\n단위: 명, 년, 보수·급여는 1인 평균 백만 원\n출처: DART 정기보고서 직원 현황·이사 감사 보수·미등기임원 보수 현황, 대기업집단 경영진 지도`;
+    try { await navigator.clipboard.writeText(txt); toast("표를 복사했습니다."); } catch { toast("복사가 막혀 있습니다. 표를 드래그해 복사해 주세요."); }
+  }));
+  return `<section class="panel"><div class="panel-head"><h2>직원과 보수, 연도별</h2><p>${lines.map(esc).join(" ") || "공시된 직원 현황과 보수 현황을 연도별로 이었습니다."}</p></div>
+    <div class="grid2" style="margin:0">
+      <div><h3 style="margin:0 0 6px">직원 수 (연말, 2026년은 6월 말)</h3>${lineChart(empSeries, { label: "직원 수", zero: false })}${multi ? `<p class="note">공시 회사 전체 선은 회사가 새로 상장하거나 빠지면 함께 움직입니다. 점선은 2018년부터 9개 시점 모두 직원 현황을 낸 회사만 더한 값입니다.</p>` : ""}</div>
+      ${paySeries.slice().reverse().map(s => `<div><h3 style="margin:0 0 6px">${s.name === "직원" ? "직원 1인 평균 급여" : `${s.name} 1인 평균 보수`} (연간)</h3>${lineChart([{ ...s, dash: false, color: "var(--accent)" }], { label: s.name, unit: "억", fmtv: v => `${(+v).toFixed(2)}억`, to: PAY_LAST() })}</div>`).join("")}
+    </div>
+    <p class="note">보수·급여는 연간 값이라 2025년까지 잇습니다(반기 보수는 반년치라 뺐습니다). 직원 수 축은 0에서 시작하지 않습니다.</p>
+    <div class="tbl" style="max-height:none;margin-top:12px"><table><thead><tr>${hdr.map((h, j) => `<th class="${j ? "n" : ""}">${h}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>
+    <div class="actions no-print" style="margin-top:8px"><button class="btn" type="button" data-spcopy="${id}">표 복사</button></div>
+    <p class="note">직원 = 사업보고서 ‘직원 등 현황’ 합계(정규직 + 기간제). 직원 평균 급여 = 회사가 공시한 1인 평균 급여액(여러 줄이면 인원으로 가중). 1인 평균이 없거나 월 급여로 적혔거나 단위가 맞지 않으면 연간 급여 총액 ÷ 직원 수. 등기임원 평균 보수 = ‘이사·감사 전체의 보수 현황’ 기준(사외이사·감사 포함). ${multi ? "보수 총액 ÷ 인원" : "회사가 공시한 1인 평균 보수액(기중 평균 인원 기준)"}. 미등기임원 평균 보수 = ‘미등기임원 보수 현황’ 총액 ÷ 인원. 퇴직금이나 주식 보상이 들어간 해는 평균이 크게 뛸 수 있고, 합병·분할·설립 연도에는 일부 기간 급여만 잡혀 낮게 나올 수 있습니다. 직원이 적은 지주회사는 미등기 임원이 직원 현황에 섞여 직원 평균 급여가 높게 나오기도 합니다. 원문 단위를 잘못 적은 공시는 값 크기로 단위를 맞췄고, 단위를 판단할 수 없으면 비워 두었습니다. 대형사처럼 직원 현황을 성별로만 합계한 회사는 성별 값을 인원으로 가중해, 회사가 적은 전체 평균과 1% 안팎 차이가 날 수 있습니다.</p>
+  </section>`;
+}
+/* 개인별 보수 5억 원 이상 공시: rows = [이름, 직위, 보수(백만 원), 인물 번호, 회사 id?] by year */
+function topPay(byYear, { multi = false, title = "" } = {}) {
+  const years = Object.keys(byYear || {}).map(Number).sort((a, b) => b - a);
+  if (!years.length) return `<section class="panel"><div class="panel-head"><h2>개인별 보수 (5억 원 이상)</h2></div><p class="empty">5억 원 이상 개인별 보수 공시가 없습니다.</p></section>`;
+  const id = uid("tp");
+  const draw = y => `<div class="tbl" style="max-height:none"><table><thead><tr><th>순위</th><th>이름</th>${multi ? "<th>회사</th>" : ""}<th>직위(공시)</th><th class="n">보수</th></tr></thead><tbody>${
+    byYear[y].map((r, j) => { const c = multi ? byId[r[4]] : null;
+      return `<tr><td>${j + 1}</td><td class="name">${r[3] ? `<a href="#p${r[3]}">${esc(r[0])}</a>` : esc(r[0])}</td>${multi ? `<td>${c ? `<a href="#c${c.id}">${esc(c.name)}</a>` : "–"}</td>` : ""}<td>${esc(r[1])}</td><td class="n">${eok(r[2])}${r[5] ? `<div class="na" style="font-size:11.5px">${esc(r[5].replace(/상위5/g, "상위 5명").replace(/등기/g, "등기임원"))}</div>` : ""}</td></tr>`; }).join("")}</tbody></table></div>`;
+  after(() => { const sel = document.getElementById(id); sel?.addEventListener("change", () => { document.getElementById(id + "b").innerHTML = draw(+sel.value); }); });
+  return `<section class="panel"><div class="panel-head"><h2>개인별 보수 (5억 원 이상)</h2><p>사업보고서가 공개한 개인별 보수입니다. 등기임원 중 5억 원 이상과, 5억 원 이상 받은 임직원 중 회사 상위 5명(미등기 포함)을 합쳤습니다. 퇴직금이 포함된 경우가 있습니다. 두 표의 금액이 다르면 큰 값을 쓰고 작은 값을 아래에 적었습니다.</p></div>
+    <div class="controls" style="margin-bottom:10px"><select id="${id}" aria-label="연도">${years.map(y => `<option value="${y}">${y}년</option>`).join("")}</select></div>
+    <div id="${id}b">${draw(years[0])}</div>
+    <p class="note">이름을 누르면 그 사람의 연도별 경력이 열립니다. 이름이 링크가 아니면 같은 해 공시 명단에서 같은 사람을 찾지 못한 경우(퇴임자, 동명이인 등)입니다.</p></section>`;
+}
+function companyPay5(c) {
+  const by = {}; (c.pay5 || []).forEach(r => { (by[r[0]] ||= []).push([r[1], r[2], r[3], r[4], null, r[5]]); });
+  Object.values(by).forEach(a => a.sort((x, y) => y[2] - x[2]));
+  return by;
+}
+
+function personPay(pid) {
+  const rows = [];
+  CORE.companies.forEach(c => (c.pay5 || []).forEach(r => { if (r[4] === pid) rows.push({ y: r[0], c, title: r[2], pay: r[3], note: r[5] }); }));
+  if (!rows.length) return "";
+  rows.sort((a, b) => b.y - a.y);
+  const ys = YEARS().filter(y => !isPartial(y));
+  const vals = ys.map(y => { const v = rows.filter(r => r.y === y).reduce((s, r) => s + r.pay, 0); return v ? v / 100 : null; });
+  return `<section class="panel"><div class="panel-head"><h2>보수 (개인별 공시, 5억 원 이상)</h2><p>개인별 보수는 등기임원은 5억 원 이상일 때, 그 밖의 임직원은 5억 원 이상 중 회사 상위 5명에 들 때만 공시됩니다. 공시가 없는 해는 5억 원 미만이었거나 대상이 아니었다는 뜻입니다.</p></div>
+    ${rows.length > 1 ? lineChart([{ name: "보수", values: vals, color: "var(--accent)" }], { label: "연도별 보수", unit: "억", fmtv: v => `${(+v).toFixed(2)}억`, to: PAY_LAST() }) : ""}
+    <div class="tbl" style="max-height:none"><table><thead><tr><th>연도</th><th>회사</th><th>직위(공시)</th><th class="n">보수</th><th>원문</th></tr></thead><tbody>${rows.map(r =>
+      `<tr><td>${r.y}</td><td><a href="#c${r.c.id}">${esc(r.c.name)}</a></td><td>${esc(r.title)}</td><td class="n">${eok(r.pay)}${r.note ? `<div class="na" style="font-size:11.5px">${esc(r.note.replace(/상위5/g, "상위 5명").replace(/등기/g, "등기임원"))}</div>` : ""}</td><td>${r.c.src[r.y] ? `<a href="${esc(r.c.src[r.y])}" target="_blank" rel="noopener">보기</a>` : "–"}</td></tr>`).join("")}</tbody></table></div>
+    <p class="note">보수에는 급여·상여·퇴직소득·주식 보상 등 해당 연도에 지급된 금액이 모두 들어갑니다. 퇴임한 해는 퇴직금 때문에 크게 뛸 수 있습니다.</p></section>`;
+}
+
 function viewCompany(id) {
   const c = byId[id]; if (!c) return viewHome();
   const g = byName[c.group], ci = CORE.companies.indexOf(c);
@@ -1267,6 +1380,8 @@ function viewCompany(id) {
     <section class="panel"><div class="panel-head"><h3>경영진 수 (연말 기준, 2026년은 반기 말)</h3></div>${lineChart([{ name: "경영진", values: c.heads, color: "var(--accent)" }], { label: "경영진 수" })}</section>
     <section class="panel"><div class="panel-head"><h3>신규 선임 · 승진 · 이탈</h3></div>${flowChart(c.ev, c.heads, { hidden: c.hidden_by_year })}</section>
   </div>
+  ${staffPay(c.tr, { src: c.tr_src })}
+  ${topPay(companyPay5(c))}
   <section class="panel"><div class="panel-head"><h2>임원 명단</h2><p>연도와 인사 변동으로 거르면 ‘올해 새로 선임된 임원’ 같은 명단을 바로 확인할 수 있습니다. 이름을 누르면 경력이 표시됩니다.</p></div>
     ${rosterHtml([ci], years, c.name)}
     <p class="note"><a id="srcl" target="_blank" rel="noopener">선택한 연도의 원문 보기</a></p></section>`;
@@ -1398,7 +1513,8 @@ function viewPerson(id) {
           <dt>출생</dt><dd>${esc(p[2].replace("-", "년 "))}월</dd>
           <dt>학력</dt><dd>${p[8] ? esc(expandDeg(p[8])) : PEOPLE.degrees[edu[0]] ? `${esc(PEOPLE.degrees[edu[0]])}${PEOPLE.fields[edu[1]] ? ` · ${esc(PEOPLE.fields[edu[1]])}` : ""}${edu[2] ? " · 해외 학위" : ""}${edu[3] ? ` · ${esc(edu[3].split("|").join(", "))}` : ""} <span class="na">(경력 문구에서 추정)</span>` : "공시 없음"}</dd>
         </dl></section>
-    </div>`;
+    </div>
+    ${personPay(p[0])}`;
     app.querySelectorAll("[data-cite]").forEach(b => b.addEventListener("click", async () => {
       try { await navigator.clipboard.writeText(b.dataset.cite); toast("인용 문구를 복사했습니다."); } catch { toast(b.dataset.cite); }
     }));

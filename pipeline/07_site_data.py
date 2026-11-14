@@ -302,6 +302,90 @@ def main():
             out.append(pct(ev_counter[(key, y, "신규")], heads_by_year[prev]))
         return out
 
+    # ---------- 직원·보수 연도별 (10_pay_staff.py 결과, 미등기 보수는 03_parse.py 결과) ----------
+    def fnum(v):
+        return float(v) if v not in ("", None) else None
+    staff = {(r["corp_code"], r["year"]): r for r in read(BUILT / "staff.csv")} if (BUILT / "staff.csv").exists() else {}
+    bpay = {(r["corp_code"], r["year"]): r for r in read(BUILT / "board_pay.csv")} if (BUILT / "board_pay.csv").exists() else {}
+    upay = {}
+    for y in YEARS:
+        if y in PARTIAL:   # 반기 보수는 반년치라 연간과 잇지 않는다
+            continue
+        p_ = BUILT / f"unreg_pay_{y}.csv"
+        if p_.exists():
+            for r in read(p_):
+                if r.get("pay_count") and r.get("pay_total_mn") and int(r["pay_count"]) > 0:
+                    t, n = float(r["pay_total_mn"]), int(r["pay_count"])
+                    # 03_parse.py는 표에 '단위'가 없으면 백만 원으로 읽는다. 천 원 표가 그대로 들어온 경우(1인 평균 100억 원 이상,
+                    # 예: KG이니시스 2020 113,764)를 백만 원으로 되돌린다.
+                    if t / n >= 1e7:   # 백만 배 어긋남: 원문 자체가 깨진 경우(한국콜마 2020 총액 '####')라 추정하지 않고 뺀다
+                        continue
+                    if t / n >= 1e4:
+                        t /= 1e3
+                    upay[(r["corp_code"], y)] = (t, n)
+    ipay = collections.defaultdict(list)
+    if (BUILT / "indiv_pay.csv").exists():
+        for r in read(BUILT / "indiv_pay.csv"):
+            ipay[r["corp_code"]].append([int(r["year"]), r["name"], spaced(r["title"]), int(r["pay_mn"]),
+                                         int(r["person_id"][1:]) if r["person_id"] else 0, r["note"] if "표는" in r["note"] else ""])
+    staff_const = {cc for cc in {k[0] for k in staff} if all((cc, y) in staff for y in YEARS)}
+
+    def trend(ccs):
+        """회사 묶음의 연도별 직원 수·평균 급여·임원 평균 보수. 평균은 인원 가중(총액 ÷ 인원)."""
+        out = {k: [] for k in ("emp", "emp_const", "n_co", "reg", "con", "fem", "ten", "sal", "reg_pay", "reg_n", "unreg_pay", "unreg_n")}
+        for y in YEARS:
+            ss = [staff[(cc, y)] for cc in ccs if (cc, y) in staff]
+            emp = sum(int(s["employees"]) for s in ss)
+            out["emp"].append(emp or None)
+            out["n_co"].append(len(ss) or None)
+            const = [staff[(cc, y)] for cc in ccs if cc in staff_const]
+            out["emp_const"].append(sum(int(s["employees"]) for s in const) or None)
+            out["reg"].append(sum(int(s["regular"] or 0) for s in ss) or None)
+            out["con"].append(sum(int(s["contract"] or 0) for s in ss) or None)
+            fem_base = [s for s in ss if s["female"] or s["male"]]
+            fe, fb = sum(int(s["female"] or 0) for s in fem_base), sum(int(s["female"] or 0) + int(s["male"] or 0) for s in fem_base)
+            out["fem"].append(pct(fe, fb) if fb else None)
+            tw = [(float(s["avg_tenure"]), int(s["employees"])) for s in ss if s["avg_tenure"]]
+            out["ten"].append(round(sum(a * b for a, b in tw) / sum(b for _, b in tw), 1) if tw else None)
+            sw = [(float(s["avg_salary_mn"]), int(s["employees"])) for s in ss if s["avg_salary_mn"]]
+            out["sal"].append(round(sum(a * b for a, b in sw) / sum(b for _, b in sw), 1) if sw else None)
+            bp = [bpay[(cc, y)] for cc in ccs if (cc, y) in bpay]
+            bt, bn = sum(float(b["reg_total_mn"]) for b in bp), sum(int(b["reg_count"]) for b in bp)
+            if len(ccs) == 1 and bp and bp[0]["reg_avg_mn"]:
+                out["reg_pay"].append(float(bp[0]["reg_avg_mn"]))   # 회사 하나면 공시된 1인 평균(기중 평균 인원 기준)을 그대로
+            else:
+                out["reg_pay"].append(round(bt / bn) if bn else None)
+            out["reg_n"].append(bn or None)
+            up = [upay[(cc, y)] for cc in ccs if (cc, y) in upay]
+            ut, un = sum(a for a, _ in up), sum(b for _, b in up)
+            out["unreg_pay"].append(round(ut / un) if un else None)
+            out["unreg_n"].append(un or None)
+        return out
+
+    CHG_FROM = "2020"
+    PI = YEARS.index(PAY_YEAR)
+
+    def emp_change(ccs):
+        """직원 증감률: CHG_FROM 말과 LAST 시점 모두 직원 현황이 있는 회사만 더해 비교(상장·편입 효과 제외)."""
+        both = [cc for cc in ccs if (cc, CHG_FROM) in staff and (cc, LAST) in staff]
+        a = sum(int(staff[(cc, CHG_FROM)]["employees"]) for cc in both)
+        b = sum(int(staff[(cc, LAST)]["employees"]) for cc in both)
+        return pct(b - a, a) if a else None
+
+    def pay_x(tr):
+        sal, un, rg = tr["sal"][PI], tr["unreg_pay"][PI], tr["reg_pay"][PI]
+        return {"emp": tr["emp"][-1], "sal": sal, "reg_pay": rg,
+                "pay_ratio": round(un / sal, 1) if un and sal else None}
+
+    def top_pay(ccs, n=15):
+        rows = [[*r[:5], cc, r[5]] for cc in ccs for r in ipay.get(cc, [])]
+        out = {}
+        for y in YEARS:
+            ry = sorted((r for r in rows if str(r[0]) == y), key=lambda r: -r[3])
+            if ry:
+                out[y] = [[r[1], r[2], r[3], r[4], r[5], r[6]] for r in ry[:n]]   # 이름, 직위, 보수, 인물 번호, 회사, 표 간 차이 메모
+        return out
+
     # ---------- 회사 ----------
     companies = []
     for c in comps:
@@ -327,6 +411,9 @@ def main():
             "_fem_dir_n": sum(r["sex"] == "여" and r["reg_class"] in ("사내이사", "사외이사", "기타비상무이사") for r in rs),
             "_fem_dir": any(r["sex"] == "여" and r["reg_class"] in ("사내이사", "사외이사", "기타비상무이사") for r in rs),
             "const": cc in const_corps,
+            "tr": trend([cc]),
+            "tr_src": {y: staff[(cc, y)]["source_url"] for y in YEARS if (cc, y) in staff},
+            "pay5": sorted(ipay.get(cc, []), key=lambda r: (-r[0], -r[3])),   # [연도, 이름, 직위, 보수(백만 원), 인물 번호(0=명단 연결 안 됨), 표 간 차이 메모]
         })
 
     # ---------- 그룹 ----------
@@ -361,6 +448,9 @@ def main():
             "new_age": round(statistics.mean(new_age_g[name]), 1) if len(new_age_g[name]) >= 10 else None,
             "hire": ext_hire(new_by_group[name]),
             "companies": [c["id"] for c in companies if c["group"] == LABEL.get(name, name)],
+            "tr": trend([c["id"] for c in companies if c["group"] == LABEL.get(name, name)]),
+            "emp_chg": emp_change([c["id"] for c in companies if c["group"] == LABEL.get(name, name)]),
+            "top_pay": top_pay([c["id"] for c in companies if c["group"] == LABEL.get(name, name)]),
             "unlisted": [c["id"] for c in companies if c["group"] == LABEL.get(name, name) and c["market"].startswith("비상장")],
         })
 
@@ -390,11 +480,13 @@ def main():
             "out_acad": pct(out["origin"].get("학계", 0), on) if on >= 5 else None,
             "out_ratio": g["boardx"]["out_ratio"], "out_major": g["boardx"]["major_pct"], "fem_board": g["boardx"]["fem_pct"],
             "fem_dir": g["boardx"]["fem_dir"],
+            **pay_x(g["tr"]), "emp_chg": g.get("emp_chg"),
         }.get(m)
 
     METRICS = ["out_ratio", "fem_dir",
                "executives", "avg_age", "female", "b80", "rank_hidden", "new_rate", "exit_rate", "new_age", "pay",
-               "ext_hire", "grad", "overseas", "out_n", "out_female", "out_gov", "out_acad"]
+               "ext_hire", "grad", "overseas", "out_n", "out_female", "out_gov", "out_acad",
+               "emp", "emp_chg", "sal", "reg_pay", "pay_ratio"]
     pm = person_mix([r["person_id"] for r in pooled_exec])
     pooled_hire = ext_hire(set().union(*new_by_group.values()))
     ob = board_stats(pooled_board)
@@ -413,6 +505,7 @@ def main():
         "out_gov": pct(sum(ob["origin"].get(o, 0) for o in ("관료·공공", "법조")), ob["n"]),
         "out_acad": pct(ob["origin"].get("학계", 0), ob["n"]),
         "out_ratio": None, "fem_dir": None,   # 아래에서 전체 회사로 채운다
+        **pay_x(trend([c["id"] for c in companies])), "emp_chg": emp_change([c["id"] for c in companies]),
     }
     suff = [g["hire"] for g in data_groups if g["hire"].get("ext_pct") is not None]
     pooled["ext_hire"] = pct(sum(h["ext"] for h in suff), sum(h["known"] for h in suff)) if suff else None   # 근거 충분 그룹만 모은 값
@@ -445,7 +538,7 @@ def main():
         c.pop("_fem_dir_n", None)
     core = {
         "meta": {"years": YEARS, "as_of": PARTIAL.get(LAST, f"{LAST}-12-31"), "flow": [FLOW_START, FLOW_END], "flow_end": FLOW_END,
-                 "pay_year": PAY_YEAR, "partial": PARTIAL, "min_n": MIN_N, "built": datetime.date.today().isoformat(),
+                 "pay_year": PAY_YEAR, "chg_from": CHG_FROM, "partial": PARTIAL, "min_n": MIN_N, "built": datetime.date.today().isoformat(),
                  "owner": SITE_OWNER, "contact": SITE_CONTACT,
                  "n_people": len({r["person_id"] for r in py}), "n_rows": len(py), "n_companies": len(companies),
                  "n_groups_data": len(data_groups), "n_const": len(const_corps),
@@ -462,6 +555,7 @@ def main():
                   "k_prev": prev_kpi([r for d in prev_g.values() for r in d.values()]),
                   "ev": {e: [all_ev[("전체", y, e)] for y in YEARS] for e in ("신규", "승진", "이탈", "공시확대", "직급체계변경")},
                   "new_rate": new_rate_series(all_heads, all_ev, "전체"),
+                  "tr": trend([c["id"] for c in companies]),
                   "func": dict(collections.Counter(r["function"] for r in pooled_exec)),
                   "mix": pm, "out": ob, "hire": pooled_hire},
         "groups": group_list, "companies": companies,
