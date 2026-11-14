@@ -46,7 +46,7 @@ python3 -I pipeline/05_link.py --years 2018-2026 && python3 -I pipeline/06_group
 | `06_group_report.py` | 그룹 지표 표 | `group_summary.csv/.md` |
 | `08_classify.py` | 기능·학력·출신 분류(규칙: `pipeline/taxonomy_rules.json`) | `classify_rows.csv`, `classify_persons.csv`, `classify_report.md` |
 | `09_assets.py` | 2025 자산총계(별도 우선, 없으면 연결)로 이사회 법정 요건 대상(자산 2조 원 이상) 판정 | `data/built/assets_2025.csv` |
-| `10_pay_staff.py` | 직원 현황(empSttus, 2026은 반기), 이사·감사 전체 보수(hmvAuditAllSttus), 개인별 보수 5억 이상(hmvAuditIndvdlBySttus + 상위 5명 indvdlByPay)을 회사-연도별로 받아 정리. 개인별 보수는 같은 회사 그해·전년·다음 해 명단과 이름으로 연결. 약 1.2만 건 호출(0.5초 간격, 약 1시간 40분) | `data/raw/paystaff/`, `data/built/staff.csv`, `board_pay.csv`, `indiv_pay.csv`, `pay_staff_report.md` |
+| `10_pay_staff.py` | 직원 현황(empSttus, 2026은 반기), 이사·감사 전체 보수(hmvAuditAllSttus), 개인별 보수 5억 이상(hmvAuditIndvdlBySttus + 상위 5명 indvdlByPay)을 회사-연도별로 받아 정리. 직원 현황은 `data/raw/sections/` 원문의 회사 합계 행(API에 없음)을 관문 통과 시 우선. 개인별 보수는 같은 회사 그해·전년·다음 해 명단과 이름으로 연결. 약 1.2만 건 호출(0.5초 간격, 약 1시간 40분) | `data/raw/paystaff/`, `data/built/staff.csv`, `board_pay.csv`, `indiv_pay.csv`, `pay_staff_report.md` |
 | `07_site_data.py` | 사이트 데이터(벤치마크·순위·분류 집계)와 `docs/index.html` 생성 | `docs/data/core.json`, `docs/data/people.json` |
 
 화면을 고칠 때는 `site/index.html`(아티팩트용 본문 조각)을 고치고 `07_site_data.py`를 다시 돌리면 `docs/index.html`이 같이 만들어진다. 로컬 확인은 `.claude/launch.json`의 `exec-atlas-site`(docs 폴더, 8765 포트).
@@ -59,7 +59,7 @@ python3 -I pipeline/05_link.py --years 2018-2026 && python3 -I pipeline/06_group
 | 미등기 명단 인원 vs 같은 보고서의 보수 현황 인원 | 연도별 합계 차이 +0.5~+4.6% |
 | 연결로 계산한 취임 연도 vs 공시된 선임일 | 51개사 2,138명, 일치 92.0%, ±1년 98.1% |
 | 분류(분류 결과를 보지 않은 별도 AI 검수자의 표본 분류와 대조, `data/built/classify_validation.md`) | 기능 94.0%, 최종 학위 90.8%, 전공 90.8%, 해외 학위 94.2%, 출신 92.5% |
-| 직원·보수(별도 AI 검수자 셋이 OpenDART 실시간 값·원문 단위 표기와 대조, `data/built/validation/pay_staff_factcheck.md`) | 계산 71/71 일치, 개인별 보수 6/6, 미등기 3/3, 인물 연결 10/10. 발견한 단위·서식 오류 12종은 고쳤고, 성별 합계 회사의 평균은 공시와 1% 안팎 차이(공개) |
+| 직원·보수(별도 AI 검수자 셋이 OpenDART 실시간 값·원문 단위 표기와 대조, `data/built/validation/pay_staff_factcheck.md`) | 계산 71/71 일치, 개인별 보수 6/6, 미등기 3/3, 인물 연결 10/10. 발견한 단위·서식 오류 12종은 고쳤다. 2차로 원문 합계 행을 읽어 공시 전체 평균에 맞췄고(삼성전자 2025 158), 소계 이중 집계·근속 개월 누락을 고쳤다 |
 
 ## 사이트 (docs/)
 

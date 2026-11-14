@@ -133,7 +133,24 @@ def num(s):
     return -v if neg else v
 
 
+def tenure(v):
+    """평균 근속 → 년. '9년 4개월 23일' '11년 1월' '38개월' '약3년2개월' '13.7'.
+    예전에는 첫 숫자만 읽어 개월을 버리고, '38개월'(두산퓨얼셀 2023)을 38년으로 읽었다."""
+    if v is None:
+        return None
+    t = re.sub(r"\s|약", "", str(v)).replace(",", "")
+    if not re.search(r"[년월일]", t):
+        return num(t)
+    y = re.search(r"([\d.]+)년", t)
+    m = re.search(r"([\d.]+)개?월", t)
+    d = re.search(r"([\d.]+)일", t)
+    if not (y or m or d):
+        return None
+    return (float(y.group(1)) if y else 0) + (float(m.group(1)) / 12 if m else 0) + (float(d.group(1)) / 365 if d else 0)
+
+
 TOTAL_RE = re.compile(r"합\s*계|총\s*계|^\s*계\s*$|^\s*전\s*체\s*$")   # '성별합계', '합 계', '총계' 등
+SUB_RE = re.compile(r"소\s*계")
 
 
 def staff_row(rows):
@@ -145,6 +162,9 @@ def staff_row(rows):
     if not rows:
         return None
     tot = [r for r in rows if TOTAL_RE.search(r.get("fo_bbm") or "") or TOTAL_RE.search(r.get("sexdstn") or "")]
+    if not tot:
+        # '합계'가 없고 '소계'만 있으면 소계 행을 쓴다(예: OCI홀딩스 2018, 멀티캠퍼스 2022는 본문 행 + 소계 행이라 다 더하면 두 배)
+        tot = [r for r in rows if SUB_RE.search(r.get("fo_bbm") or "") or SUB_RE.search(r.get("sexdstn") or "")]
     use = tot if tot else rows
     # 성별이 '합계'인 행이 있으면 그것만 (남·여 행과 겹침)
     sx_tot = [r for r in use if TOTAL_RE.search(r.get("sexdstn") or "")]
@@ -166,7 +186,7 @@ def staff_row(rows):
             male += n
         elif sx.startswith("여"):
             female += n
-        t = num(r.get("avrg_cnwk_sdytrn"))
+        t = tenure(r.get("avrg_cnwk_sdytrn"))
         if t is not None and n:
             tenure_w += t * n
             ten_n += n
@@ -224,6 +244,163 @@ def staff_row(rows):
             "rcept_no": rows[0].get("rcept_no", "")}
 
 
+SEC = RAW / "sections"
+SEC_UNIT = {"1": 1, "2": 1e3, "3": 1e6}   # 표 머리 '(단위 : 원·천원·백만원)'의 AUNITVALUE
+
+
+def _cell(tr, code, parse=None):
+    m = re.search(rf'ACODE="{code}"[^>]*>(.*?)</TE>', tr, re.S)
+    return (parse or num)(re.sub(r"<[^>]+>", "", m.group(1))) if m else None
+
+
+def section_total(rcept_no):
+    """원문 'VIII-1. 임원 및 직원 등의 현황' 섹션의 직원 현황 표에서 회사가 적은 합계 행(EMP_*T)을 읽는다.
+
+    OpenDART empSttus에는 이 합계 행이 없다. 그래서 성별로만 합계한 회사는 성별 값을 인원으로 가중할 수밖에 없고,
+    회사가 기중 평균 인원으로 계산한 전체 평균과 1% 안팎 달랐다(삼성전자 2025 157.1, 원문 합계 행 158).
+    결과: {employees, regular, contract, tenure, salary_total(원), salary_avg(원), body_sums, male, female} | None
+    """
+    p = SEC / f"{rcept_no}.xml"
+    if not rcept_no or not p.exists():
+        return None
+    t = p.read_text(encoding="utf-8")
+    g = re.search(r'<TABLE-GROUP ACLASS="EMPLOYEE".*?</TABLE-GROUP>', t, re.S)
+    if not g:
+        return None
+    g = g.group(0)
+    u = re.search(r'AUNIT="WON" AUNITVALUE="(\d)"', g)
+    unit = SEC_UNIT.get(u.group(1)) if u else None
+    body, tot_rows, d = [], [], None
+    for tr in re.findall(r"<TR[^>]*>(.*?)</TR>", g, re.S):
+        if "EMP_CNT" in tr:
+            aict, vict = _cell(tr, "EMP_AICT"), _cell(tr, "EMP_VICT")
+            d = {"employees": _cell(tr, "EMP_CNT"), "regular": _cell(tr, "EMP_REOT"), "contract": _cell(tr, "EMP_COCT"),
+                 "tenure": _cell(tr, "EMP_AVYT", tenure),
+                 "salary_total": aict * unit if aict and unit else None,
+                 "salary_avg": vict * unit if vict and unit else None}
+        elif 'ACODE="EMP_CN"' in tr:
+            opr = re.search(r'ACODE="EMP_OPR"[^>]*>(.*?)</T[EU]>', tr, re.S)
+            opr = re.sub(r"<[^>]+>", "", opr.group(1)) if opr else ""
+            sx = re.search(r'AUNIT="EMP_SEX" AUNITVALUE="(\d)"', tr)
+            row = (_cell(tr, "EMP_CN") or 0, (_cell(tr, "EMP_REO") or 0) + (_cell(tr, "EMP_COC") or 0),
+                   sx.group(1) if sx else "", _cell(tr, "EMP_AVY", tenure), _cell(tr, "EMP_VIC"), _cell(tr, "EMP_AIC"))
+            (tot_rows if TOTAL_RE.search(opr) or SUB_RE.search(opr) else body).append(row)
+    if not d or not d["employees"]:
+        return None
+    # 합계 행을 쓰려면 (1) 합계 행 인원 = 정규 + 기간제이고 (2) 원문 행을 묶은 셋 중 하나의 합과 맞아야 한다.
+    #   본문 행(사업부문 × 성별) 합 / 소계·성별합계 행 합 / 전체 행 합의 절반(본문 + 성별합계가 함께 있는데 '〃'로 적어 갈라지지 않는 경우, 예: 태광산업 2024)
+    #   행 인원은 '합계' 칸과 '정규 + 기간제' 둘 다로 센다(남해화학 2019 '공통 남' 합계 칸 7, 정규 70 + 기간제 3).
+    # KTcs 2026처럼 합계 행 칸이 밀린 표(인원 362, 정규 8,260)는 (1)에서 걸러진다.
+    E = d["employees"]
+    d["consistent"] = False
+    rc = (d["regular"] or 0) + (d["contract"] or 0)
+    # 합계 칸이 정규 + 기간제와 다른 표(빗썸 2026: 598 vs 589, 단시간을 한 번 더 센 것으로 보임)는 어느 쪽이 맞는지
+    # 원문만으로 가를 수 없어 합계 행을 쓰지 않고 API 값(회사가 적은 합계 칸)을 둔다.
+    if abs(rc - E) <= 1:
+        for i in (0, 1):
+            for rows, half in ((body, 1), (tot_rows, 1), (body + tot_rows, 2)):
+                if rows and abs(sum(r[i] for r in rows) / half - E) <= 1:
+                    d["male"] = sum(r[i] for r in rows if r[2] == "1") / half
+                    d["female"] = sum(r[i] for r in rows if r[2] == "2") / half
+                    d["consistent"] = True
+                    d["rows"], d["half"] = rows, half
+                    break
+            if d["consistent"]:
+                break
+    rows = d.get("rows") or body or tot_rows
+    half = d.get("half", 1)
+    # 원문 본문 행으로 계산한 인원 가중 근속·급여와 행 값의 범위. API 행이 깨진 회사(SK이터닉스 2026 같은 행 5번,
+    # 태광산업 2024 '〃' 행)는 이 값을 비교 기준으로 쓴다.
+    wt = [(r[0], r[3]) for r in rows if r[0] and r[3]]
+    d["w_ten"] = sum(n * x for n, x in wt) / sum(n for n, _ in wt) if wt else None
+    d["ten_rng"] = (min(x for _, x in wt), max(x for _, x in wt)) if len(wt) > 1 else None
+    ws = [(r[0], r[4]) for r in rows if r[0] and r[4]]
+    d["w_sal"] = sum(n * x for n, x in ws) / sum(n for n, _ in ws) * unit if ws and unit else None
+    d["sal_rng"] = (min(x for _, x in ws) * unit, max(x for _, x in ws) * unit) if len(ws) > 1 and unit else None
+    aic = sum(r[5] for r in rows if r[5]) / half
+    d["aic_ok"] = not aic or not d["salary_total"] or abs(d["salary_total"] / (aic * unit) - 1) <= 0.01
+    d["simple_ten"] = _mean([r[3] for r in rows])
+    d["simple_sal"] = _mean([r[4] for r in rows])
+    d["sum_sal"] = sum(r[4] for r in rows if r[4]) or None
+    d["unit"] = unit
+    e = t.find("</TABLE-GROUP>", t.find('ACLASS="EMPLOYEE"'))
+    d["note"] = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", t[e:e + 1500]))
+    return d
+
+
+def _mean(xs):
+    xs = [x for x in xs if x]
+    return sum(xs) / len(xs) if len(xs) > 1 else None
+
+
+# 합계 행 1인 평균을 행별 값의 가중평균이 아닌 방식(기중 평균 인원, 월별 평균의 합 등)으로 계산했다고 밝힌 주석
+METHOD_RE = re.compile(r"평균\s*(재직|근무|인원|급여\s*지급\s*인원)|월\s*평균\s*인원|월별\s*평균|연평균\s*인원|평균인원")
+
+
+def apply_section(s, d, period, log):
+    """API로 만든 회사-연도 값(s)을 원문 합계 행(d)으로 바꾼다. 원문 합계 행에도 오기가 있어 아래 조건을 통과한 값만 쓴다.
+
+    - 직원 수·정규·기간제·남·여: 합계 행 인원이 원문 본문 행 합과 맞을 때.
+      API가 행을 빠뜨리거나(태광산업 2024 '성별합계 여' 행 없음) 겹쳐 받은(SK이터닉스 2024 같은 행 5번) 경우가 고쳐진다.
+    - 평균 근속·1인 평균 급여: 아래 본문 주석의 조건을 통과할 때. 합계 행의 단위 오기(×1,000), 월 급여 기재(×1/12),
+      두 번 더한 값(×2), 단순평균·단순합, 정수 반올림을 거른다.
+    """
+    within = lambda a, b: a and b and 0.67 <= a / b <= 1.5
+    if d["consistent"] and d["employees"] != s["employees"]:
+        log.append(("직원 수", s["employees"], int(d["employees"])))
+        s["employees"] = int(d["employees"])
+        if d["regular"] is not None:
+            s["regular"] = int(d["regular"])
+        s["contract"] = int(d["contract"] or 0)
+        s["male"], s["female"] = int(d["male"]) or "", int(d["female"]) or ""
+    # 평균 근속: 합계 행 값이 행별 가중평균의 허용폭 안일 때만(정수로 반올림해 적은 값, 단순평균은 거른다:
+    # HD현대마린엔진 2025 합계 행 10 vs 가중 9.3, 원익머트리얼즈 2026 합계 행 6 = 단순평균, 가중 7.1)
+    # 기준은 원문 본문 행 가중값(합계 행 인원이 본문과 맞을 때), 아니면 API 가중값. 합계 행이 본문 행 값의 범위 밖이면 쓰지 않는다
+    # (AK홀딩스 2025 합계 행 3.0, 본문 범위 밖). 반올림 전 값끼리 비교한다.
+    t = d["tenure"]
+    base = d["w_ten"] if d["consistent"] and d["w_ten"] else s["avg_tenure"]
+    # 허용폭: 원문 본문 행 기준이면 행 반올림(±0.05) + 합계 행 반올림(±0.05). AK홀딩스 2025 남 22명 2.8·여 4명 3.1이면
+    # 가중평균은 최대 2.90이라 합계 행 3.0은 나올 수 없다. API 기준(이미 0.1로 반올림)이면 0.2.
+    tol = 0.11 if d["consistent"] and d["w_ten"] else 0.2 + 1e-9
+    rng = d["ten_rng"]
+    if t and 0 < t <= 45 and base and abs(t - base) <= tol and (not rng or rng[0] - 0.05 <= t <= rng[1] + 0.05):
+        s["avg_tenure"] = round(t, 1)
+    elif d["consistent"] and d["w_ten"]:
+        s["avg_tenure"] = round(d["w_ten"], 1)
+    if period != "FY":
+        return
+    # 1인 평균 급여: 합계 행 값이 연 500만~10억 원이고
+    #   (a) 행별 가중평균(기존 값) 또는 '총액 ÷ 인원'의 ±3% 안이거나 (삼성전자 2025 합계 행 158, 가중 157.1, 총액 ÷ 인원 153.6)
+    #   (b) 주석에 계산 방식(기중 평균 인원, 월별 평균의 합 등)을 밝혔고 두 값의 0.67~1.5배 안일 때
+    # 이때도 행별 값의 단순평균·단순합과 같으면 쓰지 않는다(유진기업 2020 64 = 남 70·여 58의 단순평균, 동양건설산업 2020 72,036 = 남·여 합).
+    v = d["salary_avg"]
+    cur = s["avg_salary_mn"] * 1e6 if s["avg_salary_mn"] else None
+    # 합계 행 급여 총액이 본문 행 총액 합과 1% 넘게 다르면 총액 ÷ 인원을 기준으로 쓰지 않는다(롯데에너지머티리얼즈 2020 22,197 vs 본문 30,105)
+    per_head = d["salary_total"] / d["employees"] if d["salary_total"] and d["aic_ok"] else None
+    if d["consistent"] and d["w_sal"] and not cur:
+        cur = d["w_sal"]
+    near = lambda a, b, r: a and b and abs(a / b - 1) <= r
+    u = d["unit"] or 1
+    naive = any(x and v and abs(x * u - v) <= 0.5 * u for x in (d["simple_sal"], d["sum_sal"]))
+    ref = cur or per_head
+    accept = bool(v and 5e6 <= v <= 1e9 and ref) and (
+        near(v, cur, 0.03) or near(v, per_head, 0.03)
+        or (bool(METHOD_RE.search(d["note"])) and within(v, ref)))
+    if accept and naive and not (near(v, cur, 0.03) or near(v, per_head, 0.03)):
+        accept = False
+    rng = d["sal_rng"]
+    if accept and rng and not (rng[0] - 0.5 * u <= v <= rng[1] + 0.5 * u):   # 평균이 행 값 범위 밖이면 오기
+        accept = False
+    if accept:
+        new = round(v / 1e6, 1)
+        if new != s["avg_salary_mn"]:
+            s["avg_salary_mn"] = new
+            if within(per_head, v):
+                s["salary_total_mn"] = round(d["salary_total"] / 1e6)
+    elif v and cur and abs(v - cur) > 0.03 * cur:
+        log.append(("급여 합계 행 안 씀", s["avg_salary_mn"], round(v / 1e6, 2)))
+
+
 def unit_scale(per_person):
     """OpenDART는 공시의 단위 표기대로 원으로 바꿔 준다. 단위 표기를 잘못 적은 공시만 값 크기로 바로잡는다.
     1인당 값이 1천 미만이면 백만 원, 100만 미만이면 천 원을 원으로 적은 것이고, 100억 원 초과면 원을 천 원으로 적은 것이다."""
@@ -274,6 +451,7 @@ def main():
     reports = {(j[0], j[1]): j[4] for j in js}
     staff, board, indiv = [], [], []
     miss = collections.Counter()
+    sec_log = []
     for (cc, y), rep in sorted(reports.items(), key=lambda x: (x[0][1], x[0][0])):
         base = {"group": rep["group"], "company": rep["company"], "corp_code": cc, "year": y,
                 "period": "H1" if y == H1_YEAR else "FY",
@@ -283,6 +461,19 @@ def main():
             miss["empSttus 미수집"] += 1
         s = staff_row(emp or [])
         if s:
+            d = section_total(rep["rcept_no"])
+            if d:
+                log = []
+                before = s["avg_salary_mn"]
+                apply_section(s, d, base["period"], log)
+                miss["원문 합계 행 읽음"] += 1
+                if s["avg_salary_mn"] != before:
+                    miss["1인 평균 급여를 원문 합계 행 값으로"] += 1
+                for kind, a, b in log:
+                    miss[f"원문 합계 행: {kind}"] += 1
+                    sec_log.append((rep["company"], y, kind, a, b))
+            else:
+                miss["원문 합계 행 없음"] += 1
             if base["period"] == "H1":
                 s["avg_salary_mn"] = s["salary_total_mn"] = ""  # 반년치라 연간과 비교하지 않는다
             src = f"https://dart.fss.or.kr/dsaf001/main.do?rcpNo={s.pop('rcept_no')}" if s.get("rcept_no") else base["source_url"]
@@ -367,6 +558,11 @@ def main():
     md.append("\n누락·보정: " + (", ".join(f"{k} {v}" for k, v in miss.items()) or "없음"))
     no_sal = sum(1 for r in staff if r["period"] == "FY" and not r["avg_salary_mn"])
     md.append(f"\n연간 직원 현황 중 1인 평균 급여를 못 읽은 회사-연도: {no_sal}")
+    md.append("\n## 원문 합계 행과 다른 회사-연도\n")
+    md.append("직원 수는 원문 합계 행으로 바꾼 것, 급여는 합계 행이 걸러져 API 값을 그대로 둔 것(5% 넘게 다른 것만)이다.\n")
+    md.append("| 회사 | 연도 | 항목 | API 값 | 원문 합계 행 |")
+    md.append("|---|---|---|---|---|")
+    md += [f"| {c} | {y} | {k} | {a} | {b} |" for c, y, k, a, b in sec_log]
     (BUILT / "pay_staff_report.md").write_text("\n".join(md) + "\n", encoding="utf-8")
     print("\n".join(md))
 
