@@ -33,7 +33,7 @@ for y in 2018 2019 2020 2021 2022 2023 2024 2025 2026; do python3 -I pipeline/03
 ```
 
 ```bash
-python3 -I pipeline/05_link.py --years 2018-2026 && python3 -I pipeline/06_group_report.py --year 2026 --flow-end 2025 --pay-year 2025 && python3 -I pipeline/08_classify.py && python3 -I pipeline/09_assets.py --year 2025 && python3 -I pipeline/10_pay_staff.py --fetch && python3 -I pipeline/07_site_data.py
+python3 -I pipeline/05_link.py --years 2018-2026 && python3 -I pipeline/06_group_report.py --year 2026 --flow-end 2025 --pay-year 2025 && python3 -I pipeline/08_classify.py && python3 -I pipeline/09_assets.py --year 2025 && python3 -I pipeline/10_pay_staff.py --fetch && python3 -I pipeline/11_audit.py --fetch && python3 -I pipeline/07_site_data.py
 ```
 
 | 단계 | 하는 일 | 결과 |
@@ -47,6 +47,7 @@ python3 -I pipeline/05_link.py --years 2018-2026 && python3 -I pipeline/06_group
 | `08_classify.py` | 기능·학력·출신 분류(규칙: `pipeline/taxonomy_rules.json`) | `classify_rows.csv`, `classify_persons.csv`, `classify_report.md` |
 | `09_assets.py` | 2025 자산총계(별도 우선, 없으면 연결)로 이사회 법정 요건 대상(자산 2조 원 이상) 판정 | `data/built/assets_2025.csv` |
 | `10_pay_staff.py` | 직원 현황(empSttus, 2026은 반기), 이사·감사 전체 보수(hmvAuditAllSttus), 개인별 보수 5억 이상(hmvAuditIndvdlBySttus + 상위 5명 indvdlByPay)을 회사-연도별로 받아 정리. 직원 현황은 `data/raw/sections/` 원문의 회사 합계 행(API에 없음)을 관문 통과 시 우선. 개인별 보수는 같은 회사 그해·전년·다음 해 명단과 이름으로 연결. 약 1.2만 건 호출(0.5초 간격, 약 1시간 40분) | `data/raw/paystaff/`, `data/built/staff.csv`, `board_pay.csv`, `indiv_pay.csv`, `pay_staff_report.md` |
+| `11_audit.py` | 회계감사인 명칭·감사의견(accnutAdtorNmNdAdtOpinion)과 감사용역 체결현황(adtServcCnclsSttus)을 회사-연도별로 받아 당기 행(기수 기준)만 정리. 그해 표가 비면 다음 해 보고서의 전기 행을 쓴다. 4대 회계법인은 삼일·삼정·안진·한영으로 묶는다. 감사보수는 단위가 없어 시간당 보수 3만~150만 원이 되는 단위만 쓴다. 다음 해 보고서 전기 행과 교차 점검(99.7% 일치). 약 6,800건 호출(약 45분) | `data/raw/audit/`, `data/built/audit.csv`, `audit_report.md` |
 | `07_site_data.py` | 사이트 데이터(벤치마크·순위·분류 집계)와 `docs/index.html` 생성 | `docs/data/core.json`, `docs/data/people.json` |
 
 화면을 고칠 때는 `site/index.html`(아티팩트용 본문 조각)을 고치고 `07_site_data.py`를 다시 돌리면 `docs/index.html`이 같이 만들어진다. 로컬 확인은 `.claude/launch.json`의 `exec-atlas-site`(docs 폴더, 8765 포트).

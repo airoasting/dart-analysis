@@ -57,6 +57,25 @@ NO_DISCLOSURE = {"쿠팡": "국내 소속회사가 사업보고서를 내지 않
                  "한국지엠": "한국지엠㈜이 감사보고서만 내고 사업보고서를 내지 않아 임원 명단 공시가 없습니다"}
 
 
+def audit_summary(companies):
+    """연도별 감사인 분포(4대 회계법인 비중)와 전년 대비 감사인을 바꾼 회사 수."""
+    big4 = ("삼일", "삼정", "안진", "한영")
+    out = {"n": [], "big4": [], "chg": [], "chg_n": [], "firms": {}}
+    for i, y in enumerate(YEARS):
+        rows = [c["aud"][y] for c in companies if y in c["aud"]]
+        out["n"].append(len(rows))
+        out["big4"].append(sum(r[0] in big4 for r in rows))
+        out["firms"][y] = collections.Counter(r[0] for r in rows).most_common()
+        if i == 0:
+            out["chg"].append(None)
+            out["chg_n"].append(None)
+            continue
+        both = [c for c in companies if y in c["aud"] and YEARS[i - 1] in c["aud"]]
+        out["chg"].append(sum(c["aud"][y][0] != c["aud"][YEARS[i - 1]][0] for c in both))
+        out["chg_n"].append(len(both))
+    return out
+
+
 def read(path):
     return list(csv.DictReader(open(path, encoding="utf-8-sig")))
 
@@ -323,6 +342,13 @@ def main():
                     if t / n >= 1e4:
                         t /= 1e3
                     upay[(r["corp_code"], y)] = (t, n)
+    # ---------- 회계감사인 연도별 (11_audit.py 결과) ----------
+    aud = {}
+    if (BUILT / "audit.csv").exists():
+        for r in read(BUILT / "audit.csv"):
+            aud[(r["corp_code"], r["year"])] = [r["auditor_std"], r["auditor"], r["opinion_std"],
+                                                float(r["fee_mn"]) if r["fee_mn"] else None, int(r["hours"]) if r["hours"] else None,
+                                                r["src_note"], r["emphasis"], r["source_url"]]
     ipay = collections.defaultdict(list)
     if (BUILT / "indiv_pay.csv").exists():
         for r in read(BUILT / "indiv_pay.csv"):
@@ -413,6 +439,7 @@ def main():
             "const": cc in const_corps,
             "tr": trend([cc]),
             "tr_src": {y: staff[(cc, y)]["source_url"] for y in YEARS if (cc, y) in staff},
+            "aud": {y: aud[(cc, y)] for y in YEARS if (cc, y) in aud},   # [묶음 이름, 원문 이름, 감사의견, 감사보수(백만 원), 실제 감사시간, 출처 메모, 강조사항, 원문]
             "pay5": sorted(ipay.get(cc, []), key=lambda r: (-r[0], -r[3])),   # [연도, 이름, 직위, 보수(백만 원), 인물 번호(0=명단 연결 안 됨), 표 간 차이 메모]
         })
 
@@ -560,6 +587,7 @@ def main():
                   "mix": pm, "out": ob, "hire": pooled_hire},
         "groups": group_list, "companies": companies,
     }
+    core["total"]["aud"] = audit_summary(companies)
     # ---------- 인물 ----------
     cidx = {c["id"]: i for i, c in enumerate(companies)}
     gidx = {g["ftc_name"]: i for i, g in enumerate(group_list)}

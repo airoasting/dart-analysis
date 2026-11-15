@@ -352,6 +352,7 @@ details.nums summary { cursor: pointer; color: var(--accent); font-size: 12.5px;
 /* 보고서 한 장 */
 .report { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 26px; display: grid; gap: 18px; }
 .report table td, .report table th { font-size: 13.5px; }
+#foot .disclaimer { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 11.5px; line-height: 1.6; color: var(--muted); }
 .report .foot { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 3px; }
 
 .method { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; font-size: 13.5px; color: var(--ink-2); }
@@ -513,6 +514,7 @@ const DEF = {
   out_acad: "<b>학계 출신 사외이사</b> = 주 출신이 교수·총장인 사외이사 비율.",
   emp: "<b>직원</b> = 공시 회사 사업보고서(2026년은 반기보고서) ‘직원 등 현황’의 합계(정규직 + 기간제, 회사가 적은 합계 칸 기준). 등기임원은 들어가지 않고, 일부 회사는 미등기 임원을 포함해 공시합니다.",
   emp_chg: "<b>직원 증감</b> = 2020년 말과 2026년 6월 말 모두 직원 현황을 낸 회사만 더해 비교한 증감률. 새로 상장하거나 빠진 회사의 효과는 뺐습니다.",
+  aud: "<b>회계감사인</b> = 사업보고서 ‘회계감사인의 명칭 및 감사의견’ 표의 당기(그 사업연도) 행에 적힌 회계법인. 같은 법인을 공시마다 다르게 적어(예: ‘삼일회계법인’, ‘삼일PwC’) 4대 회계법인은 삼일·삼정·안진·한영으로 묶고, 그 밖은 ‘회계법인’ 등을 뗀 이름으로 묶습니다. 그해 표가 비어 있으면 다음 해 보고서의 전기 행을 씁니다.",
   sal: "<b>직원 평균 급여</b> = 2025년 회사가 직원 현황 표 합계 행에 적은 1인 평균 급여액(그룹은 회사별 값을 직원 수로 가중). 합계 행 값이 부문별 1인 평균의 인원 가중값이나 급여 총액 ÷ 직원 수와 3% 넘게 다르고 주석에 계산 방식도 없으면, 부문별 1인 평균의 인원 가중값을 씁니다. 그것도 없으면 급여 총액 ÷ 직원 수를 씁니다.",
   reg_pay: "<b>등기임원 평균 보수</b> = 2025년 ‘이사·감사 전체의 보수 현황’의 보수 총액 ÷ 인원(그룹·전체). 회사 화면은 회사가 공시한 1인 평균 보수액(기중 평균 인원 기준)을 그대로 씁니다. 사외이사·감사위원이 함께 들어가 사내이사만의 평균보다 낮게 나옵니다.",
   pay_ratio: "<b>미등기 보수 ÷ 직원 급여</b> = 2025년 미등기 임원 1인 평균 보수를 직원 1인 평균 급여로 나눈 배수.",
@@ -851,10 +853,11 @@ function kpiCard(m, g, { label, sub } = {}) {
       : `<span class="cmp">${pv}${sub || ""}</span>${sub ? "" : `<span class="kpi-when">${timeLabel(mm.time)}</span>`}`}</div>`;
 }
 function footer() {
-  $("#foot").innerHTML = `<div>자료: DART 사업보고서·반기보고서 'VIII-1. 임원 및 직원 등의 현황'(2018–2026.6), 공정거래위원회 2026년 공시대상기업집단 지정 결과.</div>
+  $("#foot").innerHTML = `<div>자료: DART 사업보고서·반기보고서 'VIII-1. 임원 및 직원 등의 현황'(2018–2026.6)과 OpenDART 정기보고서 주요정보(직원 현황, 임원 보수, 회계감사인), 공정거래위원회 2026년 공시대상기업집단 지정 결과.</div>
     <div>이 사이트는 공시 원문에 기재된 개인 정보 항목(이름, 출생연월, 성별, 직위, 경력)만 사용했습니다.</div><div>최종 갱신일 ${M().built}.</div>
     ${M().owner ? `<div>만든 곳: ${esc(M().owner)}</div>` : ""}
-    ${M().contact ? `<div>공시와 다르거나 다른 사람과 합쳐진 기록을 보시면 ${esc(M().contact)}로 알려 주세요.</div>` : ""}`;
+    ${M().contact ? `<div>공시와 다르거나 다른 사람과 합쳐진 기록을 보시면 ${esc(M().contact)}로 알려 주세요.</div>` : ""}
+    <div class="disclaimer"><b>면책 고지</b> 이 사이트의 수치와 분류는 공시 원문을 프로그램으로 읽어 정리한 것이라 오류나 누락이 있을 수 있습니다. 공시마다 작성 방식과 단위가 달라 회사 간·연도 간 비교에는 한계가 있으며, 기능·출신·학력 분류와 동일인 판정은 이 사이트의 규칙에 따른 추정입니다. 내용이 원문과 다르면 원문이 우선하니, 중요한 판단에는 각 표의 ‘원문’ 링크로 공시를 직접 확인해 주세요. 이 사이트는 정보 제공 목적이며 투자 권유나 특정 개인·회사에 대한 평가가 아닙니다.</div>`;
 }
 
 /* 받침에 따라 조사를 고른다 */
@@ -1021,6 +1024,7 @@ function viewHome() {
     <section class="panel"><div class="panel-head"><h3>사외이사 출신 (전체 ${fmt(T.out.n)}명)</h3></div>${originStack(T.out.origin, T.out.n)}
 </section>
     ${homeStaff(T, mineG)}
+    ${homeAudit()}
   </div>
   ${methodHtml()}`;
   const tabsEl = app.querySelector('[role="tablist"]');
@@ -1354,6 +1358,45 @@ function personPay(pid) {
     <p class="note">보수에는 급여·상여·퇴직소득·주식 보상 등 해당 연도에 지급된 금액이 모두 들어갑니다. 퇴임한 해는 퇴직금 때문에 크게 뛸 수 있습니다.</p></section>`;
 }
 
+/* 회계감사인 (11_audit.py → c.aud[연도] = [묶음 이름, 원문 이름, 감사의견, 감사보수(백만 원), 실제 감사시간, 출처 메모, 강조사항, 원문]) */
+const BIG4 = ["삼일", "삼정", "안진", "한영"];
+const fyLab = y => isPartial(y) ? `${y}년 상반기` : `${y}년`;
+function auditRuns(c) {
+  const runs = [];
+  YEARS().filter(y => c.aud?.[y]).forEach(y => { const k = c.aud[y][0], r = runs.at(-1);
+    if (r && r.k === k && +r.to === +y - 1) r.to = y; else runs.push({ k, from: y, to: y }); });
+  return runs;
+}
+function auditPanel(c) {
+  const ys = YEARS().filter(y => c.aud?.[y]);
+  if (!ys.length) return "";
+  const runs = auditRuns(c), nChg = runs.length - 1;
+  const span = r => r.from === r.to ? fyLab(r.from) : `${r.from}–${isPartial(r.to) ? `${r.to} 상반기` : r.to}년`;
+  const rows = ys.slice().reverse().map(y => { const a = c.aud[y], h1 = isPartial(y);
+    return `<tr><td>${fyLab(y)}</td><td>${esc(a[1])}${a[5] ? `<div class="na" style="font-size:11.5px">그해 보고서 표가 비어 ${esc(a[5])}에서 확인</div>` : ""}</td>
+      <td>${h1 ? `<span class="na">반기 검토(의견 없음)</span>` : esc(a[2] || "–")}${a[6] ? `<div class="na" style="font-size:11.5px">강조사항: ${esc(a[6].slice(0, 120))}${a[6].length > 120 ? "…" : ""}</div>` : ""}</td>
+      <td class="n">${h1 ? "–" : eok(a[3])}</td><td class="n">${!h1 && a[4] ? `${fmt(a[4])}시간` : "–"}</td>
+      <td><a href="${esc(a[7])}" target="_blank" rel="noopener">보기</a></td></tr>`; }).join("");
+  return `<section class="panel"><div class="panel-head"><h2>회계감사인 ${defBtn("aud")}</h2>
+    <p>${runs.map(r => `<b>${esc(r.k)}</b> ${span(r)}`).join(" → ")}. ${nChg ? `이 기간 감사인이 ${nChg}번 바뀌었습니다.` : "이 기간 감사인이 바뀌지 않았습니다."}</p></div>
+    <div class="tbl" style="max-height:none"><table><thead><tr><th>사업연도</th><th>감사인(공시 이름)</th><th>감사의견</th><th class="n">감사보수</th><th class="n">실제 감사시간</th><th>원문</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="note">사업보고서 ‘회계감사인의 명칭 및 감사의견’과 ‘감사용역 체결현황’의 당기 행입니다. 2026년 상반기는 반기 검토라 감사의견과 보수를 넣지 않았습니다. 감사보수는 공시 표마다 단위(원·천 원·백만 원)가 달라, 실제 감사시간으로 나눈 시간당 보수가 3만~150만 원이 되는 단위로 읽었고 판정이 안 되면 비웠습니다. 보수에는 감사 계약에 묶인 검토·내부회계 감사가 포함될 수 있습니다.</p></section>`;
+}
+function homeAudit() {
+  const A = CORE.total.aud; if (!A || !A.n.some(v => v)) return "";
+  const ys = YEARS(), fy = ys.filter(y => !isPartial(y) && A.n[ys.indexOf(y)]).at(-1), i = ys.indexOf(fy);
+  const firms = A.firms[fy] || [], n = A.n[i], top = firms.slice(0, 8), rest = firms.slice(8).reduce((s, f) => s + f[1], 0);
+  const items = [...top.map(f => ({ k: f[0], v: 100 * f[1] / n, c: f[1] })), ...(rest ? [{ k: "그 밖의 회계법인", v: 100 * rest / n, c: rest }] : [])];
+  const max = Math.max(...items.map(x => x.v));
+  const bars = `<div class="hbars">${items.map(x => `<div class="hb"><span>${esc(x.k)}</span><span class="track"><i style="width:${100 * x.v / max}%"></i></span><span class="v"><b>${x.v.toFixed(1)}%</b> · ${fmt(x.c)}곳</span></div>`).join("")}</div>`;
+  const share = A.n.map((v, j) => v ? 100 * A.big4[j] / v : null);
+  const chgRate = A.chg.map((v, j) => v != null && A.chg_n[j] ? 100 * v / A.chg_n[j] : null);
+  return `<section class="panel"><div class="panel-head"><h3>회계감사인 (${fy}년 사업보고서, ${fmt(n)}곳) ${defBtn("aud")}</h3></div>${bars}
+      <p class="note">4대 회계법인(삼일·삼정·안진·한영)이 ${share[i].toFixed(1)}%를 감사합니다. 공동 감사는 두 법인을 함께 적은 이름으로 셉니다.</p></section>
+    <section class="panel"><div class="panel-head"><h3>감사인을 바꾼 회사 비율</h3></div>
+      ${lineChart([{ name: "전년과 감사인이 다른 회사", values: chgRate, color: "var(--accent)" }, { name: "4대 회계법인 감사 비율", values: share, color: "var(--faint)", dash: true, width: 1.5 }], { label: "감사인 교체", unit: "%", fmtv: v => `${(+v).toFixed(1)}%`, zero: true, from: +ys[1] })}
+      <p class="note">해마다 전년과 올해 감사인이 모두 확인된 회사 중 감사인이 바뀐 회사의 비율입니다(${ys.slice(1).map((y, j) => A.chg[j + 1] != null ? `${fyLab(y)} ${fmt(A.chg[j + 1])}곳` : "").filter(Boolean).join(", ")}). 2026년 상반기는 반기보고서에 적힌 올해 감사인을 2025년과 비교했습니다. 상장사는 2020 사업연도부터 주기적 감사인 지정제(6년 자유 선임 뒤 3년 지정)가 적용되어 교체 시점이 몰릴 수 있습니다. 이 데이터만으로 교체 원인을 가리지는 않습니다.</p></section>`;
+}
 function viewCompany(id) {
   const c = byId[id]; if (!c) return viewHome();
   const g = byName[c.group], ci = CORE.companies.indexOf(c);
@@ -1377,6 +1420,7 @@ function viewCompany(id) {
   </div>
   ${staffPay(c.tr, { src: c.tr_src })}
   ${topPay(companyPay5(c))}
+  ${auditPanel(c)}
   <section class="panel"><div class="panel-head"><h2>임원 명단</h2><p>연도와 인사 변동으로 거르면 ‘올해 새로 선임된 임원’ 같은 명단을 바로 확인할 수 있습니다. 이름을 누르면 경력이 표시됩니다.</p></div>
     ${rosterHtml([ci], years, c.name)}
     <p class="note"><a id="srcl" target="_blank" rel="noopener">선택한 연도의 원문 보기</a></p></section>`;
