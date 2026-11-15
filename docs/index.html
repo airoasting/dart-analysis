@@ -287,6 +287,7 @@ tr.mine .cellbar .trk i, tr.ref.mine .cellbar .trk i { background: var(--accent)
 tr.sep td { border-bottom-color: var(--others); }
 thead tr:last-child th { border-bottom: 1.5px solid var(--rule); }
 .na { color: var(--muted); font-size: 12px; }
+.nb { white-space: nowrap; font-weight: 400; }
 .pill { display: inline-block; font-size: 11.5px; padding: 1px 7px; border-radius: 10px; background: var(--line-2); color: var(--ink-2); white-space: nowrap; }
 .pill.reg { background: var(--accent-soft); color: var(--accent); }
 .pill.org { background: transparent; border: 1px solid var(--line); }
@@ -1260,8 +1261,11 @@ function bindRoster(compIdx, years, title) {
     if (ff) rows = rows.filter(x => M().funcs[x.r[6]] === ff);
     if (q) rows = rows.filter(x => (x.p[1] + " " + x.r[3] + " " + x.r[5]).toLowerCase().includes(q));
     const multi = compIdx.length > 1;
+    // 같은 명단에 동명이인이 있으면 이름 옆에 출생 연월을 붙여 구분한다(예: 삼성전자 김태훈 3명)
+    const nameN = rows.reduce((m, x) => m.set(x.p[1], (m.get(x.p[1]) || new Set()).add(x.p[0])), new Map());
+    const dup = x => nameN.get(x.p[1]).size > 1;
     const cols = [
-      { k: "name", t: "이름", cls: "name", v: x => x.p[1], f: x => `<a href="#p${x.p[0]}">${esc(x.p[1])}</a>`, xv: x => x.p[1] },
+      { k: "name", t: "이름", cls: "name", v: x => x.p[1], f: x => `<a href="#p${x.p[0]}">${esc(x.p[1])}</a>${dup(x) ? ` <span class="na nb">${esc(x.p[2].replace("-", "."))}생</span>` : ""}`, xv: x => dup(x) ? `${x.p[1]} (${x.p[2].replace("-", ".")}생)` : x.p[1] },
       ...(multi ? [{ k: "co", t: "회사", cls: "nw", v: x => compAt(x.ci).name, f: x => `<a href="#c${compAt(x.ci).id}">${esc(compAt(x.ci).name)}</a>`, xv: x => compAt(x.ci).name }] : []),
       { k: "reg", t: "구분", v: x => x.r[2], f: x => `<span class="pill ${x.r[2] === 0 ? "" : "reg"}">${esc(PEOPLE.reg[x.r[2]])}</span>`, xv: x => PEOPLE.reg[x.r[2]] },
       { k: "pos", t: "직위", cls: "nw", v: x => PEOPLE.ranks.length - x.r[4], f: x => esc(x.r[3]), xv: x => x.r[3] },
@@ -1669,7 +1673,7 @@ function runSearch() {
   CORE.groups.filter(g => g.name.toLowerCase().includes(low)).slice(0, 4).forEach(g => items.push({ tag: "그룹", t: g.name, sub: g.has_data ? `${g.rank}위 · 공시 회사 ${g.companies.length}곳` : `${g.rank}위 · 임원 공시 없음`, h: `g${g.rank}` }));
   CORE.companies.filter(c => c.name.toLowerCase().includes(low)).slice(0, 6).forEach(c => items.push({ tag: "회사", t: c.name, sub: c.group, h: `c${c.id}` }));
   if (PEOPLE && s.length >= 2) PEOPLE.people.filter(p => p[1].toLowerCase().includes(low)).slice(0, 30).forEach(p => {
-    const r = p[5].at(-1), c = compAt(r[1]); items.push({ tag: "인물", t: p[1], sub: `${p[2].slice(0, 4)}년생 · ${yshort(r[0])} ${c ? c.name : ""} ${r[3]}`, h: `p${p[0]}` });
+    const r = p[5].at(-1), c = compAt(r[1]); items.push({ tag: "인물", t: p[1], sub: `${p[2].replace("-", ".")}생 · ${yshort(r[0])} ${c ? c.name : ""} ${r[3]}`, h: `p${p[0]}` });
   });
   const wait = !PEOPLE && s.length >= 2 ? `<div class="loading" style="padding:8px 12px">인물 명단을 불러오고 있습니다. 잠시 후 결과가 이어서 표시됩니다.</div>` : "";
   results.innerHTML = items.length || wait ? items.map((it, i) => `<button role="option" type="button" data-i="${i}" class="${i === sel ? "on" : ""}" aria-selected="${i === sel}"><span class="tag">${it.tag}</span><span>${esc(it.t)}</span><span class="sub">${esc(it.sub)}</span></button>`).join("") + wait
